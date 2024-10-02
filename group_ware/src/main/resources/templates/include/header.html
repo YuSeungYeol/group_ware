@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="headerLayout">
+    <link th:href="@{/css/include/header.css}" rel="stylesheet" type="text/css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <header>
+        <div id="header_wrap">
+            <div class="menu_tap">    
+                <a th:href="@{/}"><img th:src="@{/image/차자바.png}"alt="Logo" id="logo"></a>
+            </div>
+            <div id="menu_right">
+                <button id="check_in">출근</button>
+                <button id="check_out">퇴근</button>
+                <button id="away">자리 비움</button>
+            </div>
+        </div>
+    </header>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var checkInButton = document.getElementById('check_in');
+            var checkOutButton = document.getElementById('check_out');
+            var awayButton = document.getElementById('away');
+
+            checkInButton.addEventListener('click', function() {
+                if (checkInButton.innerText === '출근') {
+                    checkInButton.innerText = '업무중';
+                    checkInButton.classList.add('active');
+                    checkInButton.disabled = true;
+                    checkOutButton.disabled = false;
+                    awayButton.disabled = false;
+                    awayButton.classList.remove('inactive');
+                    awayButton.classList.remove('checked-in');
+                    awayButton.classList.add('inactive');
+                    awayButton.innerText = '자리 비움';
+                }
+            });
+
+            checkOutButton.addEventListener('click', function() {
+                if (checkInButton.innerText === '업무중') {
+                    checkInButton.innerText = '출근';
+                    checkInButton.classList.remove('active');
+                    checkInButton.disabled = false;
+                    checkOutButton.disabled = true;
+                    awayButton.disabled = true;
+                    awayButton.classList.add('inactive');
+                    awayButton.classList.remove('checked-in');
+                    awayButton.innerText = '자리 비움';
+                }
+            });
+
+            awayButton.addEventListener('click', function() {
+                if (awayButton.innerText === '자리 비움') {
+                    awayButton.innerText = '착석';
+                    awayButton.classList.remove('inactive');
+                    awayButton.classList.add('checked-in');
+                } else {
+                    awayButton.innerText = '자리 비움';
+                    awayButton.classList.remove('checked-in');
+                    awayButton.classList.add('inactive');
+                }
+            });
+
+            checkOutButton.disabled = true;
+            awayButton.disabled = true;
+            awayButton.classList.add('inactive');
+        });
+    </script>
+</th:block>
+</html>

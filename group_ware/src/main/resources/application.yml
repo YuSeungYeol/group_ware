@@ -1,0 +1,24 @@
+# Conversion to YAML from Properties format report
+# Warnings:
+# - The yaml file had comments which are lost in the refactoring!
+spring: 
+  application:
+    name: group_ware
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://127.0.0.1:3306/group_ware
+    username: scott
+    password: tiger
+  security:
+    user:
+      name: user
+      password: 1234
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+server:
+  port: 8095
+  servlet:
+    session:
+      timeout: 8h  # 세션 타임아웃 설정 (8시간)

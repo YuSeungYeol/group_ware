@@ -1,0 +1,127 @@
+/* 오른쪽 하단 고정 버튼 그룹 */
+.button-group {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.icon-button {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    background-color: rgba(239, 239, 239, 1); /* #EFEFEF */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.icon-button img {
+    width: 24px;
+    height: 24px;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.action-buttons .btn {
+    width: 80px;
+    padding: 1px;
+    border-radius: 20px;
+    border: none;
+    color: rgba(255, 255, 255, 1); /* White */
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn.green {
+    background-color: rgba(76, 175, 80, 1); /* #4CAF50 */
+}
+
+.btn.red {
+    background-color: rgba(244, 67, 54, 1); /* #F44336 */
+}
+
+.btn.gray {
+    background-color: rgba(158, 158, 158, 1); /* #9E9E9E */
+    color: rgba(255, 255, 255, 1); /* White */
+}
+
+.btn.blue {
+    background-color: rgba(0, 188, 212, 1); /* 하늘색 */
+    color: rgba(255, 255, 255, 1); /* White */
+}
+
+.btn.purple {
+    background-color: rgba(128, 0, 128, 1); /* 보라색 */
+    color: rgba(255, 255, 255, 1); /* White */
+}
+
+.btn.green:hover {
+    background-color: rgba(69, 160, 73, 1); /* #45A049 */
+}
+
+.btn.red:hover {
+    background-color: rgba(229, 57, 53, 1); /* #E53935 */
+}
+
+.btn.gray:hover {
+    background-color: rgba(117, 117, 117, 1); /* #757575 */
+}
+
+.btn.blue:hover {
+    background-color: rgba(0, 172, 193, 1); /* #00ACC1 */
+}
+
+.btn.purple:hover {
+    background-color: rgba(106, 0, 106, 1); /* 짙은 보라색 */
+}
+
+.btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 드롭다운 메뉴 */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    bottom: 100%; /* 드롭다운 메뉴를 위로 배치 */
+    background-color: rgba(249, 249, 249, 1); /* #f9f9f9 */
+    min-width: 100px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.dropdown-content a {
+    color: rgba(0, 0, 0, 1); /* Black */
+    padding: 1px;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+}
+
+.dropdown-content a:hover {
+    background-color: rgba(241, 241, 241, 1); /* #f1f1f1 */
+}
+
+.show {
+    display: block;
+}

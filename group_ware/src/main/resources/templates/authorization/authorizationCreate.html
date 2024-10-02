@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{include/layout}">
+    <th:block layout:fragment="content">
+        <link th:href="@{/css/authorization/authorizationCreate.css}" rel="stylesheet" type="text/css">
+        <script src="https://cdn.ckeditor.com/ckeditor5/35.4.0/classic/ckeditor.js"></script>
+        <section>
+            <div id="section_wrap">
+                <form id="authorizationAddFrm" method="post" enctype="multipart/form-data">
+                    <div id="section" class="form-section">
+                        <!-- 상태 필드 숨기기 -->
+                        <input type="hidden" id="documentStatus" name="documentStatus" value="미승인">
+                        
+                        <!-- memberNo 값을 히든 필드로 추가 -->
+                        <input type="hidden" name="memberNo" value="MEMBER_NO_VALUE">
+
+                        <table>
+                            <tr>
+                                <th>결재자</th>
+                            </tr>
+                            <tr>
+                                <td><input type="text" name="approver1"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" name="approver2"></td>
+                            </tr>
+                            <tr>
+                                <th>참조자</th>
+                            </tr>
+                            <tr>
+                                <td><input type="text" name="approver3"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div id="section_wrap">
+                        <textarea id="document-editor" name="content"></textarea>
+                        <br>
+                        <input type="submit" value="결재요청">
+                        <input type="submit" value="임시저장">
+                        <input type="button" value="취소">
+                    </div>
+                    <div>
+                        <input type="file" name="content">
+                    </div>
+                </form>
+            </div>
+        </section>
+        <script src="https://cdn.ckeditor.com/ckeditor5/35.4.0/classic/ckeditor.js"></script>
+        <script>
+            ClassicEditor
+                .create(document.querySelector('#document-editor'), {
+                    toolbar: {
+                        items: [
+                            'heading', '|',
+                            'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|',
+                            'insertTable', 'imageUpload', '|',
+                            'undo', 'redo'
+                        ]
+                    },
+                    height: 500,  // 에디터 높이 설정
+                    width: '100%',  // 에디터 너비 설정
+                    ckfinder: {
+                        uploadUrl: '/authorization/document/upload'  // 파일 업로드를 위한 URL 설정
+                    },
+                    image: {
+                        toolbar: [
+                            'imageTextAlternative', 'imageStyle:full', 'imageStyle:side'
+                        ]
+                    },
+                    table: {
+                        contentToolbar: [
+                            'tableColumn', 'tableRow', 'mergeTableCells'
+                        ]
+                    },
+                })
+                .then(editor => {
+                    window.editor = editor;
+
+                    // Set initial content
+                    editor.setData(`
+                        <table style="width: 100%; border: 1px solid #000; border-collapse: collapse;">
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 5px; width: 20%; height: 40px;">소속</td>
+                                <td style="border: 1px solid #000; padding: 5px; width: 30%;"></td>
+                                <td style="border: 1px solid #000; padding: 5px; width: 20%; height: 40px;">성명</td>
+                                <td style="border: 1px solid #000; padding: 5px; width: 30%;"></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 5px; width: 20%; height: 40px;">사원번호</td>
+                                <td style="border: 1px solid #000; padding: 5px; width: 30%;"></td>
+                            </tr>
+                        </table>
+                        <br>
+                        <table style="width: 100%; border: 1px solid #000; border-collapse: collapse;">
+                            <tr>
+                                <td colspan="4" style="border: 1px solid #000; padding: 5px; text-align: center;">연차 보고서</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 5px; width: 20%;">제목</td>
+                                <td colspan="3" style="border: 1px solid #000; padding: 5px;"></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 5px;">휴가 구분</td>
+                                <td colspan="3" style="border: 1px solid #000; padding: 5px;"></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 5px;">시작 일정</td>
+                                <td style="border: 1px solid #000; padding: 5px;"></td>
+                                <td style="border: 1px solid #000; padding: 5px;">종료 일정</td>
+                                <td style="border: 1px solid #000; padding: 5px;"></td>
+                            </tr>
+                        </table>
+                        <br>
+                        <p>* '휴가 사유' 작성란은 생략되었습니다.</p>
+                        <p>* 중간/최종 보고서 등을 작성할 경우 반드시 기안일에 적어주세요.</p>
+                        <p>1. 연차의 사용은 근로기준법에 따라 연도별 발병한 연차에 한하여 사용함을 원칙으로 합니다. 단, 최초 입사 시에는 근로 기준법에 따라 발생 예정된 연차를 차용하여 최대 1회 사용할 수 있다.</p>
+                        <p>2. 결재자는 연차 사용을 최종 승인할 수 있는 가중 결재 중의 서면 또는 등록, 첨부함 제출.</p>
+                        <p>3. 중간(메타/기말)에는 사전에 통지서를, 사후에 참석함을 반드시 제출.</p>
+                    `);
+                })
+                .catch(error => {
+                    console.error('There was a problem initializing the editor:', error);
+                });
+                
+            // 폼 제출 이벤트 처리
+            const form = document.getElementById("authorizationAddFrm");
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                let vali_check = false;
+                let vali_text = "";
+
+                // CKEditor 내용 가져오기
+                const content = editor.getData();
+
+                if (content == "") {
+                    vali_text += "내용을 입력하세요.";
+                    editor.focus();
+                } else {
+                    vali_check = true;
+                }
+
+                if (!vali_check) {
+                    alert(vali_text);
+                } else {
+                    const payload = new FormData(form);
+                    payload.set('content', content);  // CKEditor 내용 추가
+                    
+                    // memberNo 값 추가
+                    const memNo = document.querySelector('input[name="memberNo"]').value;
+                    payload.set('memberNo', memNo);
+
+		            fetch('/authorization', {
+		                method: 'POST',
+		                body: payload
+		            })
+		            .then(response => response.json())
+		            .then(data => {
+		                if (data.res_code == '200') {
+		                    Swal.fire({
+		                        icon: 'success',
+		                        title: '성공',
+		                        text: data.res_msg,
+		                        confirmButtonText: "닫기"
+		                    }).then((result) => {
+		                        location.href = "/authorization/authorizationList";
+		                    });
+		                } else {
+		                    Swal.fire({
+		                        icon: 'error',
+		                        title: '실패',
+		                        text: data.res_msg,
+		                        confirmButtonText: "닫기"
+		                    });
+		                }
+		            });
+		        }
+		    });
+        </script>
+    </th:block>
+</html>

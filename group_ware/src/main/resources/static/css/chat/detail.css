@@ -1,0 +1,120 @@
+/* 전체 채팅 컨테이너 */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    height: 600px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    gap: 20px; /* 목록 사이 간격 */
+    padding: 20px;
+    margin-top: 50px;
+    margin-left: 260px; /* 사이드바 너비만큼 왼쪽에 공간 확보 */
+    width: calc(100% - 800px); /* 전체 너비에서 사이드바의 너비를 제외 */
+    box-sizing: border-box; /* 패딩과 경계를 포함한 박스 크기 계산 */
+}
+
+/* 상단 네비게이션 바 */
+.chat-header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #fafafa;
+    border-bottom: 1px solid #e0e0e0;
+    justify-content: space-between;
+}
+
+.chat-header .chat-name {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.exit-button{
+	width: 20px;
+	height: 20px;
+	background-color: transparent;
+	border: none;
+	background-image: url('/image/naga.png');
+	background-size:cover;
+	background-position: center;
+	cursor: pointer;
+	
+}
+
+.chat-header .chat-icons {
+    display: flex;
+    gap: 10px;
+}
+
+/* 채팅 메시지 영역 */
+.chat-messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    background-color: #fff;
+}
+
+/* 사용자의 메시지 스타일 */
+.message {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+}
+
+.message.user {
+    justify-content: flex-end;
+}
+
+.message .bubble {
+    max-width: 60%;
+    padding: 8px 12px;
+    border-radius: 16px;
+    margin: 2px 5px;
+}
+
+.message.user .bubble {
+    background-color: #ececec;
+    color: #333;
+}
+
+.message.other .bubble {
+    background-color: #d8d8ff;
+    color: #333;
+}
+
+/* 하단 입력 영역 */
+.chat-input {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-top: 1px solid #e0e0e0;
+    background-color: #fafafa;
+}
+
+.chat-input .input-box {
+    flex: 1;
+    padding: 10px;
+    margin: 0 10px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    background-color: #f5f5f5;
+    outline: none;
+    font-size: 14px;
+}
+
+.chat-input .send-button {
+    padding: 8px 12px;
+    border: none;
+    background-color: #d8d8ff;
+    color: #333;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.chat-input .send-button:hover {
+    background-color: #b5b5ff;
+}

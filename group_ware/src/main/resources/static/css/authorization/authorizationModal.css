@@ -1,0 +1,230 @@
+/* 모달 창 배경 스타일 */
+.modal-background-custom {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none; /* 기본적으로는 보이지 않도록 설정 */
+}
+
+/* 모달 창 기본 스타일 */
+.modal-custom {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 20px;
+    z-index: 1000;
+    width: 70%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: auto;
+    max-height: 80vh; /* 스크롤 가능한 모달 창 */
+}
+
+/* 닫기 버튼 스타일 */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    color: #333;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* 제목 스타일 */
+h3 {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* 문서 정보 및 결재자/참조자 정보 컨테이너 */
+.info-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+/* 문서 정보 테이블 스타일 */
+.header-table, .user-info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+}
+
+.header-table td, .user-info-table td, .header-table th, .user-info-table th {
+    border: 1px solid #ccc;
+    padding: 1px;
+    text-align: left;
+    font-size: 14px;
+}
+
+.header-table .label, .user-info-table .label {
+    font-weight: bold;
+    background-color: #f7f7f7;
+}
+
+/* 결재자/참조자 정보 스타일 */
+.approval-referer-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.list-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.approver-list-container, .referer-list-container {
+    width: 45%;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    padding: 8px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    margin-bottom: 5px;
+}
+
+/* 필드 그룹 스타일 */
+.field-group {
+    margin-bottom: 20px;
+}
+
+.field-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.field-group input[type="text"],
+.field-group input[type="date"],
+.field-group input[type="time"],
+.field-group input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+/* CKEditor 스타일 */
+#document-editor {
+    width: 100%;
+    height: 200px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+/* 파일 업로드 */
+input[type="file"] {
+    display: block;
+    margin-top: 10px;
+}
+
+/* 모달 스크롤바 */
+.modal-custom {
+    overflow-y: auto;
+    max-height: 80vh; 
+    padding: 20px;
+}
+
+/* 결재자 및 참조자 리스트 컨테이너 */
+.approval-referer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+.approver-list-container, .referer-list-container {
+    flex: 1;
+    text-align: center;
+    border: 1px solid black;
+    padding: 2px; /* 패딩 최소화 */
+    margin: 1px; /* 박스 간의 간격 최소화 */
+    width: 80px;
+    height: auto; /* 높이 자동 조정 */
+}
+
+.list-title {
+    font-weight: bold;
+    background-color: #f0f0f0;
+    padding: 3px; 
+    border-bottom: 1px solid black;
+    font-size: 12px;
+}
+
+/* 결재자와 참조자 이름의 높이를 동일하게 설정 */
+ul {
+    list-style: none;
+    padding: 3px;
+    margin: 0;
+    min-height: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+ul li {
+    padding: 2px;
+    text-align: center;
+    border-bottom: none;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 사인 이미지는 위에 배치되고, 이름은 아래 */
+ul li img {
+    max-width: 20px;
+    height: auto;
+    margin-bottom: 5px;
+}
+
+ul li span {
+    display: block;
+    margin-top: 5px;
+    font-size: 10px !important;
+    white-space: nowrap; 
+}
+
+.approver-list-container ul, .referer-list-container ul {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 60px;
+}
+
+.approver-list-container, .referer-list-container {
+    width: calc(25% - 5px);
+}
+
+.vertical-text {
+    writing-mode: vertical-rl;
+    text-align: center;
+    font-weight: bold;
+    background-color: #f0f0f0;
+    padding: 5px;
+    border-right: 1px solid black;
+    font-size: 5px;
+}

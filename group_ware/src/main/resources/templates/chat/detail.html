@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+
+      layout:decorate="~{include/layout}">
+    <th:block layout:fragment="content">
+        <link th:href="@{/css/chat/detail.css}" rel="stylesheet" type="text/css">
+        <section class="chat-container">
+            <div class="chat-header">
+                <div class="chat-name">
+                    <span th:text="${dto.not_me_name}">사용자 이름</span>님과의 채팅
+                                     
+                </div>
+                <div class="chat-icons">
+                <button id="exit_btn" class="exit-button"></button>   
+                    <i class="icon-settings"></i>
+                </div>
+            </div>
+
+            <!-- Hidden Inputs for Chat Data -->
+            <input type="hidden" th:value="${dto.room_no}" id="room_no">
+            <input type="hidden" th:value="${dto.from_id}" id="from_id">
+            <input type="hidden" th:value="${dto.not_me_id}" id="receiver_id">
+            <input type="hidden" id="sender_id" th:value="${#authentication.principal.username}">
+
+            <div class="chat-messages" id="chat_container">
+                <th:block th:if="${!#lists.isEmpty(resultList)}">
+                    <div th:each="msg : ${resultList}" 
+                         th:class="${#strings.equals(msg.me_flag, 'Y') ? 'message user' : 'message other'}">
+                        <div class="bubble" th:text="${msg.chat_content}">메시지 내용</div>
+                    </div>
+                </th:block>
+            </div>
+            <form id="chat_form">
+	            <div class="chat-input">
+	                <button class="send-button">+</button>
+	                <input type="text" class="input-box" id="txt_msg" placeholder="메시지를 입력하세요.">
+	                <button class="send-button" id="send_btn">↩</button>
+	            </div>
+	        </form>
+        </section>
+
+        <script>
+        // 메시지 객체 생성 함수
+function setMsgObj(chatType, chatMsg) {
+    const sender = document.getElementById("sender_id").value;
+    const receiver = document.getElementById("receiver_id").value;
+    const roomNo = document.getElementById("room_no").value;
+    const fromId = document.getElementById("from_id").value;
+    const isFromSender = (sender === fromId) ? 'Y' : 'N';
+
+    const obj = {
+        chat_type: chatType,
+        chat_content: chatMsg, // 메시지 내용이 올바른지 확인
+        sender_id: sender,
+        receiver_id: receiver,
+        room_no: roomNo,
+        is_from_sender: isFromSender
+    };
+
+    console.log('Created message object:', obj); // 메시지 객체 생성 후 확인
+    return obj;
+}
+
+     // WebSocket 설정 및 상태 관리
+        let websocket;
+
+        function setupWebSocket() {
+            // 기존에 열려있는 WebSocket이 있다면 닫고 재설정
+            if (websocket) {
+                websocket.close();
+            }
+
+            const roomNo = document.getElementById("room_no").value; // 현재 채팅방 번호
+            websocket = new WebSocket(`ws://localhost:8095/chatting/${roomNo}`); // 채팅방 번호 포함
+
+            // WebSocket 연결이 열렸을 때 처리
+            websocket.onopen = () => {
+                console.log("WebSocket connection opened.");
+                const obj = setMsgObj('open', '');
+                sendWebSocketMessage(obj);
+            };
+
+            // WebSocket 메시지 수신 처리
+            websocket.onmessage = (response) => {
+                console.log("WebSocket message received:", response.data);
+                try {
+                    const resp = JSON.parse(response.data);
+                    console.log("Parsed message:", resp);
+
+                    // flag 값을 확인하여 메시지 정렬
+                    const isFromSender = resp.is_from_sender === 'Y'; // 서버에서 올바르게 설정되었는지 확인
+                    printMsg(resp.chat_content, isFromSender ? 'Y' : 'N');
+                } catch (error) {
+                    console.error("Error parsing message:", error, response.data);
+                }
+            };
+
+            // WebSocket 연결이 닫혔을 때 처리
+            websocket.onclose = () => {
+                console.warn("WebSocket connection closed. Attempting to reconnect...");
+                setTimeout(setupWebSocket, 3000); // 3초 후 재연결 시도
+            };
+
+            // WebSocket 오류 처리
+            websocket.onerror = (error) => {
+                console.error("WebSocket error:", error);
+            };
+        }
+		
+        // 나가기 버튼
+        document.getElementById("exit_btn").addEventListener("click",() =>{
+        	if(websocket && websocket.readyState === WebSocket.OPEN){
+	        	websocket.close();
+	        	navigateToChatRoomList(); //종료 후 페이지 이동       		
+        	}else{
+        		naviagetToChatRoomList(); // 이미 닫혀 있으면 페이지 이동
+        	}
+        });
+        
+        // 페이지 이동
+        function navigateToChatRoomList(){
+        	// websocket 종료 후 chat/room/list 이동
+        	window.location.href = "/chat/room/list";
+        }
+        
+     // 메시지 전송 함수
+        function sendWebSocketMessage(message) {
+            console.log("Attempting to send message:", message); // 메시지 객체를 확인하는 로그 추가
+            if (websocket.readyState === WebSocket.OPEN) {
+                websocket.send(JSON.stringify(message));
+            } else {
+                console.warn("Cannot send message: WebSocket is not open.");
+            }
+        }
+
+        function printMsg(msg, flag) {
+            console.log("Adding message to DOM:", msg, "Flag:", flag);
+
+            // 메시지 출력 전에 기존 메시지를 확인하고 중복 추가를 막기 위한 로직 추가
+            const container = document.getElementById("chat_container");
+            requestAnimationFrame(() => {
+                const div = document.createElement("div");
+                const bubble = document.createElement("div");
+                bubble.textContent = msg;
+
+                div.classList.add('message');
+                if (flag === 'Y') {
+                    div.classList.add('user');
+                } else {
+                    div.classList.add('other');
+                }
+
+                bubble.classList.add('bubble');
+                div.appendChild(bubble);
+
+                if (container) {
+                    container.appendChild(div);
+                    scrollToBottom();
+                    console.log("Message added to chat container.");
+                } else {
+                    console.error("Chat container not found in DOM.");
+                }
+            });
+        }
+
+
+        // 스크롤 맨 아래로 이동
+        function scrollToBottom() {
+            const chatContainer = document.getElementById("chat_container");
+            if (chatContainer) {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            } else {
+                console.error("Chat container not found.");
+            }
+        }
+
+        // 페이지 로드 시 WebSocket 설정
+        document.addEventListener('DOMContentLoaded', () => {
+            setupWebSocket();
+            scrollToBottom();
+        });
+
+        // 보내기 버튼 클릭 시 메시지를 전송하고 DOM 업데이트
+        document.getElementById("chat_form").addEventListener("submit", () => {
+        	event.preventDefault(); // 폼 제출로 인한 페이지 리로드 방지
+            const msg = document.getElementById("txt_msg").value.trim();
+            if (msg) {
+                const obj = setMsgObj('msg', msg);
+                sendWebSocketMessage(obj); // 서버로 메시지 전송
+                document.getElementById('txt_msg').value = ""; // 입력 필드 초기화
+            }
+        });
+        </script>
+    </th:block>
+</html>

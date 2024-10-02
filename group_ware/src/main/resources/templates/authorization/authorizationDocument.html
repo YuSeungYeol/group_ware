@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{include/layout}">
+    <th:block layout:fragment="content">
+        <link th:href="@{/css/authorization/authorizationList.css}" rel="stylesheet" type="text/css">
+        <section style="margin-left: 220px;">
+            <div class="main-content-custom">
+                <div id="section_wrap">
+                    <div class="word">
+                        <h3>문서함</h3>
+                    </div><br>
+                    <div class="search" th:if="${searchDto != null}">
+                        <form th:action="@{/authorizationList}" th:object="${searchDto}" method="get">
+                            <select name="search_type" th:value="${searchDto.search_type}">
+                                <option th:value="1" th:selected="${searchDto.search_type} == '1'">제목</option>
+                            </select> 
+                            <input type="text" name="search_text" 
+                            th:field="*{search_text}" placeholder="검색어를 입력하세요">
+                            <input type="submit" value="검색">
+                        </form>
+                    </div>
+                    <div class="search" th:if="${searchDto == null}">
+                        <form th:action="@{/authorizationList}" method="get">
+                            <select name="search_type">
+                                <option th:value="1">문서 제목</option>
+                            </select> 
+                            <input type="text" name="search_text" placeholder="검색어를 입력하세요">
+                            <input type="submit" value="검색">
+                        </form>
+                    </div>
+                    <div class="tempSaveList">
+                        <table class="table-custom">
+                            <colgroup>
+                                <col width="40%">
+                                <col width="60%">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>문서명</th>
+                                    <th>제목</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><a th:href="@{/authorization/authorizationOff}">연차 보고서</a></td>
+                                    <td>연차 신청합니다.</td>
+                                </tr>
+                                <tr>
+                                	<td><a th:href="@{/authorization/authorizationLate}">조퇴 신청서</a></td>
+                                    <td>조퇴 신청합니다.</td>
+                                </tr>
+                                <tr>
+                               		<td><a th:href="@{/authorization/authorizationTrip}">해외 출장서</a></td>
+                                    <td>해외 출장 신청합니다.</td>
+                                </tr>
+                                <tr>
+                               		<td><a th:href="@{/authorization/authorizationOvertime}">야근 신청서</a></td>
+                                    <td>야근 신청합니다.</td>
+                                </tr>
+                                <tr>
+                               		<td><a th:href="@{/authorization/authorizationOutside}">외근 신청서</a></td>
+                                    <td>외근 신청합니다.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+        </section>
+    </th:block>
+</html>

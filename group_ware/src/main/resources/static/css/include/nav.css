@@ -1,0 +1,431 @@
+/* General reset and styling */
+body, h2, p, a, button {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    box-sizing: border-box;
+}
+
+/* 전체 섹션 레이아웃 */
+.sidebar {
+    width: 250px; /* 고정된 너비 */
+    height: 100vh; /* 전체 높이 */
+    display: flex;
+    flex-direction: column; /* 자식 요소를 수직으로 정렬 */
+    position: fixed; /* 화면 왼쪽에 고정 */
+    top: 0;
+    left: 0;
+    background-color: #F6F4FA;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+/* Profile Section 수정 (명함 스타일) */
+aside.profile-section {
+    padding: 10px 0px; /* 여백 추가 */
+    background-color: #F8F5FA;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 프로필 이미지와 사용자 정보를 좌우로 배치 */
+.profile-info {
+    display: flex;
+    justify-content: space-between; /* 사진과 정보가 좌우로 배치 */
+    align-items: center; /* 세로 정렬을 가운데로 */
+}
+
+/* 프로필 이미지 */
+.profile-image-container {
+    flex-shrink: 0; /* 이미지 크기를 고정 */
+    align-items:center;
+    justify-content:center;
+}
+
+.user-emails {
+    font-family: 'Arial', sans-serif;
+  	left:0px;
+ 	font-size:0.8rem;
+}
+
+.profile-img {
+    width: 80px; /* 더 큰 이미지 크기 */
+    height: 80px;
+    border-radius: 50%; /* 원형 이미지 */
+    background-color: #eaeaea;
+}
+.md-profile-img {
+    width: 120px; /* 더 큰 이미지 크기 */
+    height: 120px;
+    border-radius: 50%; /* 원형 이미지 */
+    background-color: #eaeaea;
+}
+
+/* 사용자 정보 */
+.user-details, .profile-details {
+    flex-grow: 1; /* 남은 공간을 차지하게 */
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+}
+.profile-details {
+    flex-grow: 1; /* 남은 공간을 차지하게 */
+    text-align: left;
+    font-family: 'Arial', sans-serif;
+}
+
+.toast {
+    visibility: hidden;
+    min-width: 250px;
+    margin-left: -125px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 16px;
+    position: fixed;
+    z-index: 1;
+    left: 50%;
+    bottom: 30px;
+    font-size: 17px;
+    transition: visibility 0s, opacity 0.5s ease-in-out;
+    opacity: 0;
+}
+
+.toast.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.user-details .profile-details p {
+    font-size: 0.3rem;
+    color: #555;
+    margin-bottom: 5px;
+    font-family: 'Arial', sans-serif;
+}
+
+.user-emails  p {
+    font-size: 0.7rem;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+/* 버튼 부분 */
+.buttons {
+    display: flex;
+    justify-content: space-evenly; /* 버튼들을 좌우로 균등하게 배치 */
+    width: 100%;
+    margin-top: 5px;
+}
+
+.buttons .btn {
+    background-color: #EFEFEF;
+    border: none;
+    border-radius: 10px;
+    padding: 5px 10px;
+    font-size: 0.7rem;
+    margin: 3px;
+    cursor: pointer;
+    color: #666;
+    width: 45%; /* 버튼 크기를 절반으로 설정 */
+}
+
+.buttons .btn:hover {
+    background-color: #ddd;
+}
+
+/* Accordion Navigation */
+.accordion-nav {
+    flex-grow: 1;
+    width: 100%;
+    overflow-y: auto;
+    padding-bottom: 10px;
+}
+
+.accordion-nav::-webkit-scrollbar {
+    width: 0;
+}
+
+.accordion-item {
+    border-bottom: 1px solid #ddd;
+}
+
+.accordion-btn {
+    width: 100%;
+    background-color: #F8F5FA;
+    border: none;
+    padding: 8px;
+    text-align: left;
+    font-size: 0.9rem; 
+    cursor: pointer;
+    color: #333;
+}
+
+.accordion-btn:after {
+    content: '+';
+    float: right;
+    color: #666;
+}
+
+.accordion-btn.active:after {
+    content: '-';
+}
+
+.accordion-content {
+    display: none; 
+    padding-left: 20px;
+    padding-right: 10px; 
+}
+
+.accordion-content a {
+    display: block;
+    padding: 5px 0;
+    font-size: 0.8rem; 
+    text-decoration: none;
+    color: #666;
+    cursor: pointer;
+}
+
+.accordion-content a:hover {
+    color: #350;
+}
+
+/* 하단 버튼 스타일링 */
+.bottom-buttons {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+    background-color: #F6F4FA;
+}
+
+.bottom-buttons .btn {
+    width: 45%;
+    background-color: #EFEFEF;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    color: #333;
+}
+
+.bottom-buttons .btn:hover {
+    background-color: #ddd;
+}
+
+/* Modal 스타일 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+
+.tree {
+    font-family: 'Noto Sans', sans-serif;
+}
+
+.branch {
+    margin-left: 10px;
+}
+
+.branch-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: left;
+}
+
+.branch-btn i {
+    margin-right: 5px;
+}
+
+ul {
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+li {
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+/* 조직도 모달 스타일 */
+#organizationModal.modal1 {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 15%;
+    top: 60%;
+    transform: translate(-50%, -50%);
+    width: 250px;
+    height: 500px;
+    background-color: #F8F5FA;
+    border-radius: 10px; /* border-radius만 설정 */
+    border: 1px solid #888; /* border-radius 오류 수정 */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    overflow-y: auto; /* 스크롤 필요 시 */
+}
+
+/* 스크롤바 숨기기 */
+#profileModal.modal::-webkit-scrollbar,
+#organizationModal.modal1::-webkit-scrollbar {
+    width: 0; /* 스크롤바 숨김 */
+    height: 0;
+}
+
+#profileModal.modal,
+#organizationModal.modal1 {
+    -ms-overflow-style: none;  /* IE와 Edge에서 스크롤바 숨김 */
+    scrollbar-width: none;  /* Firefox에서 스크롤바 숨김 */
+}
+
+/* 닫기 버튼 스타일 */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+}
+
+/* 프로필 모달 스타일 */
+#profileModal.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 30%;
+    top: 55%;
+    transform: translate(-50%, -50%);
+    width: 270px;
+    height: 250px;
+    background-color: #F8F5FA;
+    border-radius: 10px; /* border-radius만 설정 */
+    border: 1px solid #888; /* border 오류 수정 */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    align-items:center;
+}
+
+/* profile modal 및 organization modal 내부 버튼 스타일 */
+
+.modal-content .btn:hover {
+    background-color: #ddd;
+}
+
+
+
+
+/* 비밀번호 확인 모달 - 화면 정중앙 */
+.modal_mypage {
+    display: none; /* 처음에는 숨김 */
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 비밀번호 확인 박스 */
+.modal-content-mypage {
+    width: 350px; /* 너비 살짝 증가 */
+    background-color: #F8F5FA;
+    padding: 30px 20px; /* 좌우 패딩 추가 */
+    border-radius: 15px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 3;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 입력 필드 및 플로팅 라벨 */
+.input-group-mypage {
+    position: relative;
+    width: 85%; /* 인풋이 버튼과 크기가 맞도록 설정 */
+    margin-bottom: 15px;
+}
+
+.input-group-mypage input {
+    width: 100%; /* 인풋이 버튼과 동일한 크기 */
+    padding: 15px; /* 패딩 증가 */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    margin-top:20px;
+}
+
+.input-group-mypage label {
+    position: absolute;
+    top: 65%;
+    left: 10px;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #aaa;
+    transition: 0.3s ease;
+    pointer-events: none;
+    
+}
+
+/* 입력 필드가 포커스를 받으면 라벨이 위로 이동 */
+.input-group-mypage input:focus ~ label,
+.input-group-mypage input:not(:placeholder-shown) ~ label {
+    top: 10px;
+    font-size: 12px;
+    color: gray;
+}
+
+/* 확인 버튼 - 인풋과 크기 동일 */
+.submit-btn-mypage {
+    width: 100%; /* 인풋과 동일한 너비 */
+    padding: 7px; /* 인풋과 동일한 패딩 */
+    background-color: #EFEFEF; /* 버튼 색상 */
+    border: none;
+    border-radius: 10px;
+    color: black;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.submit-btn-mypage:hover {
+    background-color: #ddd;
+}
+
+/* 닫기 버튼 */
+.close-mypage {
+    color: #aaa;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.close-mypage:hover,
+.close-mypage:focus {
+    color: black;
+}
+

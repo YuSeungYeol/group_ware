@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
+    <th:block th:fragment="navLayout">
+        <link th:href="@{/css/include/nav.css}" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <!-- jstree CSS 경로 수정 -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+            
+        <div id="toast" class="toast">클립보드에 복사되었습니다.</div>
+        <section class="sidebar">
+                
+                <aside class="profile-section">
+                    <div class="profile-info">
+                        <!-- 프로필 이미지 (왼쪽) -->
+                        <div class="profile-image-container">
+                            <img th:src="@{'/profile/' + ${#authentication.principal.member.distributor.distributorName} + '/' + ${#authentication.principal.member.profileSaved}}" 
+                                 class="profile-img">
+                        </div>
+                
+                        <!-- 사용자 정보 (오른쪽) -->
+                        <div class="user-detail">
+                            <p style="text-align:right; margin-left: 5px; font-family: 'Noto Sans', sans-serif;" th:text="${#authentication.principal.member.memName} + ' ' + ${#authentication.principal.member.rank.rankName}"></p> <!-- 사용자 이름과 직급 -->
+                            <p style="text-align:right; margin-left: 5px; font-family: 'Noto Sans', sans-serif;" class="user-details" sec:authentication="principal.member.memPhone"></p> <!-- 전화번호 -->
+                            <p style="text-align:right; margin-left: 15px; font-family: 'Noto Sans', sans-serif;" class="user-details" sec:authentication="principal.member.distributor.distributorName"></p> <!-- 이메일 -->
+                            <p class="user-emails" sec:authentication="principal.member.memEmail" id="email" onclick="copyToClipboard()">이메일</p> <!-- 이메일 클릭 시 복사 -->
+                        </div>
+                    </div>
+
+                <!-- 버튼 부분 -->        
+                    <div class="buttons">
+                        <button class="btn" id="mypageButton">마이페이지</button>
+                        <button class="btn">근태현황</button>
+                    </div>
+
+                </aside>
+
+            <nav class="accordion-nav">
+                <div class="accordion-item">
+                    <button class="accordion-btn">캘린더</button>
+                    <div class="accordion-content">
+                        <a th:href="@{/calendar/calendar}">내 일정</a>
+                        <a href="#">일정 추가</a>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <button class="accordion-btn">드라이브</button>
+                    <div class="accordion-content">
+                        <a th:href="@{/folder/personal-drive}">개인드라이브</a>
+                        <a th:href="@{/folder/list}">부서드라이브</a>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <button class="accordion-btn">지점 정보</button>
+                    <div class="accordion-content">
+                        <a href="#">매장정보</a>
+                        <a href="#">지점등록</a>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <button class="accordion-btn">전자결재</button>
+                    <div class="accordion-content">
+                        <a th:href="@{/authorization/authorizationList}">결재</a>
+                        <a th:href="@{/authorization/authorizationDocument}">결재 문서함</a>
+                        <a th:href="@{/authorization/authorizationStorage}">임시 저장함</a>
+						<a th:href="@{/authorization/authorizationCheck}">결재 확인</a> 
+                        
+                    </div>
+                </div>
+                <div class="accordion-item" sec:authorize="hasAnyAuthority( 'ROLE_지점대표', 'ROLE_대표')">
+                    <button class="accordion-btn">직원관리</button>
+                    <div class="accordion-content">
+                        <a href="#">근태조회</a>
+                        <!-- 회원등록 링크는 ROLE_차장 이상만 볼 수 있도록 제한 -->
+                        <a th:href="@{/member/register}">회원등록</a>
+                        <a th:href="@{/member/list}">회원수정</a>
+                    </div>
+                </div>
+                  <div class="accordion-item" sec:authorize="hasAnyAuthority('ROLE_차장', 'ROLE_지점대표', 'ROLE_대표')">
+                    <button class="accordion-btn">차량관리</button>
+                    <div class="accordion-content">
+                        <a href="#">차량조회</a>
+                        <a href="#">차량등록</a>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <button class="accordion-btn">공지</button>
+                    <div class="accordion-content">
+                        <a th:href="@{/notice/noticeList}">공지사항</a>
+                        <a th:href="@{/board/boardList}">게시판</a>
+                    </div>
+                </div>
+            </nav>
+
+           <!-- 조직도 모달 -->
+            <div class="bottom-buttons">
+                <button class="btn" id="organizationBtn">조직도(주소록)</button>
+                <button class="btn" id="messageBtn">메신저</button>
+            </div>
+
+            <div id="organizationModal" class="modal1">
+                <span class="close">&times;</span>
+                <div id="organizationTree"></div> <!-- jstree 적용할 div -->
+            </div>
+            <div id="profileModal" class="modal">
+                <div class="modal-content"></div>
+            </div>
+                <div id="modal_mypage" class="modal_mypage">
+                    <div class="modal-content-mypage">
+                        <span class="close-mypage">&times;</span>
+                        <form id="passwordCheckForm-mypage" th:action="@{/api/member/verify-password}" method="post">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" id="csrfToken">
+                            <div class="input-group-mypage floating-label">
+                                <input type="password" id="password-mypage" name="mem_pw" placeholder=" " required>
+                                <label for="password-mypage">비밀번호를 입력하세요</label>
+                            </div>
+                            <button type="submit" class="submit-btn-mypage">확인</button>
+                        </form>
+                    </div>
+                </div>
+            
+        </section>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+        <script th:src="@{/js/nav.js}"></script>
+    </th:block>
+</html>

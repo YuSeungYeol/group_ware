@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<title>그룹웨어</title>
+</head>
+<body>
+<th:block th:replace="~{include/button_group :: buttonGroup}"></th:block>
+<th:block th:replace="~{include/nav :: navLayout}"></th:block>
+<th:block layout:fragment="content">
+</th:block>
+</body>
+</html>

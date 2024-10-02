@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{include/layout}">
+     <th:block layout:fragment="content">
+     <link th:href="@{/css/board/boardList.css}" rel="stylesheet" type="text/css">
+     <section class="main-content-custom">
+     
+     <!-- CSRF 토큰 추가 -->
+     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+        <div id="section_wrap">
+            <div class="word">
+                <h3>게시판</h3>
+            </div>
+            <div class="search" th:if="${searchDto != null}">
+                <form action="@{/board}" th:object="${searchDto}" method="get">
+                <input type="text" name="board_title" th:field="*{boardTitle}" placeholder="검색어를 입력하세요">
+                <input type="submit" value="검색">
+                </form>    
+            </div>
+            <div class="book_list">
+                <table class="table-custom">
+                    <colgroup>
+                        <col width="10%">
+                        <col width="20%">
+                        <col width="20%">
+                        <col width="20%">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>번호</th>
+                            <th>제목</th>
+                            <th>작성일자</th>
+                            <th>조회수</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <th:block th:if="${#lists.isEmpty(resultList.content)}">
+                            <tr>
+                                <td colspan="4">해당하는 게시글이 없습니다.</td>
+                            </tr>
+                        </th:block>
+                        <th:block th:if="${!#lists.isEmpty(resultList.content)}">
+                            <tr th:each="board, boardStat : ${resultList.content}">
+                                <td th:text="${boardStat.index + 1}"></td>
+                                <td>
+                                    <a th:href="@{/board/{no}(no=${board.boardNo})}" th:text="${board.boardTitle}"></a>
+                                </td>
+                                <td th:text="${#temporals.format(board.boardRegDate, 'yy-MM-dd')}"></td>
+                                <td th:text="${board.boardView}"></td>
+                            </tr>
+                        </th:block>
+                    </tbody>
+                </table>
+                <input type="button" value="등록" style="float:right;"
+                th:onclick="|location.href='@{/board/boardCreate}'|">
+            </div>
+        </div>
+    </section>
+     </th:block>
+</html>

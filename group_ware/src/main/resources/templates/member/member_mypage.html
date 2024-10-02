@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{include/layout}">
+
+    <th:block layout:fragment="content">
+        <link th:href="@{/css/member/member_mypage.css}" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    	
+        <div class="mypage-container">
+            <form id="profileForm" action="/api/member/update" method="post" enctype="multipart/form-data">
+                <!-- CSRF 토큰을 폼에 추가 -->
+                <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+                <input type="hidden" name="mem_no" th:value="${member.mem_no}">
+
+                <!-- 프로필 사진 섹션 -->
+                <div class="myinfo-section">
+                    <div id="image_container" class="myprofile-image-container">
+                        <!-- 등록된 이미지 불러오기 -->
+                        <img id="profile-pic" th:src="@{'/profile/' + ${member.distributor_name} + '/' + ${member.profile_saved}}" class="profile-image" />
+                    </div>
+                    <input type="file" id="profileImage" name="profileImage" class="image" accept="image/*" style="display:none;">
+                    
+                    <div class="input-group-my">
+                        <label for="mem_name">이름</label>
+                        <input type="text" id="mem_name" name="mem_name" th:value="${member.mem_name}" readonly>
+                    </div>
+
+                    <!-- 직급 이름 -->
+                    <div class="input-group-my">
+                        <label for="rank_name">직급</label>
+                        <input type="text" id="rank_name" name="rank_name" th:value="${member.rank_name}" readonly>
+                    </div>
+
+                    <!-- 지점 이름 -->
+                    <div class="input-group-my">
+                        <label for="distributor_name">지점명</label>
+                        <input type="text" id="distributor_name" name="distributor_name" th:value="${member.distributor_name}" readonly>
+                    </div>
+
+                    <div class="input-group-my-edit">
+                        <label for="mem_phone">전화번호</label>
+                        <input type="text" id="mem_phone" name="mem_phone" th:value="${member.mem_phone}" required>
+                    </div>
+                    <div class="input-group-my-edit">
+                        <label for="mem_email">이메일</label>
+                        <input type="text" id="mem_email" name="mem_email" th:value="${member.mem_email}" required>
+                    </div>
+
+                    <!-- 비밀번호 변경 섹션 -->
+                    <div class="input-group-my-edit">
+                        <label for="new_password">새 비밀번호</label>
+                        <input type="password" id="new_password" name="mem_pw" placeholder="미입력시 기존 비밀번호로 적용됩니다." >
+                    </div>
+                    <div class="input-group-my-edit">
+                        <label for="confirm_password">비밀번호 확인</label>
+                        <input type="password" id="confirm_password" name="confirm_password" >
+                    </div>
+
+                    <!-- 정보 수정 버튼 -->
+                    <div class="button-div">
+                        <button type="submit" class="register-button">정보 수정</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <script th:src="@{/js/member_mypage.js}"></script>
+    </th:block>
+</html>

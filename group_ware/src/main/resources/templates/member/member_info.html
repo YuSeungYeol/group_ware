@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{include/layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Member Info</title>
+    <link rel="stylesheet" th:href="@{/css/member/member_info.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery 사용 -->
+</head>
+
+<th:block layout:fragment="content">
+    <div class="member-info-container">
+        <h2>직원 정보 수정</h2>
+        
+        <form id="editForm" enctype="multipart/form-data"> <!-- form 태그에 action을 추가하지 않음 -->
+            <div class="member-detail">
+                <label>사원번호 </label>
+                <input type="text" id="memNo" name="memNo" th:value="${member.empNo}" readonly>
+            </div>
+
+            <div class="member-detail">
+                <label>이름 </label>
+                <input type="text" id="memName" name="memName" th:value="${member.memName}">
+            </div>
+
+            <div class="member-detail">
+                <label>직급 </label>
+                <select id="rank" name="rank.rankNo">
+                    <option th:value="${member.rank.rankNo}" th:text="${member.rank.rankName}" selected="selected"></option>
+                    <option th:each="rank : ${rankList}" th:value="${rank.rankNo}" 
+                            th:text="${rank.rankName}" th:if="${rank.rankNo != member.rank.rankNo}"></option>
+                </select>
+            </div>
+
+            <div class="member-detail">
+                <label>지점 </label>
+                <select id="distributor" name="distributor.distributorNo">
+                    <option th:value="${member.distributor.distributorNo}" th:text="${member.distributor.distributorName}" selected="selected"></option>
+                    <option th:each="distributor : ${distributorList}" th:value="${distributor.distributorNo}" 
+                            th:text="${distributor.distributorName}" th:if="${distributor.distributorNo != member.distributor.distributorNo}"></option>
+                </select>
+            </div>
+
+            <div class="member-detail">
+                <label>이메일 </label>
+                <input type="email" id="memEmail" name="memEmail" th:value="${member.memEmail}">
+            </div>
+
+            <div class="member-detail">
+                <label>연락처 </label>
+                <input type="text" id="memPhone" name="memPhone" th:value="${member.memPhone}">
+            </div>
+
+            <div class="member-detail">
+                <label>프로필 사진 </label>
+                <div class="profile-images">
+                    <img th:src="@{/profile/{distributorName}/{fileName}(distributorName=${member.distributor.distributorName}, fileName=${member.profileSaved})}" alt="Profile Image" class="profile-image" />
+                </div>
+                <input type="file" id="profileImage" name="profileSaved">
+            </div>
+
+            <div class="member-detail">
+                <label>남은 연차 </label>
+                <input type="text" id="memOff" name="memOff" th:value="${member.memOff}" readonly>
+            </div>
+
+            <div class="button-div">
+                <button type="button" class="register-button" onclick="submitForm()">정보 수정</button>
+            </div>
+        </form>
+        <a href="/member/list">목록으로 돌아가기</a>
+    </div>
+
+    <script>
+    // 폼 데이터를 JSON으로 변환하여 서버로 전송하는 함수
+    function submitForm() {
+        // 폼의 데이터를 가져와서 JSON으로 변환
+        const memberData = {
+            memNo: $("#memNo").val(),
+            memName: $("#memName").val(),
+            rank: { rankNo: $("#rank").val() },  // rank를 객체로 설정
+            distributor: { distributorNo: $("#distributor").val() },  // distributor를 객체로 설정
+            memEmail: $("#memEmail").val(),
+            memPhone: $("#memPhone").val(),
+            memOff: $("#memOff").val()
+        };
+
+        // JSON 데이터를 POST 요청으로 서버에 전송
+        $.ajax({
+            type: "POST",
+            url: "/api/members/edit",  // API 엔드포인트에 POST 요청
+            contentType: "application/json",
+            data: JSON.stringify(memberData),  // 데이터를 JSON으로 변환하여 전송
+            success: function(response) {
+                alert("회원 정보가 성공적으로 수정되었습니다.");
+                window.location.href = "/member/list";  // 성공 시 목록 페이지로 리다이렉트
+            },
+            error: function(error) {
+                alert("정보 수정 중 오류가 발생했습니다.");
+            }
+        });
+    }
+    </script>
+</th:block>
+
+</html>

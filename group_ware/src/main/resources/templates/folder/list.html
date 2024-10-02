@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{include/layout}">
+    <th:block layout:fragment="content">
+        <link th:href="@{/css/folder/folder.css}" rel="stylesheet" type="text/css">
+        <section id="section-warp">
+            <div id="content">
+                <h1>전체드라이브</h1>
+                <button id="createFolderBtn" class="btn btn-primary">새폴더</button>
+                <button id="deleteFolderBtn" class="btn btn-primary">삭제</button>
+                <button id="uploadFileBtn" class="btn btn-primary">파일 업로드</button>
+
+                <!-- 폴더 생성 폼 -->
+                <div id="folderForm" style="display: none; margin-top: 20px;">
+                    <label for="folderNameInput">새폴더명 : </label>
+                    <input type="text" id="folderNameInput" placeholder="폴더명을 입력하세요." required>
+                    <button id="submitFolderBtn" type="submit" class="btn btn-success">생성</button>
+                </div>
+
+                <!-- 파일 업로드 폼 -->
+                <div id="fileUploadForm" style="display: none; margin-top: 20px;">
+                    <label for="fileInput">파일 선택 : </label>
+                    <input type="file" id="fileInput" required>
+                    <button id="submitFileBtn" type="submit" class="btn btn-success">업로드</button>
+                </div>
+				
+                <!-- 폴더 및 파일 리스트 -->
+                <div id="folderContent">
+                    <table>
+                        <colgroup>
+                            <col width="15%">
+                            <col width="70%">
+                            <col width="15%">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAllCheckbox"></th>
+                                <th>이름</th>
+                                <th>등록날짜</th>
+                            </tr>
+                        </thead>
+						<tbody id="folderList">
+						    <!-- 돌아가기 링크를 위한 행 -->
+						    <tr id="backLinkRow" style="display: none;">
+						        <td colspan="3"><a href="#" id="backLink">이전으로 돌아가기</a></td>
+						    </tr>
+						
+						    <!-- 폴더 목록 표시 -->
+						    <th:block th:if="${!#lists.isEmpty(resultList)}">
+						    
+						        <tr th:each="folder : ${resultList}" th:if="${folder.member == null && folder.parentFolder == null && folder.del_yn == 'N'}">
+						            <td><input type="checkbox" class="folderCheckbox" th:value="${folder.folder_no}"></td>
+						            <td><a href="#" class="folderLink" th:data-folder-no="${folder.folder_no}" th:text="${folder.folder_name}"></a></td>
+						            <td th:text="${#temporals.format(folder.folder_reg_date, 'yy-MM-dd')}"></td>
+						        </tr>
+						    </th:block>
+						
+						    <!-- 파일 목록 표시 -->
+						    <th:block th:if="${!#lists.isEmpty(fileList)}">
+						       <tr th:each="folder : ${resultList}" th:if="${folder.parentFolder == null && folder.del_yn.equals('N') && folder.member == null}">
+						            <td><input type="checkbox" class="fileCheckbox" th:value="${file.file_no}"></td>
+						            <td>
+						                <!-- 파일 다운로드 링크 추가 -->
+						                <a href="#" class="fileDownloadLink"
+						                   th:data-file-name="${file.file_new_name}"
+						                   th:data-folder-path="${file.file_path}"
+						                   th:text="${file.file_ori_name}"></a>
+						            </td>
+						            <td th:text="${#temporals.format(file.file_reg_date, 'yy-MM-dd')}"></td>
+						        </tr>
+						    </th:block>
+						
+						    <!-- 폴더 및 파일이 없을 때 -->
+						    <th:block th:if="${#lists.isEmpty(resultList) && #lists.isEmpty(fileList)}">
+						        <tr>
+						            <td colspan="3">폴더나 파일이 없습니다.</td>
+						        </tr>
+						    </th:block>
+						</tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const createFolderBtn = document.getElementById('createFolderBtn');
+            const folderForm = document.getElementById('folderForm');
+            const submitFolderBtn = document.getElementById('submitFolderBtn');
+            const deleteFolderBtn = document.getElementById('deleteFolderBtn');
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const uploadFileBtn = document.getElementById('uploadFileBtn');
+            const fileUploadForm = document.getElementById('fileUploadForm');
+            const submitFileBtn = document.getElementById('submitFileBtn');
+            const fileInput = document.getElementById('fileInput');
+            const backLink = document.getElementById('backLink');
+            const backLinkRow = document.getElementById('backLinkRow');
+			
+            let parentFolderStack = [];
+            let selectedFolderNo = 0;
+            loadFolderContents(0);
+            // 백링크 표시 여부 업데이트 함수
+            function updateBackLinkVisibility() {
+                console.log('Updated parentFolderStack:', parentFolderStack);
+                if (parentFolderStack.length > 0) { // 스택이 1보다 크면 백링크 표시
+                    backLinkRow.style.display = 'table-row'; // 백링크 표시
+                } else {
+                    backLinkRow.style.display = 'none'; // 숨김
+                }
+                
+                backLink.removeEventListener('click', goBackToPreviousFolder);
+                backLink.addEventListener('click', goBackToPreviousFolder);
+            }
+			
+         // 폴더 내용 불러오기 함수
+            function loadFolderContents(folderNo) {
+			    // 루트 폴더는 0 또는 null로 처리
+			    const targetFolderNo = folderNo !== null && folderNo !== 0 ? folderNo : 0;
+			    
+			    fetch(`/folder/apiList?parentFolderNo=${targetFolderNo}`, {
+			        method: 'GET',
+			        headers: {
+			            'Content-Type': 'application/json'
+			        }
+			    })
+			    .then(response => response.json())
+			    .then(data => {
+			    	console.log(data);
+			        const folderListElement = document.getElementById('folderList');
+			        folderListElement.innerHTML = '';  // 폴더 리스트 초기화
+			        folderListElement.appendChild(backLinkRow);  // 백링크 유지
+			
+			        // 폴더 리스트 추가
+			        if (data.folders && data.folders.length > 0) {
+			            data.folders.forEach(folder => {
+			            	console.log('mem_no:', folder.mem_no);
+			            	if(folder.del_yn === 'N' && folder.member === null){
+			                const tr = document.createElement('tr');
+			                const checkbox = document.createElement('td');
+			                const name = document.createElement('td');
+			                const date = document.createElement('td');
+			
+			                checkbox.innerHTML = `<input type="checkbox" class="folderCheckbox" value="${folder.folder_no}">`;
+			                name.innerHTML = `<a href="#" class="folderLink" data-folder-no="${folder.folder_no}">${folder.folder_name}</a>`;
+			                date.innerText = new Date(folder.folder_reg_date).toISOString().split('T')[0];
+			
+			                tr.appendChild(checkbox);
+			                tr.appendChild(name);
+			                tr.appendChild(date);
+			                folderListElement.appendChild(tr);
+			            	}
+			            });
+			        } else {
+			            console.log("폴더가 없습니다.");
+			        }
+			
+			        // 파일 리스트 추가
+			        if (data.files && data.files.length > 0) {
+			            data.files.forEach(file => {
+			                const tr = document.createElement('tr');
+			                const checkbox = document.createElement('td');
+			                const name = document.createElement('td');
+			                const date = document.createElement('td');
+			
+			                checkbox.innerHTML = `<input type="checkbox" class="fileCheckbox" value="${file.file_no}">`;
+			                name.innerHTML = `<a href="/folder/downloadFile?fileNo=${file.file_no}">${file.file_ori_name}</a>`;
+			                date.innerText = new Date(file.file_reg_date).toISOString().split('T')[0];
+			
+			                tr.appendChild(checkbox);
+			                tr.appendChild(name);
+			                tr.appendChild(date);
+			                folderListElement.appendChild(tr);
+			            });
+			        } else {
+			            console.log("파일이 없습니다.");
+			        }
+			
+			        // 이벤트 바인딩 다시 수행
+			        bindFolderClickEvents();
+			        updateBackLinkVisibility();
+			    })
+			    .catch(error => console.error('Error fetching folder content:', error));
+			}
+
+         // 폴더 클릭 이벤트 바인딩
+            function bindFolderClickEvents() {
+                const folderLinks = document.querySelectorAll('.folderLink');
+                folderLinks.forEach(link => {
+                    link.addEventListener('click', function(event) {
+                        event.preventDefault();  // 기본 링크 동작 방지
+                        selectedFolderNo = this.getAttribute('data-folder-no');
+                        
+                        // 루트 폴더가 아닐 때만 스택에 추가
+                        if (selectedFolderNo !== '0') {
+                            parentFolderStack.push(selectedFolderNo);
+                        }
+                        console.log('Updated parentFolderStack:', parentFolderStack);
+
+                        loadFolderContents(selectedFolderNo);  // 폴더 내용 불러오기
+                        updateBackLinkVisibility();  // 백링크 표시 여부 업데이트
+                    });
+                });
+            }
+
+         // 이전 폴더로 돌아가기
+            function goBackToPreviousFolder(event) {
+                if (event) {
+                    event.preventDefault();  // 기본 링크 동작 방지
+                }
+
+                if (parentFolderStack.length > 0) {
+                    parentFolderStack.pop();  // 현재 폴더 제거
+                    
+                    // 스택이 비어있지 않고, 이전 폴더 번호가 0이면 초기 화면으로 이동
+                    const previousFolderNo = parentFolderStack.length > 0 ? parentFolderStack[parentFolderStack.length - 1] : 0;
+
+                    if (previousFolderNo === 0) {
+                        // 초기 화면으로 리다이렉트
+                        window.location.href = '/folder/list';
+                    } else {
+                        loadFolderContents(previousFolderNo);  // 폴더 내용 불러오기
+                    }
+                } else {
+                    // 이미 스택이 비어있는 경우 루트로 이동
+                    window.location.href = '/folder/list';  // 초기 화면으로 이동
+                }
+
+                updateBackLinkVisibility();  // 백링크 업데이트
+            }
+
+            // 백링크 클릭 시 동작
+            backLink.addEventListener('click', goBackToPreviousFolder);
+
+            // 폴더 클릭 이벤트 바인딩 초기화
+            bindFolderClickEvents();
+
+            // 폴더 생성 버튼 이벤트 핸들러
+            createFolderBtn.addEventListener('click', function () {
+                folderForm.style.display = folderForm.style.display === 'none' ? 'block' : 'none';
+            });
+
+            // 폴더 생성 요청
+            submitFolderBtn.addEventListener('click', function () {
+                const folderName = document.getElementById('folderNameInput').value;
+
+                if (!folderName) {
+                    alert('폴더 이름을 입력하세요.');
+                    return;
+                }
+
+                fetch(`/folder/create?parentFolderNo=${selectedFolderNo}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ folder_name: folderName })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.res_code === '200') {
+                        alert(data.res_msg);
+                        location.reload();
+                    } else {
+                        alert(data.res_msg);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('오류가 발생하였습니다.');
+                });
+            });
+
+            // 파일 업로드 버튼 이벤트 핸들러
+            uploadFileBtn.addEventListener('click', function () {
+                fileUploadForm.style.display = fileUploadForm.style.display === 'none' ? 'block' : 'none';
+            });
+
+            submitFileBtn.addEventListener('click', function () {
+                const file = fileInput.files[0];
+
+                if (!file) {
+                    alert('파일을 선택하세요.');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('file', file);
+
+                // selectedFolderNo가 null이거나 0인 경우 folderNo 파라미터를 제거
+                let url = '/folder/uploadFile';
+                if (selectedFolderNo !== null && selectedFolderNo !== 0) {
+                    url += `?folderNo=${selectedFolderNo}`;
+                }
+
+                fetch(url, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.res_code === '200') {
+                        alert(data.res_msg);
+                        location.reload();
+                    } else {
+                        alert(data.res_msg);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('파일 업로드 중 오류가 발생하였습니다.');
+                });
+            });
+
+            selectAllCheckbox.addEventListener('change', function () {
+                const folderCheckboxes = document.querySelectorAll('.folderCheckbox');
+                const fileCheckboxes = document.querySelectorAll('.fileCheckbox');
+                
+                // 폴더와 파일의 모든 체크박스를 선택/해제
+                folderCheckboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+                
+                fileCheckboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+            });
+            deleteFolderBtn.addEventListener('click', function () {
+                // 폴더 수집
+                const selectedFolderNos = Array.from(document.querySelectorAll('.folderCheckbox:checked'))
+                    .map(checkbox => checkbox.value);
+                // 파일 수집
+                const selectedFileNos = Array.from(document.querySelectorAll('.fileCheckbox:checked'))
+                    .map(checkbox => checkbox.value);
+                    
+                if (selectedFolderNos.length === 0 && selectedFileNos.length === 0) {
+                    alert('삭제할 폴더 또는 파일을 선택하세요.');
+                    return;
+                }
+
+                fetch('/folder/updateDelYn', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        folderNos: selectedFolderNos,  // 폴더 번호
+                        fileNos: selectedFileNos  // 파일 번호
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.res_code === '200') {
+                        alert(data.res_msg);
+                        // 삭제 후 최신 목록 다시 불러오기
+                        loadFolderContents(selectedFolderNo); // selectedFolderNo로 다시 목록을 불러옵니다.
+                    } else {
+                        alert(data.res_msg);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('오류가 발생하였습니다.');
+                });
+            });
+            
+            
+        });
+
+        </script>
+    </th:block>
+</html>

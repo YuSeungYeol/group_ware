@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>차량 모델 검색</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 8px 12px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #f4f4f4; }
+        tr:hover { background-color: #f1f1f1; cursor: pointer; }
+    </style>
+    <script>
+        function selectVehicleModel(model) {
+            opener.document.getElementById('vehicleModel').value = model;
+            window.close();
+        }
+
+        function searchVehicleModel() {
+            const keyword = document.getElementById('searchKeyword').value;
+
+            fetch(`/api/vehicle/searchPopup?keyword=${keyword}`)
+                .then(response => response.json())
+                .then(data => {
+                    const vehicleModelList = document.getElementById('vehicleModelList');
+                    vehicleModelList.innerHTML = '';
+                    data.forEach(vehicle => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td onclick="selectVehicleModel('${vehicle.modelName}')">${vehicle.modelName}</td>
+                            <td>${vehicle.manufacturer}</td>
+                            <td>${vehicle.yearOfRelease}</td>
+                            <td>${vehicle.sizeName}</td>
+                        `;
+                        vehicleModelList.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+</head>
+<body>
+    <h2>차량 모델 검색</h2>
+    <input type="text" id="searchKeyword" placeholder="차량 모델명 또는 제조사를 입력하세요">
+    <button onclick="searchVehicleModel()">검색</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>모델명</th>
+                <th>제조사</th>
+                <th>출시연도</th>
+                <th>크기</th>
+            </tr>
+        </thead>
+        <tbody id="vehicleModelList">
+        </tbody>
+    </table>
+</body>
+</html>

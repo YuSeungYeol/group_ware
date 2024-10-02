@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{include/layout}">
+     <th:block layout:fragment="content">
+       	<link th:href="@{/css/home.css}" rel="stylesheet" type="text/css">
+       	<section>
+			 <div id = "content">
+		        <h1>Welcome to the Main Content</h1>
+		        <p>This is where the main content will be displayed.</p>
+   			 </div>
+		</section>
+     </th:block>
+</html>

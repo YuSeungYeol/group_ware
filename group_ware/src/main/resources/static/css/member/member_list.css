@@ -1,0 +1,159 @@
+/* 전체 레이아웃 */
+.list-container {
+    width: 70%;
+	margin-left:270px;
+	margin-top:100px;
+	margin-right:100px;
+    padding: 2px 30px 20px 30px;
+    background-color: #F6F4FA;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+/* 검색 폼과 필터 폼을 한 줄에 배치 */
+.form-container {
+    display: flex;
+    justify-content: space-between; /* 좌우로 분리 */
+    align-items: center; /* 세로 중앙 정렬 */
+    margin-bottom: 15px; /* 간격 추가 */
+}
+
+/* 검색 폼 스타일 */
+.search-form {
+    display: flex;
+    align-items: center;
+}
+
+.search-form select,
+#search_mem_input {
+    margin-right: 5px; /* 검색 입력 필드와 버튼 사이 간격 */
+}
+
+/* 필터 폼은 기본적으로 오른쪽 정렬 */
+.filter-form {
+    display: flex;
+    align-items: center;
+}
+
+/* 제목 스타일 */
+.word h3 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* 테이블 스타일 */
+.member_list table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* 테이블 헤더 */
+.member_list th {
+    background-color: #808080b3;
+    color: white;
+    font-weight: bold;
+    text-align: left;
+    padding: 12px;
+    font-size: 16px;
+    border-bottom: 2px solid #ddd;
+}
+
+/* 테이블 본문 */
+.member_list td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+    color: #333;
+}
+
+/* 테이블 줄 바꿈 색 */
+.member_list tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* 테이블 행에 마우스를 올렸을 때 효과 */
+.member_list tr:hover {
+    background-color: #ddd;
+}
+
+/* 상세보기 링크 스타일 */
+.member_list a {
+    color: #808080;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.member_list a:hover {
+    text-decoration: underline;
+}
+
+/* 페이지네이션 */
+.pagination {
+    text-align: center;
+    margin: 20px ;
+}
+
+.pagination a {
+    margin: 0 5px;
+    padding: 8px 16px;
+    text-decoration: none;
+    background-color: #EFEFEF;
+    color: white;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.pagination a:hover {
+    background-color: #ddd;
+}
+
+.pagination a.active {
+    background-color: #808080b3;
+}
+
+th.asc:after {
+    content: " ↑";
+}
+
+th.desc:after {
+    content: " ↓";
+}
+/* 퇴사한 직원 (mem_leave = 'Y')에 대한 스타일 */
+.resigned-text {
+    text-decoration: line-through;
+    color: #808080; /* 텍스트도 회색으로 변경 */
+}
+#search_mem_input{
+	padding:6px;
+	border-radius:5px;
+	border: 1px solid #ccc;	
+}
+#search_mem_button{
+	background-color: #EFEFEF;
+    border: none;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+#search_mem_button:hover{
+	background-color:#ddd;
+}
+#searchType{
+			padding:5px;
+	border-radius:5px;
+	border: 1px solid #ccc;	
+}
+#statusFilter{
+	margin-left:3px;
+	padding:5px;
+	border-radius:5px;
+	border: 1px solid #ccc;	
+}
+	

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{include/layout}">
+    <th:block layout:fragment="content">
+        <link th:href="@{/css/chat/list.css}" rel="stylesheet" type="text/css">
+
+        <section id="section-warp">
+            <div class="chat-container">
+                <div class="chat-list">
+                    <h3>채팅 목록</h3>
+                    <input type="button" value="채팅 생성" class="btn btn-primary" onclick="chatCreate();" style="margin-bottom: 10px;">
+                    <input type="hidden" value="" id="parent_input">
+                    <input type="hidden" id="from_id" th:value="${#authentication.principal.username}">
+                    <input type="hidden" id="csrf_token" th:value="${_csrf.token}">
+                    <ul class="chat-list-items">
+                        <th:block th:if="${#lists.isEmpty(resultList.content)}">
+                            <li class="chat-item no-content">
+                                해당하는 게시글이 없습니다.
+                            </li>
+                        </th:block>
+                        <th:block th:if="${!#lists.isEmpty(resultList.content)}">
+                            <li th:each="chatRoom : ${resultList.content}" id="chat-item" class="chat-item" th:attr="data-room-no=${chatRoom.room_no}">
+                                <div class="chat-item-header">
+                                    <span th:text="${chatRoom.not_me_name}">상대방 이름</span>
+                                    <span class="chat-item-time" th:data-time="${chatRoom.last_date}" 
+                                          th:text="${chatRoom.last_date != null} ? ${#temporals.format(chatRoom.last_date, 'yy-MM-dd')} : '0'">
+                                    </span>
+                                </div>
+                                <p class="chat-item-message" th:text="${chatRoom.last_msg != null} ? ${chatRoom.last_msg} : '대화없음'"></p>
+                            </li>
+                        </th:block>
+                    </ul>
+                </div>
+
+                <div class="group-chat-list">
+                    <h2>그룹 채팅 목록</h2>
+                    <ul class="group-chat-items">
+                        <li class="group-chat-item">그룹 채팅 1</li>
+                        <li class="group-chat-item">그룹 채팅 2</li>
+                        <li class="group-chat-item">그룹 채팅 3</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+<script>
+    // WebSocket 설정 및 메시지 수신 처리
+    let websocket;
+
+    function setupWebSocket() {
+        websocket = new WebSocket('ws://localhost:8095/chatting/all');
+
+        websocket.onopen = () => {
+            console.log("WebSocket connection opened.");
+        };
+
+        // WebSocket 메시지 수신 시 서버에서 최신 데이터를 가져와 화면 업데이트
+        websocket.onmessage = (response) => {
+            try {
+                const resp = JSON.parse(response.data);
+                console.log("Received message on common channel:", resp);
+
+                // 메시지 수신 시 서버에서 최신 데이터를 가져옴
+                if (resp.chat_type === 'msg') {
+                    fetchChatRoomList(); // 서버에서 최신 데이터를 가져오는 함수 호출
+                }
+            } catch (error) {
+                console.error("Error parsing message:", error, response.data);
+            }
+        };
+
+        websocket.onclose = () => {
+            console.warn("WebSocket connection closed. Attempting to reconnect...");
+            setTimeout(setupWebSocket, 3000); // 3초 후 재연결 시도
+        };
+
+        websocket.onerror = (error) => {
+            console.error("WebSocket error:", error);
+        };
+    }
+
+ // 서버에서 최신 채팅방 리스트를 가져오는 함수
+    function fetchChatRoomList() {
+        fetch('/chat/room/list/data', { 
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            renderChatRoomList(data);
+        })
+        .catch(error => console.error('Error fetching chat room list:', error));
+    }
+
+ // 채팅방 리스트를 렌더링하는 함수
+    function renderChatRoomList(data) {
+        console.log('Received data:', data); // 데이터 구조 확인
+
+        const chatRooms = Array.isArray(data) ? data : data.content; // 배열이 아니면 content로 접근
+
+        if (!Array.isArray(chatRooms)) {
+            console.error('Data is not an array:', chatRooms);
+            return;
+        }
+
+        const chatListContainer = document.querySelector('.chat-list-items');
+        if (!chatListContainer) {
+            console.error('Chat list container not found.');
+            return;
+        }
+
+        // 기존 리스트 비우기
+        chatListContainer.innerHTML = '';
+
+        // 새로운 리스트 추가
+        chatRooms.forEach(chatRoom => {
+            const listItem = document.createElement('li');
+            listItem.classList.add('chat-item');
+            listItem.setAttribute('data-room-no', chatRoom.room_no);
+
+            const header = document.createElement('div');
+            header.classList.add('chat-item-header');
+
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = chatRoom.not_me_name;
+            header.appendChild(nameSpan);
+
+            const timeSpan = document.createElement('span');
+            timeSpan.classList.add('chat-item-time');
+            timeSpan.setAttribute('data-time', chatRoom.last_date);
+            timeSpan.textContent = chatRoom.last_date ? formatTime(chatRoom.last_date) : '0';
+            header.appendChild(timeSpan);
+
+            // 읽지 않은 메시지를 표시하는 알림 아이콘 추가
+            if (chatRoom.is_receiver_read === 'N') {
+                const unreadIndicator = document.createElement('span');
+                unreadIndicator.classList.add('unread-indicator');
+                unreadIndicator.textContent = '●'; // 동그라미 표시
+                header.appendChild(unreadIndicator);
+            }
+
+            const message = document.createElement('p');
+            message.classList.add('chat-item-message');
+            message.textContent = chatRoom.last_msg || '대화없음';
+
+            listItem.appendChild(header);
+            listItem.appendChild(message);
+
+            chatListContainer.appendChild(listItem);
+        });
+
+        // 렌더링 후 시간을 업데이트
+        updateTimeDisplay();
+
+        // 채팅 아이템 클릭 이벤트 재설정
+        setChatItemClickEvents();
+    }
+
+    // CSS로 스타일 설정
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .unread-indicator {
+            color: red; /* 빨간색 동그라미 */
+            font-size: 14px;
+            margin-left: 5px;
+        }
+    `;
+    document.head.appendChild(style);
+ // 페이지 로드 시 WebSocket 설정
+    document.addEventListener('DOMContentLoaded', () => {
+        setupWebSocket();
+        updateTimeDisplay(); // 초기 페이지 로드 시 시간 업데이트
+        setChatItemClickEvents(); // 초기 클릭 이벤트 설정
+    });
+
+
+ // 채팅방 아이템 클릭 이벤트 핸들러
+    function handleChatItemClick() {
+        const roomNo = this.getAttribute('data-room-no');
+        if (roomNo) {
+            window.location.href = `/chat/${roomNo}`;
+            // 클릭 시 읽음 표시를 제거 (프론트에서만 제거)
+            const unreadIndicator = this.querySelector('.unread-indicator');
+            if (unreadIndicator) {
+                unreadIndicator.remove();
+            }
+        }
+    }
+
+ // 채팅방 클릭 이벤트 설정 함수
+    function setChatItemClickEvents() {
+        const chatItems = document.querySelectorAll('.chat-item');
+        chatItems.forEach(item => {
+            item.removeEventListener('click', handleChatItemClick); // 기존 이벤트 제거
+            item.addEventListener('click', handleChatItemClick); // 새 이벤트 추가
+        });
+    }
+
+
+
+//시간을 업데이트하는 함수
+ function updateTimeDisplay() {
+     document.querySelectorAll('.chat-item-time').forEach(item => {
+         const timeData = item.getAttribute('data-time');
+         if (timeData) {
+             item.textContent = formatTime(timeData);
+         }
+     });
+ }
+ 
+    // 시간 포맷 함수
+    function formatTime(timestamp) {
+        const messageTime = new Date(timestamp);
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - messageTime) / 1000);
+        const diffInMinutes = Math.floor(diffInSeconds / 60);
+        const diffInHours = Math.floor(diffInMinutes / 60);
+        const diffInDays = Math.floor(diffInHours / 24);
+
+        if (diffInSeconds < 60) {
+            return "방금 전"; // 1분 미만
+        } else if (diffInMinutes < 60) {
+            return `${diffInMinutes}분 전`; // 1시간 미만
+        } else if (diffInHours < 24) {
+            return `${diffInHours}시간 전`; // 24시간 미만
+        } else if (diffInDays < 7) {
+            return `${diffInDays}일 전`; // 하루 이상, 7일 미만
+        } else {
+            return messageTime.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        }
+    }
+    
+    const observer = new MutationObserver(updateTimeDisplay);
+    observer.observe(document.querySelector('.chat-list-items'), { childList: true, subtree: true });
+    const chatCreate = function () {
+        // 새로운 창을 열어서 채팅방 생성 페이지로 이동
+        let newWin = window.open('/chat/room/create', '_blank', 'width=300,height=300');
+        let timer = setInterval(function () {
+            if (newWin.closed) {
+                clearInterval(timer);
+                const pVal = document.getElementById('parent_input').value; // 생성된 방의 정보를 가져오기 위한 hidden input value
+                if (pVal != "") {
+                    const fromId = document.getElementById('from_id').value; // 현재 사용자의 아이디
+                    let obj = {
+                        to_id: pVal,
+                        from_id: fromId
+                    };
+                    const jsonData = JSON.stringify(obj);
+                    const csrfToken = document.getElementById('csrf_token').value; // CSRF 토큰 값
+                    fetch('/chat/room/create', {
+                        method: 'post',
+                        body: jsonData,
+                        headers: {
+                            "Content-Type": "application/json;charset=utf-8",
+                            "Accept": "application/json",
+                            'X-CSRF-TOKEN': csrfToken
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.res_msg); // 서버에서 반환한 메시지 표시
+                        if (data.res_code == '200') {
+                            location.href = '/chat/room/list'; // 채팅방 목록 페이지로 이동
+                            document.getElementById('parent_input').value = ''; // 입력 값 초기화
+                        }
+                    });
+                }
+            }
+        }, 1000);
+    };
+</script>
+
+    </th:block>
+</html>

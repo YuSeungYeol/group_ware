@@ -1,0 +1,189 @@
+/* src/main/resources/static/css/folder.css */
+.section-wrap {
+   
+}
+#content {
+    max-width: 900px;
+    margin-top: 150px; margin-left: 270px; margin-right: 100px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* 테이블 스타일 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table thead th {
+    background-color: #808080;
+    color: white;
+    text-align: left;
+    padding: 10px;
+}
+
+table tbody td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* 링크와 버튼 스타일 */
+a {
+    text-decoration: none;
+    color: #333; /* 색상을 더 어둡게 설정 */
+}
+
+a:hover {
+	
+}
+
+a.folderLink{
+	color: #333;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #EFEFEF;
+    color: #666;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #ddd;
+}
+
+
+#folderForm {
+    display: none; /* 처음에 폼을 숨김 */
+    margin-top: 20px;
+}
+
+#folderForm.visible {
+    display: block; /* 폼을 표시할 때 사용하는 클래스 */
+}
+
+/* src/main/resources/static/css/folder.css */
+.section-wrap {
+   
+}
+#content {
+    max-width: 900px;
+    margin-top: 150px; margin-left: 270px; margin-right: 100px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* 테이블 스타일 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table thead th {
+    background-color: #808080;
+    color: white;
+    text-align: left;
+    padding: 10px;
+}
+
+table tbody td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* 링크와 버튼 스타일 */
+a {
+    text-decoration: none;
+    color: #333; /* 색상을 더 어둡게 설정 */
+}
+
+
+a.folderLink{
+	color: #333;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #EFEFEF;
+    color: #666;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #ddd;
+}
+
+
+/* 공지사항 같은 빈 폴더 목록 알림 스타일 */
+td[colspan="3"] {
+    text-align: center;
+    font-style: italic;
+    color: #888;
+    padding: 20px;
+}
+
+#folderForm {
+    display: none; /* 처음에 폼을 숨김 */
+    margin-top: 20px;
+}
+
+#folderForm.visible {
+    display: block; /* 폼을 표시할 때 사용하는 클래스 */
+}
+
+.folder-show {
+    display: table-row !important; /* 또는 적절한 display 값 */
+}
+

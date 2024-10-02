@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{include/layout}">
+     <th:block layout:fragment="content">
+     <link th:href="@{/css/board/boardList.css}" rel="stylesheet" type="text/css">
+      <section class="main-content-custom">
+     
+     <!-- CSRF 토큰 추가 -->
+     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+    	
+	 <div id="section_wrap">
+		<div class="word">
+			<h3>게시글 상세 보기</h3>
+		</div>
+		<div class="_detail">
+			<ul>
+				<li>
+					<table>
+						<tr>
+							<td>게시글 제목</td>
+							<td th:text="${dto.boardTitle}"></td>
+						</tr>
+						<tr>
+							<td>게시글 내용</td>
+							<td th:utext="${dto.boardContent}"></td> <!-- HTML을 출력하려면 th:utext를 사용 -->
+						</tr>
+						<tr>
+							<td>작성자</td>
+							<td th:text="${dto.member != null ? dto.member.memName : '알 수 없는 사용자'}"></td>
+						</tr>
+						<tr>
+							<td>등록일</td>
+							<td th:text="${#temporals.format(dto.boardRegDate, 'yy-MM-dd HH:mm:ss')}"></td>
+						</tr>
+						<tr>
+							<td>수정일</td>
+							<td th:text="${dto.boardNewDate != null ? #temporals.format(dto.boardNewDate, 'yy-MM-dd HH:mm:ss') : '수정 전'}"></td>
+						</tr>
+					</table>
+				</li>
+			</ul>	
+		</div>
+		<div class="buttons">
+		    <th:block th:if="${dto.member != null and dto.member.memNo == loggedInUser.memNo}">
+		        <a class="update_board_button" 
+		           th:href="@{/board/update/{no}(no=${dto.boardNo})}">
+		            게시글 수정
+		        </a>
+		        <a class="delete_board_button" 
+		           th:onclick="boardDelete([[${dto.boardNo}]]);">
+		            게시글 삭제
+		        </a>
+    </th:block>
+</div>
+	</div>
+	 </section>
+	 <script>
+	    const boardDelete = function(boardNo) {
+	        if (confirm("정말 삭제하시겠습니까?")) {
+	            // CSRF 토큰 추가
+	            const csrfToken = document.querySelector('input[name="_csrf"]').value;
+	
+	            fetch('/board/' + boardNo, {
+	                method: 'delete',
+	                headers: {
+	                    'X-CSRF-TOKEN': csrfToken // CSRF 토큰 추가
+	                }
+	            })
+	            .then(response => response.json())
+	            .then(data => {
+	                if (data.res_code === '200') {
+	                    Swal.fire({
+	                        icon: 'success',
+	                        title: '성공',
+	                        text: data.res_msg,
+	                        confirmButtonText: '닫기'
+	                    }).then((result) => {
+	                        location.href = '/board/boardList'; // 삭제 후 목록으로 리다이렉트
+	                    });
+	                } else {
+	                    Swal.fire({
+	                        icon: 'error',
+	                        title: '오류',
+	                        text: data.res_msg,
+	                        confirmButtonText: '닫기'
+	                    });
+	                }
+	            })
+	            .catch(error => {
+	                console.error('Error:', error);
+	                Swal.fire({
+	                    icon: 'error',
+	                    title: '실패',
+	                    text: '서버 요청에 실패했습니다.'
+	                });
+	            });
+	        }
+	    };
+	</script>
+   </th:block>
+</html>

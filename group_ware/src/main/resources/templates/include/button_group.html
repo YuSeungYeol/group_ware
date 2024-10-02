@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <th:block th:fragment="buttonGroup">
+        <meta name="_csrf" th:content="${_csrf.token}"/>
+        <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+        <link th:href="@{/css/include/button_group.css}" rel="stylesheet" type="text/css">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <!-- 오른쪽 하단 고정 버튼 그룹 -->
+        <div class="button-group">
+            <div class="action-buttons">
+                <button class="btn green" id="btnStartWork" onclick="startWork()">출   근</button>
+                <button class="btn red" id="btnEndWork" onclick="endWork()" disabled>퇴   근</button>
+
+                <div class="dropdown">
+                    <button class="btn gray" id="btnOut" onclick="toggleDropdown()" disabled>착 석</button>
+                    <div class="dropdown-content" id="dropdownMenu">
+                        <a onclick="selectMenu('외 근')">외 근</a>
+                        <a onclick="selectMenu('외 출')">외 출</a>
+                        <a onclick="selectMenu('식 사')">식 사</a>
+                        <a onclick="selectMenu('착 석')">착 석</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 로그아웃 폼 추가 -->
+        <form id="logoutForm" th:action="@{/logout}" method="post">
+            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+        </form>
+
+        <!-- JavaScript 추가 -->
+        <script th:src="@{/js/button_group.js}"></script>
+    </th:block>
+</html>

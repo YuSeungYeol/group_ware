@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{include/layout}">
+<head>
+    <title>차량 목록</title>
+    <link rel="stylesheet" th:href="@{/css/vehicle/list.css}" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</head>
+<th:block layout:fragment="content">
+<section>
+    <h1>차량 목록</h1>
+
+    <form id="searching" th:action="@{/vehicle}" method="get">
+        <div class="search-container">
+            <div class="search-elements">
+                <select name="searchType">
+                    <option value="licensePlate" th:selected="${searchType == 'licensePlate'}">차량번호</option>
+                    <option value="vehicleModel" th:selected="${searchType == 'vehicleModel'}">차량모델</option>
+                    <option value="rentalStatus" th:selected="${searchType == 'rentalStatus'}">대여여부</option>
+                </select>
+                <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어 입력">
+                <button type="submit">검색</button>
+            </div>
+            <div class="delete-section">
+                <button type="button" id="deleteButton" disabled onclick="confirmDelete()">등록해제</button>
+            </div>
+        </div>
+    </form>
+
+    <table>
+        <colgroup>
+            <col width="30%">
+            <col width="20%">
+            <col width="15%">
+            <col width="20%">
+            <col width="15%">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>차량모델</th>
+                <th>차량번호</th>
+                <th>대여여부</th>
+                <th>등록일자</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="vehicleTableBody">
+            <tr th:each="vehicle : ${vehicles}" th:data-id="${vehicle.vehicleNo}">
+                <td th:text="${vehicle.vehicleModel}">차량모델</td>
+                <td th:text="${vehicle.licensePlate}">차량번호</td>
+                <td th:text="${vehicle.rentalStatus}">대여상태</td>
+                <td th:text="${vehicle.registrationDate}">등록일자</td>
+                <td>
+                    <a th:href="@{'/vehicle/' + ${vehicle.vehicleNo} + '/track'}" class="track-link">위치추적</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 페이징 -->
+    <div class="pagination">
+        <ul>
+            <li th:each="i : ${#numbers.sequence(0, totalPages-1)}">
+                <a th:href="@{/vehicle(searchType=${searchType}, keyword=${keyword}, page=${i}, size=${size})}"
+                   th:text="${i + 1}" th:classappend="${currentPage == i} ? 'active' : ''"></a>
+            </li>
+        </ul>
+    </div>
+</section>
+
+
+
+<script>
+    let selectedRow = null;
+    let selectedVehicleId = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const tableBody = document.getElementById('vehicleTableBody');
+        const deleteButton = document.getElementById('deleteButton');
+
+        tableBody.addEventListener('click', function(event) {
+            const targetRow = event.target.closest('tr');
+
+            if (selectedRow) {
+                selectedRow.classList.remove('selected');
+            }
+
+            if (targetRow && targetRow !== selectedRow) {
+                selectedRow = targetRow;
+                selectedVehicleId = targetRow.getAttribute('data-id');
+                selectedRow.classList.add('selected');
+                deleteButton.disabled = false;
+            } else {
+                selectedRow = null;
+                selectedVehicleId = null;
+                deleteButton.disabled = true;
+            }
+        });
+    });
+
+    function confirmDelete() {
+        if (!selectedVehicleId) {
+            Swal.fire({
+                icon: 'error',
+                title: '차량 선택 오류',
+                text: '먼저 삭제할 차량을 선택해 주세요.'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: '차량 삭제',
+            text: '선택한 차량을 삭제하려면 차량 번호를 입력해주세요.',
+            input: 'text',
+            inputPlaceholder: '차량 번호 입력',
+            showCancelButton: true,
+            confirmButtonText: '확인',
+            cancelButtonText: '취소',
+            preConfirm: (inputValue) => {
+                if (!inputValue) {
+                    Swal.showValidationMessage('차량 번호를 입력해야 합니다.');
+                }
+                return inputValue;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const inputLicensePlate = result.value;
+                const licensePlate = selectedRow.querySelector('td:nth-child(2)').textContent.trim();
+
+                if (inputLicensePlate !== licensePlate) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '차량 번호 불일치',
+                        text: '입력한 차량 번호가 선택한 차량의 번호와 일치하지 않습니다.'
+                    });
+                } else {
+                    deleteVehicle(selectedVehicleId);
+                }
+            }
+        });
+    }
+
+    function deleteVehicle(vehicleId) {
+        fetch(`/api/vehicle/delete/${vehicleId}`, {  // 경로 수정
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.res_code === '200') {
+                Swal.fire({
+                    icon: 'success',
+                    title: '삭제 완료',
+                    text: data.res_msg
+                }).then(() => {
+                    location.reload();
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: '삭제 실패',
+                    text: data.res_msg
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: '오류 발생',
+                text: '차량 삭제 중 오류가 발생했습니다. ' + error.message
+            });
+        });
+    }
+</script>
+</th:block>
+</html>

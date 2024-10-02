@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{include/layout}">
+    <th:block layout:fragment="content">
+        <link th:href="@{/css/authorization/authorizationCreate.css}" rel="stylesheet" type="text/css">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!-- Quill Editor 스타일 및 스크립트 추가 -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/quill/2.0.2/quill.snow.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/2.0.2/quill.min.js"></script>
+        <section>
+            <div id="section_wrap">
+                <form id="authorizationAddFrm" enctype="multipart/form-data">
+                    <div id="section" class="form-section">
+                        <!-- 상태 필드 숨기기 -->
+                        <input type="hidden" id="documentStatus" name="documentStatus" value="미승인">
+                        
+                        <!-- CSRF 토큰 추가 -->
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        
+                        <!-- memberNo 필드 추가 -->
+                        <input type="hidden" id="memberNo" name="memberNo" value="19">
+
+                        <!-- 문서 종류 -->
+                        <label>문서 종류</label>
+                        <select name="docType">
+                            <option value="off Report">연차 보고서</option>
+                        </select>
+
+                        <label>부서</label>
+                        <select id="departmentSelect">
+                            <option value="">전체</option>
+                        </select>
+                        <label>결재자</label>
+                        <select id="approverSelect1">
+                            <option value="">전체</option>
+                        </select>
+                        <select id="approverSelect2">
+                            <option value="">전체</option>
+                        </select>
+                        <label>참조자</label>
+                        <select id="refererSelect">
+                            <option value="">전체</option>
+                        </select>
+                    </div>
+
+                    <span>
+                        <table class="header-table">
+                            <colgroup>
+                                <col width="310">
+                                <col width="490">
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td colspan="2" class="doc-title">연차 신청서</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <table class="user-info-table">
+                                            <colgroup>
+                                                <col width="90">
+                                                <col width="220">
+                                            </colgroup>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="label">기안자</td>
+                                                    <td><input type="text"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="label">소속</td>
+                                                    <td><input type="text"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="label">기안일</td>
+                                                    <td><input type="text" placeholder="예시 : 2024-10-02"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="label">직원번호</td>
+                                                    <td><input type="text" value="19"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                    <td class="approval-info">
+                                        <table class="approval-table">
+                                            <tr>
+                                                <!-- 첫 번째 결재자 -->
+                                                <td class="vertical-text">결재자</td>
+                                                <td class="name" id="approver1Name"></td>
+
+                                                <!-- 두 번째 결재자 -->
+                                                <td class="vertical-text">결재자</td>
+                                                <td class="name" id="approver2Name"></td>
+
+                                                <!-- 참조자 -->
+                                                <td class="vertical-text">참조자</td>
+                                                <td class="name" id="refererName"></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+ 
+                        <!-- Draft Section -->
+                        <table class="draft-section">
+                            <colgroup>
+                                <col width="120">
+                                <col width="230">
+                                <col width="120">
+                                <col width="330">
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td class="label">제목</td>
+                                    <td colspan="3"><input type="text" class="info-input" name="title" placeholder="예시 : 연차 신청이요"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label">휴가 구분</td>
+                                    <td colspan="3"><input type="text" class="info-input" name="leaveType" placeholder="예시 : 연차, 반차, 병가"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label">시작 일정</td>
+                                    <td colspan="3"><input type="date" class="info-input" name="startDate"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label">종료 일정</td>
+                                    <td colspan="3"><input type="date" class="info-input" name="endDate"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label">신청일 수</td> <!-- mem_off로 변경 -->
+                                    <td colspan="4"><input type="number" step="0.5" class="info-input" name="startEndDate"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="editor-placeholder">
+                                        <div id="document-editor">
+                                            <input type="text" class="ckeditor_change">
+                                            <p style="font-size: 12px; margin-top: 10px;">* '휴가 사유' 작성란은 생략되었습니다.</p>
+                                            <p style="font-size: 12px; margin-top: 5px;">참조자가 등 휴가 사유를 반드시 작성해야 하는 경우에는 [결재요청] 클릭 후 기입 의견에 적어주세요.</p>
+                                            <p style="font-size: 12px; margin-top: 5px;">1. 연차의 사용은 근로기준법에 따라 전년도에 발생한 개인별 잔여 연차에 한하여 사용함을 원칙으로 한다.</p>
+                                            <p style="font-size: 12px; margin-top: 5px;">2. 조정된 휴가 일정 제출은 통상 업무 가능 자격을 갖춘 경우에만 제출 가능합니다.</p>
+                                            <p style="font-size: 12px; margin-top: 5px;">3. 기타 추가 정보는 서류에 작성하여 제출해야 합니다.</p> 
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </span>
+
+                    <!-- File Upload -->
+                    <div>
+                        <input type="file" name="content">
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="submitButton">
+                        <input type="button" id="submitRequest" value="결재요청">
+                        <input type="button" id="saveTemporary" value="임시저장">
+                        <input type="button" id="cancelButton" value="취소">
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <script>
+        var loggedInMemNo = '[[${loggedInMemNo}]]';
+        var quill = new Quill('#document-editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ header: [1, 2, false] }],
+                    ['bold', 'italic', 'underline'],
+                    ['image', 'code-block']
+                ]
+            }
+        });
+
+        const form = document.getElementById("authorizationAddFrm");
+        const csrfToken = document.querySelector('input[name="_csrf"]').value;
+
+        // "결재요청" 버튼 이벤트 리스너
+        document.getElementById('submitRequest').addEventListener('click', (event) => {
+            handleSubmit(event, "/authorization");
+            event.preventDefault(); // 기본 폼 제출 방지 // 결재요청 처리
+        });
+
+        // "임시저장" 버튼 이벤트 리스너
+        document.getElementById('saveTemporary').addEventListener('click', (event) => {
+            event.preventDefault();
+            let content = quill.root.innerHTML;
+
+            if (content === "<p><br></p>") {
+                Swal.fire({
+                    icon: 'error',
+                    title: '오류',
+                    text: '내용을 입력하세요.'
+                });
+                quill.focus();
+                return;
+            }
+
+            const payload = new FormData(form);
+            payload.set('content', content);
+            
+            // 문서 타입 추가
+            let docType = document.querySelector('select[name="docType"]').value;
+            payload.set('docType', docType);
+
+            // 추가 필드 설정 (필요한 값들)
+            let leaveType = document.querySelector('input[name="leaveType"]').value;
+            let startDate = document.querySelector('input[name="startDate"]').value;
+            let endDate = document.querySelector('input[name="endDate"]').value;
+            let startEndDate = document.querySelector('input[name="startEndDate"]').value;
+            
+            // 필요한 필드들을 payload에 추가
+            payload.set('leaveType', leaveType);
+            payload.set('startDate', startDate);
+            payload.set('endDate', endDate);
+            payload.set('startEndDate', startEndDate);
+
+            // 결재자 및 참조자 제외
+            payload.delete('approvers'); // 결재자 정보 삭제
+            payload.delete('referer');   // 참조자 정보 삭제
+
+            fetch("/authorization/saveTemp", {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: payload
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.res_code === '200') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '성공',
+                        text: '임시 저장이 완료되었습니다.'
+                    }).then(() => {
+                        location.href = "/authorization/authorizationStorage";
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '실패',
+                        text: data.res_msg
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Error during saveTemp request:", error);
+            });
+        });
+
+        // 공통으로 처리하는 함수 (URL에 따라 동작 변경)
+        function handleSubmit(event, apiUrl) {
+            event.preventDefault();
+            let content = quill.root.innerHTML;
+
+            // Quill 에디터가 빈 값일 때 경고
+            if (content === "<p><br></p>") {
+                Swal.fire({
+                    icon: 'error',
+                    title: '오류',
+                    text: '내용을 입력하세요.'
+                });
+                quill.focus();
+                return;
+            }
+
+            const payload = new FormData(document.getElementById('authorizationAddFrm'));
+            payload.set('content', content);  // Quill Editor 내용 추가
+
+            // 결재자와 참조자 정보 추가
+            const approvers = [];
+            const approver1 = document.querySelector('#approverSelect1 option:checked').value;
+            const approver2 = document.querySelector('#approverSelect2 option:checked').value;
+
+            if (approver1) approvers.push(parseInt(approver1));
+            if (approver2) approvers.push(parseInt(approver2));
+         	
+            // FormData에 추가할 때 JSON.stringify 사용하지 말고 배열 형태로 추가
+            approvers.forEach(approver => payload.append('approvers', approver));
+
+            payload.set('approvers', JSON.stringify(approvers));
+
+            const referer = parseInt(document.querySelector('#refererSelect option:checked').value);
+            payload.set('referer', referer);
+
+            const memberNo = document.querySelector('input[name="memberNo"]').value;
+            payload.set('memberNo', memberNo);
+
+            // 추가된 leaveType, startDate, endDate, startEndDate 필드 설정
+            payload.set('leaveType', document.querySelector('input[name="leaveType"]').value);
+            payload.set('startDate', document.querySelector('input[name="startDate"]').value);
+            payload.set('endDate', document.querySelector('input[name="endDate"]').value);
+            payload.set('startEndDate', document.querySelector('input[name="startEndDate"]').value);
+
+            // FormData의 내용 확인 (디버깅용)
+            for (let pair of payload.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+
+            // Fetch API를 사용하여 폼 데이터를 서버로 전송
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: payload
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.res_code === '200') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '성공',
+                        text: data.res_msg
+                    }).then(() => {
+                        location.href = apiUrl === "/authorization" ? "/authorization/authorizationList" : "/authorization/authorizationStorage";
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '실패',
+                        text: data.res_msg
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Error during submit request:", error);
+            });
+        }
+        
+        
+     // 부서 선택에 따른 결재자 및 참조자 목록 불러오기 (이 부분은 그대로 유지)
+        document.getElementById('departmentSelect').addEventListener('change', function() {
+            let departmentId = this.value;
+
+            // 부서 ID가 제대로 들어오는지 확인
+            console.log("Selected Department ID: ", departmentId);
+
+            // departmentId가 존재하는 경우만 API 호출
+            if (departmentId) {
+                console.log(`/approval/getEmployeesByDistributor?distributorId=${departmentId}`);  // 생성되는 URL 확인
+
+                fetch(`/approval/getEmployeesByDistributor?distributorId=${departmentId}`)
+                    .then(response => {
+                        // 응답이 정상인지 확인
+                        if (!response.ok) {
+                            throw new Error(`Error: ${response.status} ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
+                    .then(employees => {
+                        // employees 데이터가 배열 형태인지 확인
+                        console.log("Received Employees Data: ", employees);
+                        if (!Array.isArray(employees)) {
+                            console.error("응답 데이터가 배열 형태가 아닙니다.");
+                            return;
+                        }
+
+                        // "전체" 기본 옵션 추가
+                        let approverOptions = '<option value="">전체</option>';
+                        let refererOptions = '<option value="">전체</option>';
+
+                        // 각 직원 데이터 확인 후 옵션 생성
+                        employees.forEach((employee) => {
+                            console.log("Employee Data: ", employee);  // 각 직원 데이터 확인
+                            approverOptions += `<option value="${employee.memNo}">${employee.memName}</option>`;
+                            refererOptions += `<option value="${employee.memNo}">${employee.memName}</option>`;
+                        });
+
+                        // 결재자와 참조자 select box에 옵션만 설정
+                        document.getElementById('approverSelect1').innerHTML = approverOptions;
+                        document.getElementById('approverSelect2').innerHTML = approverOptions;
+                        document.getElementById('refererSelect').innerHTML = refererOptions;
+
+                        // 옵션들이 제대로 반영되었는지 확인
+                        console.log("Approver Options: ", approverOptions);
+                        console.log("Referer Options: ", refererOptions);
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                    });
+            } else {
+                // departmentId가 없는 경우 기본 옵션 설정
+                document.getElementById('approverSelect1').innerHTML = '<option value="">전체</option>';
+                document.getElementById('approverSelect2').innerHTML = '<option value="">전체</option>';
+                document.getElementById('refererSelect').innerHTML = '<option value="">전체</option>';
+            }
+        });
+
+
+        // 결재자 저장 전에 중복 체크 후 저장 (이 부분도 그대로 유지)
+        function saveApprover(authorNo, approverMemNo) {
+            fetch(`/approval/checkApprover?authorNo=${authorNo}&approverMemNo=${approverMemNo}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.exists) {
+                        fetch('/approval/saveApprover', {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                authorNo: authorNo,
+                                approverMemNo: approverMemNo,
+                                status: 'P'
+                            }),
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                console.log('Approver saved successfully');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error saving approver:', error);
+                        });
+                    } else {
+                        console.log('Approver already exists');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking approver:', error);
+                });
+        }
+        // 결재자 참조자 멤버 리스트업
+	
+        fetch('/api/distributors/getAll')
+        .then(response => response.json())
+        .then(distributors => {
+            console.log(distributors);  // 응답 데이터를 출력하여 확인
+            if (Array.isArray(distributors)) {
+                let options = '<option value="">전체</option>';
+                distributors.forEach(distributor => {
+                    options += `<option value="${distributor.distributorNo}">${distributor.distributorName}</option>`;
+                });
+                departmentSelect.innerHTML = options;
+            } else {
+                console.error("Expected an array but got", distributors);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching distributors:', error);
+        });
+		
+     // 페이지 로드 시 결재자와 참조자 정보를 기본 설정
+        document.addEventListener('DOMContentLoaded', function() {
+            updateApproverTable(); // 페이지 로드 후 바로 업데이트 실행
+        });
+
+        function updateApproverTable() {
+            const approver1 = document.querySelector('#approverSelect1 option:checked');
+            const approver2 = document.querySelector('#approverSelect2 option:checked');
+            const referer = document.querySelector('#refererSelect option:checked');
+
+            // 결재자 1 정보 업데이트
+            if (approver1 && approver1.value !== "") {
+                if (document.getElementById('approver1Name')) {
+                    document.getElementById('approver1Name').innerText = approver1.text;  // 결재자 1의 이름
+                }
+            } else {
+                if (document.getElementById('approver1Name')) {
+                    document.getElementById('approver1Name').innerText = "결재자 이름";
+                }
+            }
+
+            // 결재자 2 정보 업데이트
+            if (approver2 && approver2.value !== "") {
+                if (document.getElementById('approver2Name')) {
+                    document.getElementById('approver2Name').innerText = approver2.text;  // 결재자 2의 이름
+                }
+            } else {
+                if (document.getElementById('approver2Name')) {
+                    document.getElementById('approver2Name').innerText = "결재자 이름";
+                }
+            }
+
+            // 참조자 정보 업데이트
+            if (referer && referer.value !== "") {
+                if (document.getElementById('refererName')) {
+                    document.getElementById('refererName').innerText = referer.text;  // 참조자의 이름
+                }
+            } else {
+                if (document.getElementById('refererName')) {
+                    document.getElementById('refererName').innerText = "참조자 이름";
+                }
+            }
+        }
+
+
+     // 부서 변경 시 데이터 다시 가져오도록 이벤트 추가
+        document.getElementById('departmentSelect').addEventListener('change', function() {
+            let departmentId = this.value;
+
+            if (departmentId) {
+                fetch(`/approval/getEmployeesByDistributor?distributorId=${departmentId}`)
+                    .then(response => response.json())
+                    .then(employees => {
+                    	console.log("Received Employees Data: ", employees);  // 여기서 데이터를 확인
+                        let approverOptions = '<option value="">전체</option>';
+                        let refererOptions = '<option value="">전체</option>';
+
+                        employees.forEach((employee) => {
+                            approverOptions += `<option value="${employee.memNo}" data-name="${employee.memName}">${employee.memName}</option>`;
+                            refererOptions += `<option value="${employee.memNo}" data-name="${employee.memName}">${employee.memName}</option>`;
+                        });
+
+                        document.getElementById('approverSelect1').innerHTML = approverOptions;
+                        document.getElementById('approverSelect2').innerHTML = approverOptions;
+                        document.getElementById('refererSelect').innerHTML = refererOptions;
+
+                        // 결재자 및 참조자 정보 업데이트
+                        updateApproverTable();
+                    })
+                    .catch(error => console.error('Fetch error:', error));
+            }
+        });
+
+        // 결재자 및 참조자 정보 업데이트
+		function updateApproverTable() {
+		    const approver1 = document.querySelector('#approverSelect1 option:checked');
+		    const approver2 = document.querySelector('#approverSelect2 option:checked');
+		    const referer = document.querySelector('#refererSelect option:checked');
+		
+		    // 결재자 1 정보 업데이트
+		    if (approver1 && approver1.value !== "") {
+		        document.getElementById('approver1Name').innerText = approver1.text || "결재자 이름";
+		    } else {
+		        document.getElementById('approver1Name').innerText = "";
+		    }
+		
+		    // 결재자 2 정보 업데이트
+		    if (approver2 && approver2.value !== "") {
+		        document.getElementById('approver2Name').innerText = approver2.text || "결재자 이름";
+		    } else {
+		        document.getElementById('approver2Name').innerText = "";
+		    }
+		
+		    // 참조자 정보 업데이트
+		    if (referer && referer.value !== "") {
+		        document.getElementById('refererName').innerText = referer.text || "참조자 이름";
+		    } else {
+		        document.getElementById('refererName').innerText = "";
+		    }
+		}
+		
+		// 결재자 또는 참조자 선택 시 자동 반영
+		document.getElementById('approverSelect1').addEventListener('change', updateApproverTable);
+		document.getElementById('approverSelect2').addEventListener('change', updateApproverTable);
+		document.getElementById('refererSelect').addEventListener('change', updateApproverTable);
+
+		document.getElementById('cancelButton').addEventListener('click', function() {
+		    window.location.href = "/authorization/authorizationList";
+		});
+        </script>
+    </th:block>
+</html>

@@ -1,0 +1,75 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.2'
+    id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'com.ware'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Thymeleaf (템플릿 엔진)
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    // Thymeleaf Layout Dialect (레이아웃 템플릿 사용)
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0'
+    // Thymeleaf Extras for Spring Security
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    // Spring Web (웹 애플리케이션 개발)
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    // Spring Data JPA (데이터베이스 연동)
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // Spring WebSocket (웹소켓)
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    // Spring Validation (입력 데이터 검증)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // Spring Security (인증 및 인가)
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    // MariaDB 드라이버 (MySQL 계열 DB 연동)
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.2'
+    // javax.annotation
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    
+    // Lombok (자동으로 getter/setter 등을 생성)
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    // Spring DevTools (개발 편의성 도구)
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    // 테스트 관련 라이브러리
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    
+    
+    // ckeditor을 위해 추가
+    implementation 'org.jsoup:jsoup:1.14.3' 
+    
+    
+    //출퇴근관련
+    tasks.withType(JavaCompile) {
+    options.compilerArgs << '-parameters'
+}
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// 결재 확인을 위해 추가
+tasks.withType(JavaCompile) {
+  options.compilerArgs << '-parameters'
+}

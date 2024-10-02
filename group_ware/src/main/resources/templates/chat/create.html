@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" >
+    <th:block layout:fragment="content">
+        <link th:href="@{/css/chat/create.css}" rel="stylesheet" type="text/css">
+
+        <section id="section-warp">
+            <div id="section_wrap">
+				<div class="word">
+					<h3>회원 목록</h3>
+				</div><br>
+				<div class="member_list">
+					<table>
+						<colgroup>
+							<col width="30%">
+							<col width="70%">
+						</colgroup>
+						<thead>
+							<tr>
+								<th>선택</th>
+								<th>회원명</th>
+							</tr>
+						</thead>
+						<tbody>
+							<th:block th:if="${#lists.isEmpty(resultList)}">
+								<tr>
+									<td colspan="2">채팅이 가능한 회원이 없습니다.</td>
+								</tr>
+							</th:block>
+							<th:block th:if="${!#lists.isEmpty(resultList)}">
+								<tr th:each="member, memberStat : ${resultList}">
+									<td>
+										<input type="radio" name="selected_member" id="selected_member"
+										th:value ="${member.mem_id}">
+									</td>
+									<td th:text="${member.mem_name}"></td>
+								</tr>
+							</th:block>
+						</tbody>
+					</table>
+					<br>
+					<input type="button" value="채팅 시작" style="float:right;"
+					onclick="createChatRoom();">
+				</div>
+			</div>
+		</section>
+		<script>
+			const createChatRoom = function(){
+				const selectedVal = document.querySelector('input[name="selected_member"]:checked').value;
+				opener.document.getElementById('parent_input').value = selectedVal;
+				window.close();
+			}
+		</script>
+		
+    </th:block>
+</html>

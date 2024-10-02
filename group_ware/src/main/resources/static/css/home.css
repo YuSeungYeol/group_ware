@@ -1,0 +1,5 @@
+#content {
+    margin-left: 250px; /* 사이드바의 넓이만큼 마진 */
+   	padding : 20px;
+    flex-grow: 1;
+}

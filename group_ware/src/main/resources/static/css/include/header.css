@@ -1,0 +1,102 @@
+#header_wrap {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    padding: 10px 20px; 
+    background-color: #333; 
+    color: white;
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%; 
+    z-index: 1000; 
+    box-sizing: border-box;
+    height: 60px; 
+    border-bottom: 2px solid #444; 
+}
+#logo{
+	margin-left:25px;
+	width : 120px;
+}
+
+.menu_tap a {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.menu_tap img {
+    height: 40px; 
+    margin-right: 10px; /
+}
+
+#menu_right {
+    display: flex;
+    gap: 20px; 
+}
+
+
+button {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    width: 100px; 
+    height: 40px; 
+    padding: 0;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.4); 
+    border: none;
+    cursor: pointer;
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+}
+
+button:hover {
+    background-color: #555;
+    color: #FFA500;
+}
+
+button:disabled {
+    background-color: #ddd;
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+/* 버튼 활성화/비활성화 상태 */
+#check_in.active {
+    background-color: #ffcc00;
+    color: #000;
+}
+
+#check_out.disabled {
+    background-color: #ddd;
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+#away.active {
+    background-color: #28a745; 
+    color: #fff;
+}
+
+#away.inactive {
+    background-color: rgba(0, 0, 0, 0.4); 
+    color: #fff;
+}
+
+#away.checked-in {
+    background-color: #ddd; /* 착석 상태 배경색 */
+    color: #000;
+}
+
+/* body의 상단 여백 */
+body {
+    padding-top: 60px; /* 헤더 높이만큼 상단 여백 추가 */
+    margin: 0;
+    font-family: 'Noto Sans', sans-serif;
+}

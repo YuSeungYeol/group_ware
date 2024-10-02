@@ -1,0 +1,132 @@
+/* 전체 섹션 스타일 */
+.main-content-custom {
+    margin-top: 100px;
+    margin-left: 270px;
+    margin-right: 120px;
+    margin-bottom: 100px;
+    padding: 20px;
+    background-color: #F6F4FA;
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    min-height: 600px;
+}
+
+/* 테이블 스타일 */
+.table-custom {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.table-custom th, .table-custom td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.table-custom th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.table-custom td a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.table-custom td a:hover {
+    text-decoration: underline;
+}
+
+/* 테이블 hover 효과 */
+.table-custom tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* 모달 스타일 */
+.modal-custom {
+    display: none;
+    position:fixed;
+    z-index: 1000;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%; /* 너비 설정 */
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+}
+
+.modal-content-custom {
+    width: 100%;
+    text-align: left;
+}
+
+/* 버튼 스타일 */
+.custom-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    margin-top: 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.custom-button:hover {
+    background-color: #45a049;
+}
+
+/* 하단 버튼 */
+.bottom-buttons-custom {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+    background-color: #EFEFEF;
+    position:fixed;
+    bottom: 10px;
+    right: 10px;
+    z-index: 1001; /* 높은 우선순위 */
+}
+
+.bottom-buttons-custom .btn-custom {
+    width: 70px;
+    background-color: #ddd;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: #333;
+}
+
+.bottom-buttons-custom .btn-custom:hover {
+    background-color: #ccc;
+}
+
+/* 완료된 문서와 진행 중인 문서 스타일 */
+.status-complete {
+    color: #4CAF50; /* 초록색 */
+    font-weight: bold;
+}
+
+.status-pending {
+    color: #FFA500; /* 주황색 */
+    font-weight: bold;
+}
+
+.status-rejected {
+    color: #FF0000; /* 빨간색 */
+    font-weight: bold;
+}
+
+
+
+

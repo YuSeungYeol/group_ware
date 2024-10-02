@@ -1,0 +1,73 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: rgba(248, 248, 255, 1);
+
+}
+.member-info-container {
+    width: 77%;
+    margin-left: 270px;
+    margin-right: 100px;
+    padding: 20px;
+    background-color: rgba(248, 248, 255, 1);
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
+        justify-content:center;
+    align-content:center;
+}
+
+.member-detail {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.member-detail label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size:0.9rem;
+}
+
+.member-detail input, .member-detail select, .member-detail button {
+    width: 50%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(200, 200, 200, 1);
+    background-color: rgba(248, 248, 255, 1);
+}
+
+.button-div {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.register-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background-color: rgba(239, 239, 239, 0.9);
+    color: #666;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.register-button:hover {
+    background-color: rgba(252, 240, 250, 1);
+    color: black;
+}
+
+.profile-images {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 10px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid rgba(200, 200, 200, 1);
+}
+
+.profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}

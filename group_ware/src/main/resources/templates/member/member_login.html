@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block>
+    <head>
+        <link th:href="@{/css/member/member_login.css}" rel="stylesheet" type="text/css">
+    </head>
+    <section>
+        <!-- 로그인 페이지 전체 컨테이너 -->
+        <div class="container">
+            <!-- 배경 이미지 -->
+            <div class="background-image"></div>
+
+            <!-- 하얀색 배경이 열리는 애니메이션 요소 -->
+            <div class="white-background" id="white-background-left"></div>
+            <div class="white-background" id="white-background-right"></div>
+
+            <!-- 로그인 폼이 있는 부분 -->
+            <div class="login-box hidden" id="login-box">
+                <form id="loginForm" th:action="@{/login}" method="POST">
+                    <!-- CSRF 토큰 추가 -->
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                    <div class="input-group1">
+                        <div class="floating-label">
+                            <input type="text" id="mem_id" name="mem_id" required placeholder=" ">
+                            <label for="mem_id">아이디 또는 전화번호</label>
+                        </div>
+                    </div>
+
+                    <div class="input-group2">
+                        <div class="floating-label">
+                            <input type="password" id="mem_pw" name="mem_pw" required placeholder=" ">
+                            <label for="mem_pw">비밀번호</label>
+                        </div>
+                    </div>
+
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember-me" name="remember-me">
+                        <label for="remember-me">아이디 기억하기</label>
+                    </div>
+
+                    <button type="submit">로그인</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 스크립트 -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // 배경 열림 애니메이션 시작
+                function openBackground() {
+                    const leftBg = document.getElementById("white-background-left");
+                    const rightBg = document.getElementById("white-background-right");
+                    const loginBox = document.getElementById("login-box");
+
+                    leftBg.classList.add("open-left");
+                    rightBg.classList.add("open-right");
+
+                    setTimeout(() => {
+                        loginBox.classList.remove("hidden");
+                        loginBox.classList.add("show");
+                    }, 1000); // 애니메이션 시간에 맞춰 로그인 폼 표시
+                }
+
+                setTimeout(openBackground, 1500); 
+                document.addEventListener("click", openBackground);
+
+                // 로그인 실패 시 흔들림 효과
+                function shakeLoginBox() {
+                    const loginBox = document.getElementById("login-box");
+                    loginBox.classList.add("shake", "error");
+                    setTimeout(() => {
+                        loginBox.classList.remove("shake", "error");
+                    }, 500);
+                }
+
+                // 로그인 성공 시 배경이 날아가는 애니메이션 실행
+                function closeBackgroundOnSuccess() {
+                    const leftBg = document.getElementById("white-background-left");
+                    const rightBg = document.getElementById("white-background-right");
+                    const loginBox = document.getElementById("login-box");
+
+                    // 1단계: 로그인 박스가 위로 사라짐
+                    loginBox.classList.add("slide-up");
+
+                    // 1초 후 하얀 배경을 닫는 애니메이션 실행
+                    setTimeout(() => {
+                        leftBg.classList.remove("open-left");
+                        rightBg.classList.remove("open-right");
+                        leftBg.classList.add("close-left");
+                        rightBg.classList.add("close-right");
+
+                        // 홈으로 리다이렉트
+                        setTimeout(() => {
+                            window.location.href = "/"; // 홈으로 이동
+                        }, 1000); // 닫히는 애니메이션 시간 후 페이지 이동
+                    }, 1000);
+                }
+
+                // 로그인 폼 제출 시 처리
+                const loginForm = document.getElementById("loginForm");
+                if (loginForm) {
+                    loginForm.addEventListener("submit", function (event) {
+                        event.preventDefault(); // 폼 제출 중단 (서버 응답 확인 전까지)
+
+                        const form = this;
+                        const formData = new FormData(form);
+
+                        fetch(form.action, {
+                            method: form.method,
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.json().then(data => {
+                                    throw new Error(data.error);
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            closeBackgroundOnSuccess(); // 로그인 성공 시 애니메이션 실행
+                        })
+                        .catch(error => {
+                            shakeLoginBox();  // 로그인 실패 시 흔들림
+                            console.error("Login Error:", error); 
+                        });
+                    });
+                }
+            });
+        </script>
+    </section>
+</th:block>

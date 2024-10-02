@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{include/layout}">
+    <th:block layout:fragment="content">
+        <link th:href="@{/css/member/member_register.css}" rel="stylesheet" type="text/css">
+        <section>
+            <div class="registration-container">
+                <form id="profileForm" action="/api/member/register" method="post" enctype="multipart/form-data">
+                    <!-- CSRF 토큰을 폼에 추가 -->
+                    <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+
+                    <div class="left-section">
+                        <div class="input-group">
+                            <label for="profileImage" class="image-label">프로필 사진</label>
+                            <button type="button" id="changeImageButton" onclick="triggerFileInput()">첨부하기</button>
+                            <div id="image_container" class="draggable-container">
+                                <img id="profile-pic" src="#" class="draggable-image" />
+                            </div>
+                            <input type="file" id="profileImage" name="profileImage" class="image" accept="image/*" style="display:none;">
+                        </div>
+                        <div class="input-group">
+                            <label id="input-label" for="mem_id">아이디</label>
+                            <input type="text" id="mem_id" name="mem_id" required>
+                        </div>
+                        <div class="input-group">
+                            <label id="input-label" for="mem_pw">비밀번호</label>
+                            <input type="password" id="mem_pw" name="mem_pw" required>
+                        </div>
+                        <div class="input-group">
+                            <label id="input-label" for="mem_pw_check">비밀번호 확인</label>
+                            <input type="password" id="mem_pw_check" name="mem_pw_check" required>
+                        </div>
+                        <div class="input-group">
+                            <label id="input-label" for="mem_name">이름</label>
+                            <input type="text" id="mem_name" name="mem_name" required>
+                        </div>
+                        <div class="input-group">
+                            <label id="input-label" for="mem_phone">전화번호</label>
+                            <input type="text" id="mem_phone" name="mem_phone" required placeholder="-없이 숫자만 입력해주세요">
+                        </div>
+                        <div class="input-group">
+                            <label id="input-label" for="distributor_no">소속</label>
+                            <select id="distributor_no" name="distributor_no" required class="searchable-select">
+                                <option value="">지점을 선택하세요</option>
+                                <option th:each="distributor : ${distributors}" th:value="${distributor.distributorNo}" th:text="${distributor.distributorName}"></option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label id="input-label" for="rank_no">직급</label>
+                            <select id="rank_no" name="rank_no" required>
+                                <option value="">직급을 선택하세요</option>
+                                <option th:each="rank : ${rank}" th:value="${rank.rankNo}" th:text="${rank.rankName}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="right-section">
+                        <div class="input-group">
+                            <label for="mem_reg_date">입사일</label>
+                            <input type="date" id="mem_reg_date" name="mem_reg_date" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="mem_email">이메일</label>
+                            <div class="email-group">
+                                <div class="email-row">
+                                    <input type="text" id="email_user" name="email_user" placeholder="이메일 입력" required>
+                                    <small>@</small>
+                                    <input type="text" id="email_domain" name="email_domain" placeholder="도메인 입력" readonly>
+                                </div>
+                                <div class="email-row">
+                                    <select id="email_select" onchange="handleEmailDomainChange(this)">
+                                        <option value="direct">직접입력</option>
+                                        <option value="naver.com">naver.com</option>
+                                        <option value="gmail.com">gmail.com</option>
+                                        <option value="hanmail.net">hanmail.net</option>
+                                        <option value="nate.com">nate.com</option>
+                                        <option value="kakao.com">kakao.com</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-div">
+                        <button type="submit" class="register-button">회원 등록</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <script th:src="@{/js/member_register.js}"></script>
+    </th:block>
+</html>

@@ -1,0 +1,226 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+}
+
+.container {
+    display: flex;
+    justify-content: center; /* 중앙으로 정렬 */
+    align-items: center;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 배경 이미지 */
+.background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('/image/loginCar.jpg') no-repeat center center;
+    background-size: cover;
+    z-index: 1; /* 이미지가 가장 아래 레이어에 배치 */
+    transition: transform 1s ease-in-out; /* 애니메이션 적용을 위한 기본 설정 */
+}
+
+/* 하얀색 배경이 열리는 애니메이션 */
+.white-background {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    background-color: white;
+    z-index: 2; /* 하얀색 배경이 이미지 위에 놓임 */
+    transition: transform 0.5s ease-in-out;
+}
+
+/* 왼쪽 하얀색 배경 */
+#white-background-left {
+    left: 0;
+    transform-origin: left; /* 왼쪽에서 열림 */
+}
+
+/* 오른쪽 하얀색 배경 */
+#white-background-right {
+    right: 0;
+    transform-origin: right; /* 오른쪽에서 열림 */
+}
+
+/* 좌우로 열리는 애니메이션 */
+.open-left {
+    transform: translateX(-100%);
+}
+.open-right {
+    transform: translateX(100%);
+}
+
+/* 로그인 폼 */
+.login-box {
+    width: 300px;
+    background-color: #fff;
+    padding-top: 30px;
+    padding-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 3; /* 로그인 박스는 하얀색 배경 위에 배치 */
+    position: relative; /* 중앙 정렬을 위해 relative로 변경 */
+    opacity: 0; /* 처음엔 투명하게 시작 */
+    transform: translateY(50px); /* 아래로 내림 */
+    transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+}
+
+.login-box.show {
+    opacity: 1;
+    transform: translateY(0); /* 폼이 위로 올라옴 */
+}
+
+/* 로그인 박스가 위로 사라지는 애니메이션 */
+@keyframes slideUp {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+}
+
+/* 위로 사라짐 적용 클래스 */
+.login-box.slide-up {
+    animation: slideUp 1s ease forwards;
+}
+
+/* 입력 그룹 및 플로팅 라벨 */
+.input-group1  {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+}
+.input-group2 {
+    margin-bottom: 7px;
+    display: flex;
+    justify-content: center;
+}
+
+.floating-label {
+    position: relative;
+    width: 80%;
+}
+
+.floating-label input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 10px;
+    outline: none;
+}
+
+.floating-label label {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    font-size: 14px;  /* 기본 크기 */
+    color: #aaa;
+    transition: 0.3s ease;
+    pointer-events: none;
+}
+
+/* 입력 필드가 포커스를 받으면 라벨이 위로 이동 */
+.floating-label input:focus ~ label,
+.floating-label input:not(:placeholder-shown) ~ label {
+    top: -11px; /* 위로 이동 */
+    font-size: 10px; /* 작은 크기 */
+    color: gray; /* 색상 변화 */
+    left:5px;
+}
+
+/* 로그인 버튼 */
+button {
+    width: 80%;
+    padding: 5px;
+    background-color: #F6F4FA;
+    border: none;
+    border-radius: 5px;
+    color: black;
+    font-size: 10px;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto;
+}
+
+button:hover {
+    background-color: #ddd;
+}
+
+/* 로그인 폼 흔들림 애니메이션 */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-10px); }
+    40%, 80% { transform: translateX(10px); }
+}
+@keyframes slideRight {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+.login-box.slide-right {
+    animation: slideRight 0.3s ease forwards;
+}
+.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* Remember me 스타일 */
+.remember-me {
+    display: flex;
+    justify-content: left;
+    margin-bottom: 7px;
+    margin-left: 30px;
+}
+
+.error {
+    border: 2px solid red;
+}
+
+.remember-me input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.remember-me label {
+    font-size: 10px;
+    color: #666;
+}
+
+/* 하얀 배경이 다시 닫히는 애니메이션 */
+.close-left {
+    transform: translateX(0); /* 왼쪽 배경이 원래 위치로 돌아감 */
+}
+
+.close-right {
+    transform: translateX(0); /* 오른쪽 배경이 원래 위치로 돌아감 */
+}
+
+/* 로그인 박스가 투명하게 사라지는 애니메이션 */
+.login-box.fade-out {
+    opacity: 0;
+    transition: opacity 1.5s ease;
+}
+
+    

@@ -1,0 +1,58 @@
+@charset "UTF-8";
+	.ck-editor__editable .ck-table-bogus-paragraph {
+	    display: inline-block;
+	    width: 100%;
+	    padding: 10px;
+	    text-align: left;
+	    border: 1px solid #000;
+	    height: 40px;
+	}
+	
+	/* 전체 테이블 스타일 */
+	.ck-editor__editable .ck-table-bogus-paragraph table {
+	    width: 100% !important;
+	    border-collapse: collapse !important;
+	    margin-bottom: 20px !important;
+	    font-family: Arial, sans-serif !important;
+	    color: #000 !important;
+	    border: 2px solid #000 !important;
+	}
+	
+	/* 테이블 셀 스타일 */
+	.ck-editor__editable .ck-table-bogus-paragraph table td {
+	    padding: 10px;
+	    text-align: left;
+	    border: 1px solid #000;
+	    height: 40px;
+	}
+	
+	/* 첫 번째 테이블의 소속, 성명, 사원번호 셀 스타일 */
+	.ck-editor__editable .ck-table-bogus-paragraph .identity-table td {
+	    width: 25%;
+	}
+	
+	/* 제목을 포함한 두 번째 테이블 스타일 */
+	.ck-editor__editable .ck-table-bogus-paragraph .main-table .title {
+	    text-align: center;
+	    font-weight: bold;
+	    background-color: #e0e0e0;
+	}
+	
+	/* 결재 및 참조 섹션 스타일 */
+	.ck-editor__editable .ck-table-bogus-paragraph .approval-table .approval, 
+	.ck-editor__editable .ck-table-bogus-paragraph .approval-table .referer {
+	    text-align: center;
+	    font-weight: bold;
+	    background-color: #e0e0e0;
+	}
+	
+	/* 설명 섹션 스타일 */
+	.ck-editor__editable .ck-table-bogus-paragraph .explanation-section {
+	    font-size: 12px;
+	    line-height: 1.5;
+	    margin-top: 10px;
+	}
+	
+	.ck-editor__editable .ck-table-bogus-paragraph .explanation-section p {
+	    margin: 5px 0;
+	}

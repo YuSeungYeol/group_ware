@@ -1,0 +1,41 @@
+/* 전체 섹션 스타일 */
+.main-content-custom {
+    margin-left: 285px; /* 사이드바 너비에 맞춤 */
+    padding: 20px;
+    background-color: #f4f4f4;
+    min-height: 100vh; /* 전체 페이지를 채우는 높이 */
+    margin-right: 150px;
+}
+
+/* 테이블 스타일 */
+.table-custom {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.table-custom th, .table-custom td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.table-custom th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.table-custom td a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.table-custom td a:hover {
+    text-decoration: underline;
+}
+
+/* 테이블 hover 효과 */
+.table-custom tr:hover {
+    background-color: #f9f9f9;
+}

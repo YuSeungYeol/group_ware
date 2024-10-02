@@ -1,0 +1,109 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: rgba(248, 248, 255, 1);
+}
+
+.mypage-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: rgba(248, 248, 255, 1);
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    margin-left: 270px;  /* 좌측 마진 유지 */
+    margin-right: 110px; /* 우측 마진 */
+    margin-top: 110px;  /* 상단 마진 유지 */
+    min-height: calc(100vh - 110px); /* 화면 높이를 기준으로 상단 마진을 뺀 높이 */
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+form {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.myprofile-image-container {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid rgba(200, 200, 200, 1);
+    margin-bottom: 10px; /* 입력 필드와의 간격을 위한 마진 */
+ 
+}
+
+.profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.myinfo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 모든 요소를 가로 중앙 정렬 */
+    width: 30%;  /* 정보 섹션이 전체의 50% 차지 */
+}
+
+/* 라벨과 인풋이 각각 블록처럼 쌓이도록 설정 */
+.input-group-my, .input-group-my-edit {
+    display: block;
+    margin-bottom: 10px;
+    width: 100%;
+    margin-right:14px;
+}
+
+/* 라벨이 한 줄에 나타나게 설정 */
+.input-group-my label, .input-group-my-edit label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.input-group-my input{
+	background-color : #c4c4c4;
+	border:1.2px solid #4d4d4d;
+}
+.input-group-my-edit input {
+	background-color : #ffffdb;
+	border:1.2px solid #4d4d4d;
+	}
+/* 인풋 필드가 라벨 아래로 내려오도록 */
+input, select {
+    width: 100%;
+    padding: 8px 8px 8px 8px;
+    border-radius: 10px;
+
+}
+
+.button-div {
+    text-align: right;
+    margin-top: 20px;
+    width: 110%; /* 버튼이 정렬될 섹션의 너비 */
+}
+
+.register-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background-color: rgba(239, 239, 239, 0.9);
+    color: #666;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.register-button:hover {
+    background-color: rgba(252, 240, 250, 1);
+    color: black;
+}
