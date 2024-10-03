@@ -36,10 +36,27 @@ public class NoticeService {
     }
     // 공지사항 등록
     public Notice createNotice(NoticeDto dto, Member member) {
-    		Notice notice = dto.toEntity();
-        	notice.setMember(member);  // mem_no 값을 설정
-        return noticeRepository.save(notice); 
+        Notice notice = dto.toEntity();
+        notice.setMember(member);
+
+        // noticeSchedule 값이 null이면 기본값을 "N"으로 설정
+        if (dto.getNoticeSchedule() == null) {
+            notice.setNoticeSchedule("N");
+        }
+
+        // 일정이 설정된 경우만 날짜를 설정
+        if ("Y".equals(dto.getNoticeSchedule())) {
+            notice.setNoticeStartDate(dto.getNoticeStartDate());
+            notice.setNoticeEndDate(dto.getNoticeEndDate());
+        } else {
+            notice.setNoticeStartDate(null);
+            notice.setNoticeEndDate(null);
+        }
+
+        return noticeRepository.save(notice);
     }
+
+
     // 공지사항 상세화면 
     public NoticeDto selectNoticeOne(Long notice_no) {
     		Notice origin = noticeRepository.findByNoticeNo(notice_no);

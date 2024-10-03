@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -553,7 +554,6 @@ public class AuthorizationService {
 	            throw new IllegalArgumentException("참조자 경로를 찾을 수 없습니다.");
 	        }
 	    }
-
 
 
 }

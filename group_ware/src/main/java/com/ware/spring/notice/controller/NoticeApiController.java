@@ -43,25 +43,13 @@ public class NoticeApiController {
         resultMap.put("res_code", "404");
         resultMap.put("res_msg", "게시글 등록 중 오류가 발생했습니다.");
 
-        // 로그인한 사용자 정보 가져오기 (Principal 또는 Session)
-        String username;
-        if (principal != null) {
-            username = principal.getName();
-        } else {
-            Member loggedInMember = (Member) session.getAttribute("loggedInUser");
-            if (loggedInMember == null) {
-                resultMap.put("res_msg", "로그인이 필요합니다.");
-                return resultMap;
-            }
-            username = loggedInMember.getMemId();
-        }
+        // 로그인한 사용자 정보 가져오기
+        String username = principal != null ? principal.getName() : ((Member) session.getAttribute("loggedInUser")).getMemId();
 
-        // Member 조회
         Member loggedInMember = memberRepository.findByMemId(username)
-                .orElseThrow(() -> new RuntimeException("로그인된 사용자를 찾을 수 없습니다."));
+            .orElseThrow(() -> new RuntimeException("로그인된 사용자를 찾을 수 없습니다."));
 
-        // 로그인한 사용자의 등급 확인 (rank_no >= 6 인지 확인)
-        if (loggedInMember.getRank().getRankNo() < 6) { // rankNo가 6 미만인 경우 접근 제한
+        if (loggedInMember.getRank().getRankNo() < 6) {
             resultMap.put("res_msg", "공지사항 등록 권한이 없습니다.");
             return resultMap;
         }
@@ -70,6 +58,19 @@ public class NoticeApiController {
         dto.setMember(loggedInMember);
         dto.setNoticeView(0);  // 조회수 기본값 설정
 
+        // 체크박스 값이 'Y'인지 확인
+        if ("Y".equals(dto.getNoticeSchedule())) {
+            // 공지 시작일과 종료일이 모두 입력되었는지 확인
+            if (dto.getNoticeStartDate() == null || dto.getNoticeEndDate() == null) {
+                resultMap.put("res_msg", "공지 시작일과 종료일을 입력하세요.");
+                return resultMap;
+            }
+        } else {
+            // 체크박스가 체크되지 않은 경우 날짜 필드는 무시
+            dto.setNoticeStartDate(null);
+            dto.setNoticeEndDate(null);
+        }
+
         if (noticeService.createNotice(dto, loggedInMember) != null) {
             resultMap.put("res_code", "200");
             resultMap.put("res_msg", "게시글이 성공적으로 등록되었습니다.");
@@ -77,6 +78,9 @@ public class NoticeApiController {
 
         return resultMap;
     }
+
+
+
 
     // 공지사항 수정
     @ResponseBody

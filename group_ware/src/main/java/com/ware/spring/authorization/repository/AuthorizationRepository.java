@@ -25,5 +25,5 @@ public interface AuthorizationRepository extends JpaRepository<Authorization, Lo
 
 	List<Authorization> findByMember_MemNoAndAuthorStatusIn(Long memNo, List<String> statuses);
 
-	
+
 }
