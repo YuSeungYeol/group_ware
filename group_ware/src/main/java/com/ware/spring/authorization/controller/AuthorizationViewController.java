@@ -282,7 +282,7 @@ public class AuthorizationViewController {
     public AuthorizationDto getCompletedAuthorizationById(@PathVariable("authorNo") Long authorNo) {
         Authorization authorization = authorizationRepository.findByAuthorNo(authorNo);
         
-        if (authorization == null) {  // null 체크 수행
+        if (authorization == null) {
             throw new IllegalArgumentException("Authorization not found: " + authorNo);
         }
 
@@ -291,11 +291,26 @@ public class AuthorizationViewController {
         // 결재 경로 추가
         List<ApprovalRouteDto> approvalRouteDtos = approvalRouteRepository.findByAuthorization_AuthorNo(authorization.getAuthorNo())
                 .stream()
-                .map(route -> ApprovalRouteDto.toDto(route)) // ApprovalRoute -> ApprovalRouteDto 변환
+                .map(route -> {
+                    ApprovalRouteDto dto = ApprovalRouteDto.toDto(route);
+                    
+                    // 결재자 서명 추가
+                    if ("Y".equals(route.getIsApprover())) {
+                        dto.setApproverSignature(route.getApproverSignature());
+                    }
+
+                    // 참조자 서명 추가
+                    if ("Y".equals(route.getIsReferer())) {
+                        dto.setRefererSignature(route.getRefererSignature());
+                    }
+
+                    return dto;
+                })
                 .collect(Collectors.toList());
 
         authorizationDto.setApprovalRoutes(approvalRouteDtos); // DTO에 결재 경로 추가
         return authorizationDto;
     }
+
 
 }

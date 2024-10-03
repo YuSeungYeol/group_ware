@@ -117,16 +117,16 @@ public class ApprovalRouteService {
     // ApprovalRoute 생성 메서드
     @Transactional
     public ApprovalRoute createApprovalRoute(Long authorNo, Long memNo, String approvalStatus, int approvalOrder, boolean isApprover, boolean isReferer, String signature) {
+        // AuthorNo, MemNo 확인
         Authorization authorization = authorizationRepository.findById(authorNo)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid authorNo"));
+        System.out.println("AuthorNo: " + authorization.getAuthorNo());
 
         Member member = memberRepository.findById(memNo)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid memberNo"));
-
-        // 로그 추가 (디버깅용)
         System.out.println("MemberNo: " + member.getMemNo());
-        System.out.println("AuthorNo: " + authorization.getAuthorNo());
 
+        // ApprovalRouteBuilder에 저장할 데이터들 확인
         ApprovalRoute.ApprovalRouteBuilder routeBuilder = ApprovalRoute.builder()
                 .authorization(authorization)
                 .member(member)
@@ -139,16 +139,27 @@ public class ApprovalRouteService {
         // 결재자인 경우 서명 저장
         if (isApprover) {
             routeBuilder.approverSignature(signature);
+            System.out.println("결재자 서명 저장: " + signature);  // 디버깅 로그 추가
         }
 
         // 참조자인 경우 서명 저장
         if (isReferer) {
             routeBuilder.refererSignature(signature);
+            System.out.println("참조자 서명 저장: " + signature);  // 디버깅 로그 추가
         }
 
-        ApprovalRoute approvalRoute = routeBuilder.build();
-        return approvalRouteRepository.save(approvalRoute);
+        // ApprovalRoute 저장 후 로그 출력
+        ApprovalRoute approvalRoute = approvalRouteRepository.save(routeBuilder.build());
+        System.out.println("ApprovalRoute 저장 완료: " + approvalRoute.getApproNo());
+
+        // 결재자 서명과 참조자 서명 상태 확인
+        System.out.println("최종 결재자 서명: " + approvalRoute.getApproverSignature());
+        System.out.println("최종 참조자 서명: " + approvalRoute.getRefererSignature());
+
+        return approvalRoute;
     }
+
+
 
     
     @Transactional

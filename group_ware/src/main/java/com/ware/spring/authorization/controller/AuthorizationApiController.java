@@ -330,7 +330,7 @@ public class AuthorizationApiController {
     }
 
     // 결재 모달창 상세 확인
-	@RequestMapping(value = "/api/authorization/{authorNo}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/authorization/{authorNo}", method = RequestMethod.GET)
     @ResponseBody
     public AuthorizationDto getAuthorizationById(@PathVariable("authorNo") Long authorNo) {
         System.out.println("Entering getAuthorizationById method with authorNo: " + authorNo);
@@ -355,11 +355,20 @@ public class AuthorizationApiController {
             List<ApprovalRouteDto> referers = new ArrayList<>();
             
             for (ApprovalRoute route : approvalRoutes) {
+                ApprovalRouteDto dto = ApprovalRouteDto.toDto(route);
+                
+                // 서명 필드 추가
+                dto.setApproverSignature(route.getApproverSignature());
+                dto.setRefererSignature(route.getRefererSignature());
+
+                // 결재자인 경우 리스트에 추가
                 if ("Y".equals(route.getIsApprover())) {
-                    approvers.add(ApprovalRouteDto.toDto(route));  // ApprovalRouteDto로 변환
+                    approvers.add(dto);
                 }
+
+                // 참조자인 경우 리스트에 추가
                 if ("Y".equals(route.getIsReferer())) {
-                    referers.add(ApprovalRouteDto.toDto(route));  // ApprovalRouteDto로 변환
+                    referers.add(dto);
                 }
             }
             
@@ -377,6 +386,7 @@ public class AuthorizationApiController {
             return null;
         }
     }
+
 	
 	
     
@@ -395,7 +405,7 @@ public class AuthorizationApiController {
 	        if (action.equals("approve")) {
 	            try {
 	                // 승인 요청 처리
-	                authorizationService.approveDocument(authorNo, signature);
+	                authorizationService.approveDocument(authorNo, signature,memNo);
 
 	                // 승인 시 결재자의 서명을 저장
 	                authorizationService.updateApproverSignature(authorNo, memNo, signature);

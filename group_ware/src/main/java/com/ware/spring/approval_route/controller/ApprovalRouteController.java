@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.ware.spring.approval_route.domain.ApprovalRoute;
 import com.ware.spring.approval_route.domain.ApprovalRouteDto;
+import com.ware.spring.approval_route.repository.ApprovalRouteRepository;
 import com.ware.spring.approval_route.service.ApprovalRouteService;
 import com.ware.spring.authorization.domain.Authorization;
 import com.ware.spring.authorization.domain.AuthorizationDto;
@@ -25,15 +26,17 @@ public class ApprovalRouteController {
     private final MemberRepository memberRepository;
     private final AuthorizationService authorizationService;
     private final AuthorizationRepository authorizationRepository;
+    private final ApprovalRouteRepository approvalRouteRepository;
     
     @Autowired
     public ApprovalRouteController(ApprovalRouteService approvalRouteService, 
     		MemberRepository memberRepository, AuthorizationService authorizationService
-    		,AuthorizationRepository authorizationRepository) {
+    		,AuthorizationRepository authorizationRepository, ApprovalRouteRepository approvalRouteRepository) {
         this.approvalRouteService = approvalRouteService;
         this.memberRepository = memberRepository;
         this.authorizationService = authorizationService;
         this.authorizationRepository = authorizationRepository;
+        this.approvalRouteRepository = approvalRouteRepository;
     }
 
     // 특정 authorNo에 대한 모든 결재자 및 참조자 조회
@@ -114,14 +117,11 @@ public class ApprovalRouteController {
                 Member approver = memberRepository.findById(dto.getMemNo()).orElse(null);
                 if (approver != null) {
                     dto.setApproverName(approver.getMemName());
-                    
+
                     // 결재자의 서명 정보 설정 (ApprovalRoute의 서명 사용)
-                    dto.setApproverSignature(authorization.getApprovalRoutes()
-                            .stream()
-                            .filter(route -> "Y".equals(route.getIsApprover()) && route.getMember().getMemNo().equals(approver.getMemNo()))
-                            .findFirst()
-                            .map(ApprovalRoute::getApproverSignature)
-                            .orElse("서명 없음"));
+                    ApprovalRoute route = approvalRouteRepository.findByAuthorization_AuthorNoAndMember_MemNoAndIsApprover(authorization.getAuthorNo(), approver.getMemNo(), "Y")
+                            .orElseThrow(() -> new RuntimeException("Approval route not found"));
+                    dto.setApproverSignature(route.getApproverSignature());
                 }
             }
 
@@ -130,20 +130,18 @@ public class ApprovalRouteController {
                 Member referer = memberRepository.findById(dto.getMemNo()).orElse(null);
                 if (referer != null) {
                     dto.setRefererName(referer.getMemName());
-                    
+
                     // 참조자의 서명 정보 설정 (ApprovalRoute의 서명 사용)
-                    dto.setRefererSignature(authorization.getApprovalRoutes()
-                            .stream()
-                            .filter(route -> "Y".equals(route.getIsReferer()) && route.getMember().getMemNo().equals(referer.getMemNo()))
-                            .findFirst()
-                            .map(ApprovalRoute::getRefererSignature)
-                            .orElse("서명 없음"));
+                    ApprovalRoute route = approvalRouteRepository.findByAuthorization_AuthorNoAndMember_MemNoAndIsReferer(authorization.getAuthorNo(), referer.getMemNo(), "Y")
+                            .orElseThrow(() -> new RuntimeException("Approval route not found"));
+                    dto.setRefererSignature(route.getRefererSignature());
                 }
             }
         });
 
         return ResponseEntity.ok(approvalRouteDtos);
     }
+
 
 
 

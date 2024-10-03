@@ -14,5 +14,11 @@ public interface ApprovalRouteRepository extends JpaRepository<ApprovalRoute, Lo
     Optional<ApprovalRoute> findByAuthorization_AuthorNoAndMember_MemNo(Long authorNo, Long memNo);
     Optional<ApprovalRoute> findByAuthorization_AuthorNoAndApprovalOrder(Long authorNo, int approvalOrder);
 
+    // 결재자 정보 조회
+    Optional<ApprovalRoute> findByAuthorization_AuthorNoAndMember_MemNoAndIsApprover(Long authorNo, Long memNo, String isApprover);
+
+    // 참조자 정보 조회
+    Optional<ApprovalRoute> findByAuthorization_AuthorNoAndMember_MemNoAndIsReferer(Long authorNo, Long memNo, String isReferer);
+
     
 }

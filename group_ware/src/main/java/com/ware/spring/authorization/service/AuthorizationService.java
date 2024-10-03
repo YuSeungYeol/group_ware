@@ -255,7 +255,21 @@ public class AuthorizationService {
                     // ApprovalRouteDto로 변환하여 설정
                     List<ApprovalRouteDto> routeDtos = approvalRouteRepository.findByAuthorization_AuthorNo(authorization.getAuthorNo())
                         .stream()
-                        .map(route -> ApprovalRouteDto.toDto(route)) // toDto의 간단한 버전 사용
+                        .map(route -> {
+                            ApprovalRouteDto routeDto = ApprovalRouteDto.toDto(route);
+
+                            // 결재자 서명 추가
+                            if ("Y".equals(route.getIsApprover())) {
+                                routeDto.setApproverSignature(route.getApproverSignature());
+                            }
+
+                            // 참조자 서명 추가
+                            if ("Y".equals(route.getIsReferer())) {
+                                routeDto.setRefererSignature(route.getRefererSignature());
+                            }
+
+                            return routeDto;
+                        })
                         .collect(Collectors.toList());
 
                     dto.setApprovalRoutes(routeDtos); // approvalRoute 목록을 DTO에 설정
@@ -268,29 +282,52 @@ public class AuthorizationService {
         System.out.println("로그인된 사용자 정보 없음");
         return Collections.emptyList();
     }
+
     
 
 
     // 승인 처리 메서드
     @Transactional
-    public void approveDocument(Long authorNo, String signature) {
+    public void approveDocument(Long authorNo, String signature, Long memNo) {
         Authorization authorization = authorizationRepository.findById(authorNo)
             .orElseThrow(() -> new IllegalArgumentException("해당 문서를 찾을 수 없습니다."));
 
-        // 문서 유형이 연차 신청서인지 확인
+        // 현재 결재 경로에서 해당 멤버(memNo)를 찾음
+        Optional<ApprovalRoute> approvalRouteOpt = approvalRouteRepository.findByAuthorization_AuthorNoAndMember_MemNo(authorNo, memNo);
+        
+        if (!approvalRouteOpt.isPresent()) {
+            throw new IllegalArgumentException("해당 결재 경로를 찾을 수 없습니다.");
+        }
+
+        ApprovalRoute approvalRoute = approvalRouteOpt.get();
+
+        // 결재자인 경우 서명을 저장하고 승인 상태를 변경
+        if ("Y".equals(approvalRoute.getIsApprover())) {
+            approvalRoute.setApproverSignature(signature);  // 결재자 서명 저장
+            approvalRoute.setApprovalStatus("Y");  // 결재자 승인 상태로 변경
+            approvalRouteRepository.save(approvalRoute);  // 결재 경로 저장
+        }
+
+        // 참조자인 경우 서명을 저장하고 승인 상태를 변경
+        if ("Y".equals(approvalRoute.getIsReferer())) {
+            approvalRoute.setRefererSignature(signature);  // 참조자 서명 저장
+            approvalRoute.setApprovalStatus("Y");  // 참조자 승인 상태로 변경
+            approvalRouteRepository.save(approvalRoute);  // 참조 경로 저장
+        }
+
+        // 문서 상태 변경 로직 (필요한 경우 추가 로직)
         if ("off Report".equals(authorization.getDoctype())) {
             // 모든 결재자가 승인했는지 확인
             boolean allApproversApproved = checkAllApproversApproved(authorNo);
 
             if (allApproversApproved) {
-                Member member = authorization.getMember(); // 결재자의 멤버 정보를 가져옴
+                Member member = authorization.getMember(); // 기안자의 멤버 정보 가져옴
                 Double startEndDate = authorization.getStartEndDate(); // 사용하려는 연차 일수
                 Double memOff = member.getMemOff(); // 남아 있는 연차 일수
                 Double memUseOff = member.getMemUseOff(); // 사용한 연차 일수
 
                 // 남아 있는 연차가 부족한 경우
                 if (memOff < startEndDate) {
-                    // 상태를 '반려'로 변경하고 예외 처리
                     authorization.setAuthorStatus("N");
                     authorizationRepository.save(authorization);
                     throw new IllegalArgumentException("남아 있는 연차 일수가 부족합니다.");
@@ -298,25 +335,17 @@ public class AuthorizationService {
 
                 // 남아 있는 연차에서 사용한 연차 차감
                 member.setMemOff(memOff - startEndDate);
-
-                // 사용한 연차에 이번 사용한 연차 누적
                 member.setMemUseOff(memUseOff + startEndDate);
-
-                // 멤버 정보 저장
                 memberRepository.save(member);
-
-                // 승인 상태로 변경
-                authorization.setSignature(signature);
-                authorization.setAuthorStatus("Y"); // 승인 상태로 변경
-                authorizationRepository.save(authorization);
             }
-        } else {
-            // 다른 문서 유형의 경우 승인만 처리
-            authorization.setSignature(signature);
-            authorization.setAuthorStatus("Y"); // 승인 상태로 변경
-            authorizationRepository.save(authorization);
         }
+
+        // 결재자 또는 참조자 상태가 'Y'로 변경되었으면, 문서 상태도 승인 상태로 변경
+        authorization.setAuthorStatus("Y"); 
+        authorizationRepository.save(authorization);
     }
+
+
     
     // 모든 결재자가 승인했는지 확인하는 메서드
     public boolean checkAllApproversApproved(Long authorNo) {
