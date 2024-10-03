@@ -65,7 +65,7 @@ public class NoticeApiController {
                 resultMap.put("res_msg", "공지 시작일과 종료일을 입력하세요.");
                 return resultMap;
             }
-        } else {
+        } else { 
             // 체크박스가 체크되지 않은 경우 날짜 필드는 무시
             dto.setNoticeStartDate(null);
             dto.setNoticeEndDate(null);

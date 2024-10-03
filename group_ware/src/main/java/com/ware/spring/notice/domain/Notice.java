@@ -56,7 +56,7 @@ public class Notice {
 	private LocalDateTime noticeNewDate;
 	
 	@Column(name="notice_view")
-	private int noticeView;
+	private int noticeView; 
 	
 	@Column(name="deleteYn")
 	private String deleteYn;
