@@ -55,7 +55,7 @@ public class NoticeDto {
                 .noticeSchedule(noticeSchedule)    
                 .build();
     }
- 
+  
     // 엔티티에서 DTO로 변환하는 메서드
     public NoticeDto toDto(Notice notice) {
         return NoticeDto.builder()

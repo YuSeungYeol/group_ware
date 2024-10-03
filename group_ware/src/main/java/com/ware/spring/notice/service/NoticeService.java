@@ -54,7 +54,7 @@ public class NoticeService {
         }
 
         return noticeRepository.save(notice);
-    } 
+    }  
 
 
     // 공지사항 상세화면 

@@ -70,3 +70,4 @@ public class Notice {
 	@Column(name="notice_schedule")
 	private String noticeSchedule;
 }
+ 
