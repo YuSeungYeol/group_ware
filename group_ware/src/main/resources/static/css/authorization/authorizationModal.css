@@ -177,7 +177,6 @@ ul {
     list-style: none;
     padding: 3px;
     margin: 0;
-    min-height: 50px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -187,26 +186,21 @@ ul {
 ul li {
     padding: 2px;
     text-align: center;
-    border-bottom: none;
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-
-/* 사인 이미지는 위에 배치되고, 이름은 아래 */
-ul li img {
-    max-width: 20px;
-    height: auto;
-    margin-bottom: 5px;
+    flex-wrap: nowrap; /* 줄바꿈 방지 */
 }
 
 ul li span {
-    display: block;
-    margin-top: 5px;
-    font-size: 10px !important;
-    white-space: nowrap; 
+    display: inline-block; /* 블록 형태로 표시 */
+    font-size: 10px !important; /* 강제로 크기 줄이기 */
+    white-space: nowrap !important; /* 줄바꿈 방지 */
+    overflow: hidden !important; /* 공간을 벗어나지 않도록 처리 */
+    text-overflow: ellipsis !important; /* 넘칠 경우 ... 처리 */
 }
+
 
 .approver-list-container ul, .referer-list-container ul {
     display: flex;

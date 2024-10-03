@@ -498,7 +498,9 @@
 	            fetchCompletedApprovalData(authorNo)
 	                .then(data => {
 	                    console.log("Fetched data:", data);  // 전체 데이터를 출력하여 확인
-
+	                    console.log("Fetched approvers data:", data.approvers);
+                        console.log("Fetched referers data:", data.referers);
+						
 	                    // 데이터가 제대로 들어오는지 확인 후 필드에 적용
 	                    if (data && data.authorNo) {
 	                        document.getElementById('authorNo').value = data.authorNo;
@@ -594,7 +596,8 @@
 
 	                        // 결재자 및 참조자 정보 업데이트 (signature 포함)
 	                        updateApproverTable(data.approvers, data.referers);
-
+	                        
+	                        
 	                        // 모달창을 표시
 	                        const completedModal = document.getElementById('CompletedApprovalModal');
 	                        const completedModalBackground = document.getElementById('completedModalBackground');
@@ -629,7 +632,7 @@
 	            });
 	        }
 			
-	     // 결재자와 참조자 정보를 업데이트하는 함수 추가
+	     // 결재자와 참조자 정보를 업데이트하는 함수
 	        function updateApproverTable(approvers, referers) {
 	            try {
 	                // 첫 번째 결재자 리스트 초기화
@@ -641,20 +644,25 @@
 	                    const approver1 = approvers[0];
 	                    console.log("첫 번째 결재자 데이터:", approver1); // 데이터 확인용 로그
 
-	                    let signatureHtml = approver1.approverSignature // approverSignature로 수정
-	                        ? `<img src="data:image/png;base64,${approver1.approverSignature}" alt="서명" style="width: 50px; height: 50px;">`
-	                        : '서명 없음'; // 서명이 없을 경우
+	                    // Base64 문자열과 길이 확인
+	                    console.log("Approver 1 Signature Data:", approver1.approverSignature);
+	                    console.log("Approver 1 Signature Length:", approver1.approverSignature ? approver1.approverSignature.length : 'null');
 
-	                    const listItem = document.createElement('tr'); // tr 태그 생성
+	                    let signatureHtml = approver1.approverSignature
+		                    ? `<img src="${approver1.approverSignature.trim()}" alt="서명" style="width: 50px; height: 50px;">`
+		                    : '서명 없음'; // 서명이 없을 경우
+
+
+	                    const listItem = document.createElement('li'); // tr 태그 생성
 	                    listItem.innerHTML = `
-	                        <td>${approver1.memberName || "결재자 이름 없음"}</td>
-	                        <td>${signatureHtml}</td>
+	                        <span>${approver1.memberName || "결재자 이름 없음"}</span>
+	                        <span>${signatureHtml}</span>
 	                    `;
 	                    approver1List.appendChild(listItem); // tr 요소를 첫 번째 결재자 리스트에 추가
 	                } else {
 	                    console.warn("첫 번째 결재자 없음");
-	                    const emptyItem = document.createElement('tr');
-	                    emptyItem.innerHTML = `<td colspan="2">결재자 없음</td>`;
+	                    const emptyItem = document.createElement('li');
+	                    emptyItem.innerHTML = `<span colspan="2">결재자 없음</span>`;
 	                    approver1List.appendChild(emptyItem);
 	                }
 
@@ -667,20 +675,25 @@
 	                    const approver2 = approvers[1];
 	                    console.log("두 번째 결재자 데이터:", approver2); // 데이터 확인용 로그
 
-	                    let signatureHtml = approver2.approverSignature // approverSignature로 수정
-	                        ? `<img src="data:image/png;base64,${approver2.approverSignature}" alt="서명" style="width: 50px; height: 50px;">`
-	                        : '서명 없음'; // 서명이 없을 경우
+	                    // Base64 문자열과 길이 확인
+	                    console.log("Approver 2 Signature Data:", approver2.approverSignature);
+	                    console.log("Approver 2 Signature Length:", approver2.approverSignature ? approver2.approverSignature.length : 'null');
 
-	                    const listItem = document.createElement('tr'); // tr 태그 생성
+	                    let signatureHtml = approver2.approverSignature
+		                    ? `<img src="${approver1.approverSignature.trim()}" alt="서명" style="width: 50px; height: 50px;">`
+		                    : '서명 없음'; // 서명이 없을 경우
+
+
+	                    const listItem = document.createElement('li'); // tr 태그 생성
 	                    listItem.innerHTML = `
-	                        <td>${approver2.memberName || "결재자 이름 없음"}</td>
-	                        <td>${signatureHtml}</td>
+	                        <span>${approver2.memberName || "결재자 이름 없음"}</span>
+	                        <span>${signatureHtml}</span>
 	                    `;
 	                    approver2List.appendChild(listItem); // tr 요소를 두 번째 결재자 리스트에 추가
 	                } else {
 	                    console.warn("두 번째 결재자 없음");
-	                    const emptyItem = document.createElement('tr');
-	                    emptyItem.innerHTML = `<td colspan="2">결재자 없음</td>`;
+	                    const emptyItem = document.createElement('li');
+	                    emptyItem.innerHTML = `<span colspan="2">결재자 없음</span>`;
 	                    approver2List.appendChild(emptyItem);
 	                }
 
@@ -693,26 +706,32 @@
 	                    const referer = referers[0];
 	                    console.log("참조자 데이터:", referer); // 데이터 확인용 로그
 
-	                    let signatureHtml = referer.refererSignature // refererSignature로 수정
-	                        ? `<img src="data:image/png;base64,${referer.refererSignature}" alt="서명" style="width: 50px; height: 50px;">`
-	                        : '서명 없음'; // 서명이 없을 경우
+	                    // Base64 문자열과 길이 확인
+	                    console.log("Referer Signature Data:", referer.refererSignature);
+	                    console.log("Referer Signature Length:", referer.refererSignature ? referer.refererSignature.length : 'null');
 
-	                    const listItem = document.createElement('tr'); // tr 태그 생성
+	                    let signatureHtml = referer.refererSignature
+	                    	? `<img src="${referer.refererSignature.trim()}" alt="서명" style="width: 50px; height: 50px;">`
+	                    	: '서명 없음'; // 서명이 없을 경우
+
+
+	                    const listItem = document.createElement('li'); // tr 태그 생성
 	                    listItem.innerHTML = `
-	                        <td>${referer.memberName || "참조자 이름 없음"}</td>
-	                        <td>${signatureHtml}</td>
+	                        <span>${referer.memberName || "참조자 이름 없음"}</span>
+	                        <span>${signatureHtml}</span>
 	                    `;
 	                    refererList.appendChild(listItem); // tr 요소를 참조자 리스트에 추가
 	                } else {
 	                    console.warn("참조자 없음");
-	                    const emptyItem = document.createElement('tr');
-	                    emptyItem.innerHTML = `<td colspan="2">참조자 없음</td>`;
+	                    const emptyItem = document.createElement('li');
+	                    emptyItem.innerHTML = `<span colspan="2">참조자 없음</span>`;
 	                    refererList.appendChild(emptyItem);
 	                }
 	            } catch (error) {
 	                console.error("오류 발생:", error);
 	            }
 	        }
+
 
 
 
