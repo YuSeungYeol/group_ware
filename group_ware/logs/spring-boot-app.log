@@ -716,3 +716,8 @@ java.io.StreamCorruptedException: invalid type code: 00
 2024-10-03 13:51:21 [http-nio-8095-exec-6] INFO  com.ware.spring.HomeController - 프로그램 시작
 2024-10-03 13:51:21 [http-nio-8095-exec-6] WARN  com.ware.spring.HomeController - 4단계 : 경고
 2024-10-03 13:51:21 [http-nio-8095-exec-6] ERROR com.ware.spring.HomeController - 5단계 : 오류 발생
+2024-10-03 15:04:59 [RMI TCP Connection(168)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-10-03 15:04:59 [RMI TCP Connection(168)-127.0.0.1] INFO  o.a.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8095"]
+2024-10-03 15:04:59 [RMI TCP Connection(168)-127.0.0.1] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-10-03 15:04:59 [RMI TCP Connection(168)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-9 - Shutdown initiated...
+2024-10-03 15:04:59 [RMI TCP Connection(168)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-9 - Shutdown completed.

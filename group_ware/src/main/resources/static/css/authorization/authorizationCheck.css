@@ -24,7 +24,7 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     overflow: auto;
-    max-height: 80%; /* 스크롤 가능한 모달 창 */
+    max-height: 80vh; /* 스크롤 가능한 모달 창 */
 }
 
 /* 닫기 버튼 스타일 */
@@ -138,15 +138,12 @@ input[type="file"] {
     margin-top: 10px;
 }
 
-
-
 /* 모달 스크롤바 */
 .modal-custom {
-    overflow-y: auto; /* 스크롤 가능하게 */
-    max-height: 80vh; /* 모달 최대 높이 */
+    overflow-y: auto;
+    max-height: 80vh; 
     padding: 20px;
 }
-
 
 /* 결재자 및 참조자 리스트 컨테이너 */
 .approval-referer-container {
@@ -163,65 +160,55 @@ input[type="file"] {
     border: 1px solid black;
     padding: 2px; /* 패딩 최소화 */
     margin: 1px; /* 박스 간의 간격 최소화 */
-    width: 80px; /* 각 박스의 너비를 더 줄임 */
+    width: 80px;
+    height: auto; /* 높이 자동 조정 */
 }
 
 .list-title {
     font-weight: bold;
     background-color: #f0f0f0;
-    padding: 3px; /* 제목 부분의 여백 최소화 */
+    padding: 3px; 
     border-bottom: 1px solid black;
-    font-size: 12px; /* 텍스트 크기 */
+    font-size: 12px;
 }
 
 /* 결재자와 참조자 이름의 높이를 동일하게 설정 */
 ul {
     list-style: none;
-    padding: 3px; /* 내부 여백 최소화 */
+    padding: 3px;
     margin: 0;
-    min-height: 50px; /* 높이 축소 */
     display: flex;
-    flex-direction: column; /* 세로 정렬 */
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
 ul li {
-    padding: 2px; /* 내부 항목의 패딩 최소화 */
+    padding: 2px;
     text-align: center;
-    border-bottom: none; /* 필요 시 변경 가능 */
-    width: 100%; /* 가로로 정렬되도록 너비를 설정 */
+    width: 100%;
     display: flex;
-    flex-direction: column; /* 세로 정렬 */
-    align-items: center; /* 수평 가운데 정렬 */
-}
-
-/* 사인 이미지는 여전히 위에 배치되고, 이름은 아래로 */
-ul li img {
-    max-width: 20px; /* 사인의 크기 */
-    height: auto;
-    margin-bottom: 5px; /* 이름과 사인의 간격 조정 */
-    font-size: 5px;
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: nowrap; /* 줄바꿈 방지 */
 }
 
 ul li span {
-    display: block; /* 이름을 한 줄로 표시 */
-    margin-top: 5px; /* 사인 아래에 간격 추가 */
-    font-size: 10px !important; /* 글자 크기를 줄임 */
-    white-space: nowrap; /* 이름이 가로로 나란히 표시되도록 */
+    display: inline-block; /* 블록 형태로 표시 */
+    font-size: 10px !important; /* 강제로 크기 줄이기 */
+    white-space: nowrap !important; /* 줄바꿈 방지 */
+    overflow: hidden !important; /* 공간을 벗어나지 않도록 처리 */
+    text-overflow: ellipsis !important; /* 넘칠 경우 ... 처리 */
 }
 
-/* 결재자/참조자 두 개의 열을 나란히 배치 */
+
 .approver-list-container ul, .referer-list-container ul {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 60px; /* 박스 높이 축소 */
+    height: 60px;
 }
 
-.approver-list-container, .referer-list-container {
-    width: calc(25% - 5px); /* 각 리스트 컨테이너의 너비 더 축소 */
-}
 
 .vertical-text {
     writing-mode: vertical-rl;
@@ -230,6 +217,5 @@ ul li span {
     background-color: #f0f0f0;
     padding: 5px;
     border-right: 1px solid black;
-    font-size: 5px; /* 텍스트 크기 */
+    font-size: 5px;
 }
-
