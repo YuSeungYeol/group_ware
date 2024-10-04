@@ -165,21 +165,23 @@ public class AuthorizationService {
         }
     }
     // 임시 저장함
-    public List<AuthorizationDto> selectTemporaryAuthorizationList() {
-        // 현재 로그인한 사용자 정보 가져오기
+    public Page<AuthorizationDto> selectTemporaryAuthorizationList(Pageable pageable) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof SecurityUser) {
             SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
             Long memNo = securityUser.getMember().getMemNo();  // 로그인한 사용자의 memNo 가져오기
 
-            // 현재 사용자의 임시 저장 문서만 가져오기
-            List<Authorization> authorizationList = authorizationRepository.findByAuthorStatusAndMember_MemNo("T", memNo);
-            return authorizationList.stream()
-                .map(AuthorizationDto::toDto)
-                .collect(Collectors.toList());
+            // 현재 사용자의 임시 저장 문서만 가져오기, 페이징 처리
+            Page<Authorization> authorizationPage = authorizationRepository.findByAuthorStatusAndMember_MemNo("T", memNo, pageable);
+
+            // Page<Authorization>을 Page<AuthorizationDto>로 변환하여 반환
+            return authorizationPage.map(AuthorizationDto::toDto);
         }
-        return Collections.emptyList(); // 인증되지 않은 경우 빈 리스트 반환
+        return Page.empty(); // 인증되지 않은 경우 빈 페이지 반환
     }
+
+
+
 
     
     

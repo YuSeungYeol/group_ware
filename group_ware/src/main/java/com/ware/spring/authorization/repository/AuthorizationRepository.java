@@ -24,7 +24,7 @@ public interface AuthorizationRepository extends JpaRepository<Authorization, Lo
 
 	Optional<Authorization> findByAuthorNoAndAuthorStatusIn(Long authorNo, List<String> statuses);
 
-	List<Authorization> findByAuthorStatusAndMember_MemNo(String string, Long memNo);
+	Page<Authorization> findByAuthorStatusAndMember_MemNo(String authorStatus, Long memNo, Pageable pageable);
 
 	List<Authorization> findByMember_MemNoAndAuthorStatusIn(Long memNo, List<String> statuses);
 
@@ -33,6 +33,7 @@ public interface AuthorizationRepository extends JpaRepository<Authorization, Lo
 
     // 완료된 문서(승인/반려) 조회
     Page<Authorization> findByAuthorStatusIn(List<String> statuses, Pageable pageable);
+
 
 
 }

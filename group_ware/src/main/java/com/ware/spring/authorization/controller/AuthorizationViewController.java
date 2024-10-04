@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -157,7 +158,7 @@ public class AuthorizationViewController {
 
     // 임시 저장함
     @GetMapping("/authorization/authorizationStorage")
-    public String selectTemporaryAuthorizationList(Model model, Principal principal) {
+    public String selectTemporaryAuthorizationList(@PageableDefault(size = 5) Pageable pageable, Model model, Principal principal) {
         // 로그인한 사용자의 empNo 가져오기
         String memName = principal.getName();
         Optional<Member> memberOpt = memberRepository.findByMemName(memName);
@@ -169,17 +170,18 @@ public class AuthorizationViewController {
             System.out.println("Member with name " + memName + " not found.");
         }
 
-        List<AuthorizationDto> tempList = authorizationService.selectTemporaryAuthorizationList();
-        if (tempList != null) {
-            for (AuthorizationDto dto : tempList) {
-                System.out.println("AuthorizationDto: " + dto.toString()); // 각 객체의 내용 출력
-            }
-        }
-        System.out.println("Temporary Authorization List: " + tempList);  // 로그 추가
-        model.addAttribute("tempList", tempList);
-        System.out.println("Model attributes set, rendering template...");  // 로그 추가
-        return "authorization/authorizationStorage";  // 임시 저장 문서를 보여줄 뷰
+        // 페이징 처리된 임시 저장 문서 리스트 가져오기
+        Page<AuthorizationDto> tempListPage = authorizationService.selectTemporaryAuthorizationList(pageable);
+
+        // 페이징된 리스트를 모델에 추가
+        model.addAttribute("tempListPage", tempListPage);
+        model.addAttribute("currentPage", tempListPage.getNumber() + 1); // 현재 페이지
+        model.addAttribute("totalPages", tempListPage.getTotalPages()); // 전체 페이지 수
+
+        return "authorization/authorizationStorage";
     }
+
+
 
     
     // authorNo를 이용하여 문서 상세 페이지로 이동

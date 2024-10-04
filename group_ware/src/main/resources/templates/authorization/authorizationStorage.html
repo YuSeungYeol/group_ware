@@ -29,38 +29,41 @@
                     <br>
 
                     <div class="temp-save-list">
-                        <table class="table-custom">
-                            <thead>
-                                <tr>
-                                    <th>문서양식</th>
-                                    <th>제목</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tempSaveList">
-							    <tr th:if="${tempList == null || #lists.isEmpty(tempList)}">
-							        <td colspan="2">해당되는 문서가 없습니다.</td>
-							    </tr>
-							    <tr th:each="authorization : ${tempList}">
-							        <td th:text="${authorization.authorName != null ? authorization.authorName : 'N/A'}"></td>
-							        <td>
-							           <a href="javascript:void(0);"
-										   th:attr="onclick='validateAndSubmit(' + ${authorization.authorNo} + ');'"
-										   th:text="${authorization.authTitle}"></a>
-							        </td>					        
-							    </tr>
-							</tbody>
-                        </table>
-                    </div>
-
-                    <div class="pagination-section">
-                        <ul class="pagination">
-                            <li class="page-item"><a class="page-link" href="#">&larr; Previous</a></li>
-                            <li class="page-item"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item"><a class="page-link" href="#">Next &rarr;</a></li>
-                        </ul>
-                    </div>
+					    <table class="table-custom">
+					        <thead>
+					            <tr>
+					                <th>문서양식</th>
+					                <th>제목</th>
+					            </tr>
+					        </thead>
+					        <tbody id="tempSaveList">
+					            <tr th:if="${tempListPage.content == null || #lists.isEmpty(tempListPage.content)}">
+					                <td colspan="2">해당되는 문서가 없습니다.</td>
+					            </tr>
+					            <tr th:each="authorization : ${tempListPage.content}">
+					                <td th:text="${authorization.authorName != null ? authorization.authorName : 'N/A'}"></td>
+					                <td>
+					                   <a href="javascript:void(0);"
+					                       th:attr="onclick='validateAndSubmit(' + ${authorization.authorNo} + ');'"
+					                       th:text="${authorization.authTitle}"></a>
+					                </td>
+					            </tr>
+					        </tbody>
+					    </table>
+					</div>
+                    <!-- 페이징 버튼 -->
+					<div class="pagination">
+					    <a th:href="@{/authorization/authorizationStorage(page=${currentPage - 2})}" th:if="${currentPage > 1}">&laquo; 처음</a>
+					    <a th:href="@{/authorization/authorizationStorage(page=${currentPage - 2})}" th:if="${currentPage > 1}">&lsaquo; 이전</a>
+					    
+					    <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+					        <a th:text="${i}" th:href="@{/authorization/authorizationStorage(page=${i - 1})}"
+					           th:classappend="${i == currentPage} ? 'active'">1</a>
+					    </span>
+					    
+					    <a th:href="@{/authorization/authorizationStorage(page=${currentPage})}" th:if="${currentPage < totalPages}">다음 &rsaquo;</a>
+					    <a th:href="@{/authorization/authorizationStorage(page=${totalPages - 1})}" th:if="${currentPage < totalPages}">끝 &raquo;</a>
+					</div>
                 </div>
             </div>
         </section>
