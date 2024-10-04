@@ -6,153 +6,184 @@
      <link th:href="@{/css/authorization/authorizationList.css}" rel="stylesheet" type="text/css">
      <link th:href="@{/css/authorization/authorizationModal.css}" rel="stylesheet" type="text/css">
      <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
-     <section >
-     
-     	<!-- CSRF 토큰 추가 -->
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" id="csrfToken">
+     <section>
+	    <!-- CSRF 토큰 추가 -->
+	    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" id="csrfToken">
+	    <input type="hidden" id="authorNo" name="authorNo" th:value="${authorization != null ? authorization.authorNo : ''}" />
+	
+	    <div class="main-content-custom">
+	        <div id="section_wrap">
+	            <div class="word">
+	                <h3>기안 진행 목록</h3>
+	            </div><br>
+	            <div class="book_list">
+	                <table class="table-custom">
+	                    <colgroup>
+	                        <col width="20%">
+	                        <col width="30%">
+	                        <col width="20%">
+	                        <col width="20%">
+	                    </colgroup>
+	                    <thead>
+	                        <tr>
+	                            <th>기안일</th>
+	                            <th>결재 양식</th>
+	                            <th>제목</th>
+	                            <th>상태</th>
+	                        </tr>
+	                    </thead>
+	                    <tbody id="resultList">
+	                        <th:block th:if="${resultList == null || #lists.isEmpty(resultList)}">
+	                            <tr>
+	                                <td colspan="4">해당되는 문서가 없습니다.</td>
+	                            </tr>
+	                        </th:block>
+	                        <th:block th:if="${resultList != null && !#lists.isEmpty(resultList)}">
+	                            <tr th:each="authorization : ${resultList}">
+	                                <td th:text="${authorization.authorRegDate != null ? #temporals.format(authorization.authorRegDate, 'yyyy.MM.dd') : ''}"></td>
+	                                <td th:text="${authorization.authorName != null ? authorization.authorName : 'N/A'}"></td>
+	                                <td>
+	                                    <a href="javascript:void(0);" th:text="${authorization.authTitle != null ? authorization.authTitle : '제목 없음'}" 
+	                                       th:onclick="'openApprovalModal(' + ${authorization.authorNo} + ')'"></a>
+	                                </td>
+	                                <td th:text="${authorization.authorStatus == 'T' ? '임시 저장' 
+	                                    : (authorization.authorStatus == 'P' ? '미승인' 
+	                                    : (authorization.authorStatus == 'N' ? '반려' 
+	                                    : (authorization.authorStatus == 'Y' ? '승인' 
+	                                    : (authorization.authorStatus == 'R' ? '회수됨' : 'Unknown'))))}"></td>
+	                            </tr>
+	                        </th:block>
+	                    </tbody>
+	                </table>
 
-		<input type="hidden" id="authorNo" name="authorNo" th:value="${authorization != null ? authorization.authorNo : ''}" />
-
-
-        <div class="main-content-custom"> <!-- custom 클래스 추가 -->
-        <div id="section_wrap">
-            <div class="word">
-                <h3>기안 진행 목록</h3> <!-- 주석: 기안 진행 목록 제목 -->
-            </div><br>
-            <div class="book_list">
-                <table class="table-custom"> <!-- custom 클래스 추가 -->
-                    <colgroup>
-                        <col width="20%">
-                        <col width="30%">
-                        <col width="20%">
-                        <col width="20%">
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            <th>기안일</th>
-                            <th>결재 양식</th>
-                            <th>제목</th>
-                            <th>상태</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resultList">
-					    <th:block th:if="${resultList == null || #lists.isEmpty(resultList)}">
-					        <tr>
-					            <td colspan="4">해당되는 문서가 없습니다.</td> <!-- 주석: 문서가 없을 때 -->
-					        </tr>
-					        <script>
-					            console.log("resultList is null or empty: [[${resultList}]]");
-					        </script>
-					    </th:block>
-					    <th:block th:if="${resultList != null && !#lists.isEmpty(resultList)}">
-					        <tr th:each="authorization : ${resultList}">
-					            <td th:text="${authorization.authorRegDate != null ? #temporals.format(authorization.authorRegDate, 'yyyy.MM.dd') : ''}"></td>
-					            <td th:text="${authorization.authorName != null ? authorization.authorName : 'N/A'}"></td>
-					            <td>
-					                <a href="javascript:void(0);" th:text="${authorization.authTitle != null ? authorization.authTitle : '제목 없음'}" 
-					                   th:onclick="'openApprovalModal(' + ${authorization.authorNo} + ')'"></a>
-					            </td>
-								<td th:text="${authorization.authorStatus == 'T' ? '임시 저장' 
-								    : (authorization.authorStatus == 'P' ? '미승인' 
-								    : (authorization.authorStatus == 'N' ? '반려' 
-								    : (authorization.authorStatus == 'Y' ? '승인' 
-								    : (authorization.authorStatus == 'R' ? '회수됨' : 'Unknown'))))}"></td>
-					        </tr>
-					    </th:block>
-					</tbody>
-                </table>
-                <br>
-
-                <!-- 완료된 문서 리스트 -->
-                <div class="word">
-                    <h3>완료 문서</h3> 
-                </div><br>
-                <div class="book_list">
-                    <table class="table-custom">
-                        <colgroup>
-                            <col width="20%">
-                            <col width="30%">
-                            <col width="20%">
-                            <col width="20%">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th>기안일</th>
-                                <th>결재 양식</th>
-                                <th>제목</th>
-                                <th>상태</th>
-                            </tr>
-                        </thead>
-                        <tbody id="completeList">
-						    <th:block th:if="${completedList == null || #lists.isEmpty(completedList)}">
-						        <tr>
-						            <td colspan="4">완료된 문서가 없습니다.</td>
-						        </tr>
-						    </th:block>
-						    <th:block th:if="${completedList != null && !#lists.isEmpty(completedList)}">
-						        <tr th:each="authorization : ${completedList}">
-						            <td th:text="${authorization.authorRegDate != null ? #temporals.format(authorization.authorRegDate, 'yyyy.MM.dd') : ''}"></td>
-						            <td th:text="${authorization.authorName != null ? authorization.authorName : 'N/A'}"></td>
-						            <td>
-						                <a href="javascript:void(0);" th:text="${authorization.authTitle != null ? authorization.authTitle : '제목 없음'}" 
-						                   th:onclick="'openCompletedApprovalModal(' + ${authorization.authorNo} + ')'"></a>
-						            </td>
-						            <td th:text="${authorization.authorStatus == 'Y' ? '승인' : '반려'}"></td>
-						        </tr>
-						    </th:block>
-						</tbody>
-                    </table>
-                </div>
-                
-                <div id="section_wrap">
-                <form id="authorizationAddFrm" enctype="multipart/form-data">
-                    <div id="section" class="form-section">
-                    <input type="button" value="새 결재 진행" style="float:right;" onclick="openModal()">
-                    <!-- 모달 창 -->
-                    <div id="documentModal" class="modal-custom" style="display: none;"> <!-- custom 클래스 추가 -->
-                        <h3>결재 양식 선택</h3>
-                        <table class="table-custom"> <!-- custom 클래스 추가 -->
-                            <thead>
-                                <tr>
-                                    <th>양식</th>
-                                    <th>제목</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr onclick="selectDocument('연차 보고서', '/authOff/authOffCreate?type=1')">
-                                    <td>연차 보고서</td>
-                                    <td>연차 신청 합니다.</td>
-                                </tr>
-                                <tr onclick="selectDocument('지각 사유서', '/authLate/authLateCreate?type=2')">
-                                    <td>지각 사유서</td>
-                                    <td>지각 사유 제출 합니다.</td>
-                                </tr>
-                                <tr onclick="selectDocument('해외 출장 신청서', '/authTrip/authTripCreate?type=3')">
-                                    <td>해외 출장 신청서</td>
-                                    <td>해외 출장 신청 합니다.</td>
-                                </tr>
-                                <tr onclick="selectDocument('야근 신청서', '/authOvertime/authOvertimeCreate?type=4')">
-                                    <td>야근 신청서</td>
-                                    <td>야근 신청 합니다.</td>
-                                </tr>
-                                <tr onclick="selectDocument('외근 신청서', '/authOutside/authOutsideCreate?type=5')">
-                                    <td>외근 신청서</td>
-                                    <td>외근 신청 합니다.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <br>
-                        <input type="button" value="취소" class="btn-custom" onclick="closeModal()"> <!-- custom 클래스 추가 -->
-                    </div>
-                    <!-- 모달 배경 -->
-                    <div id="modalBackground" class="modal-background-custom" style="display: none;"></div> <!-- custom 클래스 추가 -->
-                </div>
-            </form>
-            </div>
-        </div>
-    </div>
-    </div>
-        </section>
+					<!-- 기안 진행 목록 페이징 -->
+					<div class="pagination">
+					    <!-- 이전 페이지 링크: 2 페이지 이상일 때만 표시 -->
+					    <a th:href="@{/authorization/authorizationList(draftPage=${draftPage.pageable.pageNumber - 1}, completedPage=${completedPage.pageable.pageNumber})}" 
+					       th:if="${draftPage.pageable.pageNumber > 0}">&lsaquo;</a>
+					
+					    <!-- 페이지 번호 반복 (현재 페이지 기준으로 앞뒤로 최대 3개) -->
+					    <span th:each="i : ${#numbers.sequence(draftPage.pageable.pageNumber > 0 ? draftPage.pageable.pageNumber : 1, draftPage.pageable.pageNumber + 2 < draftPage.totalPages ? draftPage.pageable.pageNumber + 2 : draftPage.totalPages)}">
+					        <a th:text="${i}" 
+					           th:href="@{/authorization/authorizationList(draftPage=${i - 1}, completedPage=${completedPage.pageable.pageNumber})}" 
+					           th:classappend="${i == draftPage.pageable.pageNumber + 1} ? 'active'">1</a>
+					    </span>
+					
+					    <!-- 다음 페이지 링크: 마지막 페이지가 아닐 때만 표시 -->
+					    <a th:href="@{/authorization/authorizationList(draftPage=${draftPage.pageable.pageNumber + 1}, completedPage=${completedPage.pageable.pageNumber})}" 
+					       th:if="${draftPage.pageable.pageNumber + 1 < draftPage.totalPages}">&rsaquo;</a>
+					</div>
+	                <br>
+	
+	                <!-- 완료된 문서 리스트 -->
+	                <div class="word">
+	                    <h3>완료 문서</h3> 
+	                </div><br>
+	                <div class="book_list">
+	                    <table class="table-custom">
+	                        <colgroup>
+	                            <col width="20%">
+	                            <col width="30%">
+	                            <col width="20%">
+	                            <col width="20%">
+	                        </colgroup>
+	                        <thead>
+	                            <tr>
+	                                <th>기안일</th>
+	                                <th>결재 양식</th>
+	                                <th>제목</th>
+	                                <th>상태</th>
+	                            </tr>
+	                        </thead>
+	                        <tbody id="completeList">
+	                            <th:block th:if="${completedList == null || #lists.isEmpty(completedList)}">
+	                                <tr>
+	                                    <td colspan="4">완료된 문서가 없습니다.</td>
+	                                </tr>
+	                            </th:block>
+	                            <th:block th:if="${completedList != null && !#lists.isEmpty(completedList)}">
+	                                <tr th:each="authorization : ${completedList}">
+	                                    <td th:text="${authorization.authorRegDate != null ? #temporals.format(authorization.authorRegDate, 'yyyy.MM.dd') : ''}"></td>
+	                                    <td th:text="${authorization.authorName != null ? authorization.authorName : 'N/A'}"></td>
+	                                    <td>
+	                                        <a href="javascript:void(0);" th:text="${authorization.authTitle != null ? authorization.authTitle : '제목 없음'}" 
+	                                           th:onclick="'openCompletedApprovalModal(' + ${authorization.authorNo} + ')'"></a>
+	                                    </td>
+	                                    <td th:text="${authorization.authorStatus == 'Y' ? '승인' : '반려'}"></td>
+	                                </tr>
+	                            </th:block>
+	                        </tbody>
+	                    </table>
+	                </div>
+	
+					<!-- 완료된 문서 페이징 -->
+					<div class="pagination">
+					    <!-- 이전 페이지 링크: 2 페이지 이상일 때만 표시 -->
+					    <a th:href="@{/authorization/authorizationList(draftPage=${draftPage.pageable.pageNumber}, completedPage=${completedPage.pageable.pageNumber - 1})}" 
+					       th:if="${completedPage.pageable.pageNumber > 0}">&lsaquo;</a>
+					
+					    <!-- 페이지 번호 반복 (현재 페이지 기준으로 앞뒤로 최대 3개) -->
+					    <span th:each="i : ${#numbers.sequence(completedPage.pageable.pageNumber > 0 ? completedPage.pageable.pageNumber : 1, completedPage.pageable.pageNumber + 2 < completedPage.totalPages ? completedPage.pageable.pageNumber + 2 : completedPage.totalPages)}">
+					        <a th:text="${i}" 
+					           th:href="@{/authorization/authorizationList(draftPage=${draftPage.pageable.pageNumber}, completedPage=${i - 1})}" 
+					           th:classappend="${i == completedPage.pageable.pageNumber + 1} ? 'active'">1</a>
+					    </span>
+					
+					    <!-- 다음 페이지 링크: 마지막 페이지가 아닐 때만 표시 -->
+					    <a th:href="@{/authorization/authorizationList(draftPage=${draftPage.pageable.pageNumber}, completedPage=${completedPage.pageable.pageNumber + 1})}" 
+					       th:if="${completedPage.pageable.pageNumber + 1 < completedPage.totalPages}">&rsaquo;</a>
+					</div>
+						
+	                <!-- 모달 창 -->
+	                <div id="section_wrap">
+	                    <form id="authorizationAddFrm" enctype="multipart/form-data">
+	                        <div id="section" class="form-section">
+	                            <input type="button" value="새 결재 진행" style="float:right;" onclick="openModal()">
+	                            <!-- 모달 창 -->
+	                            <div id="documentModal" class="modal-custom" style="display: none;">
+	                                <h3>결재 양식 선택</h3>
+	                                <table class="table-custom">
+	                                    <thead>
+	                                        <tr>
+	                                            <th>양식</th>
+	                                            <th>제목</th>
+	                                        </tr>
+	                                    </thead>
+	                                    <tbody>
+	                                        <tr onclick="selectDocument('연차 보고서', '/authOff/authOffCreate?type=1')">
+	                                            <td>연차 보고서</td>
+	                                            <td>연차 신청 합니다.</td>
+	                                        </tr>
+	                                        <tr onclick="selectDocument('지각 사유서', '/authLate/authLateCreate?type=2')">
+	                                            <td>지각 사유서</td>
+	                                            <td>지각 사유 제출 합니다.</td>
+	                                        </tr>
+	                                        <tr onclick="selectDocument('해외 출장 신청서', '/authTrip/authTripCreate?type=3')">
+	                                            <td>해외 출장 신청서</td>
+	                                            <td>해외 출장 신청 합니다.</td>
+	                                        </tr>
+	                                        <tr onclick="selectDocument('야근 신청서', '/authOvertime/authOvertimeCreate?type=4')">
+	                                            <td>야근 신청서</td>
+	                                            <td>야근 신청 합니다.</td>
+	                                        </tr>
+	                                        <tr onclick="selectDocument('외근 신청서', '/authOutside/authOutsideCreate?type=5')">
+	                                            <td>외근 신청서</td>
+	                                            <td>외근 신청 합니다.</td>
+	                                        </tr>
+	                                    </tbody>
+	                                </table>
+	                                <br>
+	                                <input type="button" value="취소" class="btn-custom" onclick="closeModal()">
+	                            </div>
+	                            <!-- 모달 배경 -->
+	                            <div id="modalBackground" class="modal-background-custom" style="display: none;"></div>
+	                        </div>
+	                    </form>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	</section>
         
         <!-- 결재 상태 모달 창 HTML -->
         <div id="approvalModal" class="modal-custom" style="display: none;"> 

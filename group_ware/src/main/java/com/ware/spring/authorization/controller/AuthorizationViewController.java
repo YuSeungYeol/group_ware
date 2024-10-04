@@ -11,6 +11,9 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -57,17 +60,29 @@ public class AuthorizationViewController {
 
     // 결재 리스트 조회
     @GetMapping("/authorization/authorizationList")
-    public String selectAuthorizationList(Model model) {
-        // 로그인한 사용자의 기안 진행 목록(P 상태)과 완료된 목록(Y/N 상태)을 각각 조회
-        List<AuthorizationDto> resultList = authorizationService.selectDraftAuthorizationList(); // 'P' 상태 문서만 조회
-        List<AuthorizationDto> completedList = authorizationService.selectCompletedAuthorizationList(); // 'Y' 또는 'N' 상태 문서만 조회
+    public String listAuthorizations(
+            @RequestParam(value = "draftPage", defaultValue = "0") int draftPage,
+            @RequestParam(value = "completedPage", defaultValue = "0") int completedPage,
+            Model model
+    ) {
+        Pageable draftPageable = PageRequest.of(draftPage, 5); // 페이지당 10개 문서 표시
+        Page<Authorization> resultList = authorizationService.getDraftAuthorizations(draftPageable);
 
-        // 모델에 각각 추가
-        model.addAttribute("resultList", resultList); // 기안 진행 목록
-        model.addAttribute("completedList", completedList); // 완료된 목록
+        Pageable completedPageable = PageRequest.of(completedPage, 5);
+        Page<Authorization> completedList = authorizationService.getCompletedAuthorizations(completedPageable);
 
-        return "authorization/authorizationList"; // 결재 리스트 페이지로 이동
+        // 모델에 추가 (getContent()로 리스트만 가져옴)
+        model.addAttribute("resultList", resultList.getContent());
+        model.addAttribute("draftPage", resultList); // Page 객체 전달
+        model.addAttribute("completedList", completedList.getContent());
+        model.addAttribute("completedPage", completedList); // Page 객체 전달
+
+        return "authorization/authorizationList";
     }
+
+
+
+
 
     @GetMapping("/authorization/authorizationCreate")
     public String createAuthorizationPage(Model model, Principal principal) {

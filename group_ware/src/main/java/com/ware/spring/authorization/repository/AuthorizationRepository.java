@@ -3,9 +3,12 @@ package com.ware.spring.authorization.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.ware.spring.authorization.domain.Authorization;
+import com.ware.spring.authorization.domain.AuthorizationDto;
 
 public interface AuthorizationRepository extends JpaRepository<Authorization, Long> {
 
@@ -24,6 +27,12 @@ public interface AuthorizationRepository extends JpaRepository<Authorization, Lo
 	List<Authorization> findByAuthorStatusAndMember_MemNo(String string, Long memNo);
 
 	List<Authorization> findByMember_MemNoAndAuthorStatusIn(Long memNo, List<String> statuses);
+
+	// 기안 진행 중인 문서 조회
+    Page<Authorization> findByAuthorStatus(String status, Pageable pageable);
+
+    // 완료된 문서(승인/반려) 조회
+    Page<Authorization> findByAuthorStatusIn(List<String> statuses, Pageable pageable);
 
 
 }

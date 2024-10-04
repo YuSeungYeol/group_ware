@@ -14,7 +14,8 @@ import java.util.stream.Collectors;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -553,6 +554,16 @@ public class AuthorizationService {
 	        } else {
 	            throw new IllegalArgumentException("참조자 경로를 찾을 수 없습니다.");
 	        }
+	    }
+	    
+	    // 기안 진행 목록 페이징 처리
+	    public Page<Authorization> getDraftAuthorizations(Pageable pageable) {
+	        return authorizationRepository.findByAuthorStatus("P", pageable); // "P"는 진행 중인 상태
+	    }
+
+	    // 완료된 문서 목록 페이징 처리
+	    public Page<Authorization> getCompletedAuthorizations(Pageable pageable) {
+	        return authorizationRepository.findByAuthorStatusIn(Arrays.asList("Y", "N"), pageable); // "Y": 승인, "N": 반려
 	    }
 
 

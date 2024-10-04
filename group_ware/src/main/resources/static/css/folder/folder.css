@@ -1,7 +1,4 @@
 /* src/main/resources/static/css/folder.css */
-.section-wrap {
-   
-}
 
 h1 {
     color: #333;
@@ -27,24 +24,13 @@ table tbody td {
     padding: 10px;
     border-bottom: 1px solid #ddd;
 }
-
-table tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-table tbody tr:hover {
-    background-color: #f1f1f1;
-}
-
 /* 링크와 버튼 스타일 */
 a {
     text-decoration: none;
     color: #333; /* 색상을 더 어둡게 설정 */
 }
 
-a:hover {
-	
-}
+
 
 a.folderLink{
 	color: #333;
@@ -64,25 +50,14 @@ a.folderLink{
     color: #666;
     border: none;
     transition: background-color 0.3s;
+    margin-bottom: 10px;
 }
 
 .btn-primary:hover {
     background-color: #ddd;
 }
-
-
-#folderForm {
-    display: none; /* 처음에 폼을 숨김 */
-    margin-top: 20px;
-}
-
 #folderForm.visible {
     display: block; /* 폼을 표시할 때 사용하는 클래스 */
-}
-
-/* src/main/resources/static/css/folder.css */
-.section-wrap {
-   
 }
 #content {
 	min-height:500px;
@@ -106,33 +81,49 @@ table {
     border-collapse: collapse;
     margin-bottom: 20px;
 }
-
+table {
+    border: 1px solid #ddd;
+	border-radius:20px;
+}
 table thead th {
-    background-color: #808080;
-    color: white;
+    background-color:rgba(209,201,240,0.6);
+    color: Black;
     text-align: left;
     padding: 10px;
+    border-bottom: 1px solid #ddd;
 }
+#deleteFolderBtn{
+	float: left;
+}
+#folderForm{
+	float:right;
+	margin-bottom:10px;
+}
+#fileUploadForm{
+	float:right;
+	margin-bottom:10px;
+}
+#uploadFileBtn{
+	margin-left:5px;
+	margin-right:5px;
+	float: right;
+}  
+#createFolderBtn{
+	float: right;
 
+}
 table tbody td {
     padding: 10px;
     border-bottom: 1px solid #ddd;
 }
 
-table tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
+table tbody tr:nth-child {
+    background-color: rgba(209,201,240,0.3);
 }
 
 table tbody tr:hover {
-    background-color: #f1f1f1;
+    background-color: rgba(209,201,240,0.1);
 }
-
-/* 링크와 버튼 스타일 */
-a {
-    text-decoration: none;
-    color: #333; /* 색상을 더 어둡게 설정 */
-}
-
 
 a.folderLink{
 	color: #333;
@@ -145,12 +136,13 @@ a.folderLink{
     border-radius: 5px;
     text-align: center;
     cursor: pointer;
+    border: none;
 }
 
 .btn-primary {
     background-color: #F6F4FA;
-    color: #666;
     border: none;
+    color: #666;
     transition: background-color 0.3s;
 }
 
@@ -167,10 +159,6 @@ td[colspan="3"] {
     padding: 20px;
 }
 
-#folderForm {
-    display: none; /* 처음에 폼을 숨김 */
-    margin-top: 20px;
-}
 
 #folderForm.visible {
     display: block; /* 폼을 표시할 때 사용하는 클래스 */
