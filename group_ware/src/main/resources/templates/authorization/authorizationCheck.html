@@ -7,44 +7,64 @@
         <link th:href="@{/css/authorization/authorizationCheck.css}" rel="stylesheet" type="text/css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
         <section>
-            <!-- CSRF 토큰 추가 -->
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" id="csrfToken">    
+		    <!-- CSRF 토큰 추가 -->
+		    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" id="csrfToken">    
+		
+		    <div class="main-content-custom">
+		        <h3>결재 진행 목록</h3>
+		        <table class="table-custom">
+		            <colgroup>
+		                <col width="10%">
+		                <col width="30%">
+		                <col width="20%">
+		                <col width="20%">
+		                <col width="30%">
+		            </colgroup>
+		            <thead>
+		                <tr>
+		                    <th>기안일</th>
+		                    <th>결재 양식</th>
+		                    <th>제목</th>
+		                    <th>상태</th>
+		                    <th>기안자</th>
+		                </tr>
+		            </thead>
+		            <tbody id="resultList">
+		                <tr th:each="authorization : ${authorizationPage.content}"> <!-- 'authorizationPage.content'로 변경 -->
+		                    <td th:text="${authorization.authorRegDate != null ? #temporals.format(authorization.authorRegDate, 'yyyy.MM.dd') : ''}"></td>
+		                    <td th:text="${authorization.doctype}"></td>
+		                    <td>
+		                        <a href="javascript:void(0);" 
+		                           th:text="${authorization.authTitle}" 
+		                           th:onclick="'openApprovalModal(' + ${authorization.authorNo} + ')'">
+		                        </a>
+		                    </td>
+		                    <td th:text="${authorization.authorStatus == 'P' ? '대기중' : (authorization.authorStatus == 'Y' ? '승인' : '반려')}"></td>
+		                    <td th:text="${authorization.memName}"></td>
+		                </tr>
+		            </tbody>
+		        </table>
+		        
+		        <!-- 페이징 블록 -->
+		        <div class="pagination">
+		            <!-- 이전 페이지 링크: 2 페이지 이상일 때만 표시 -->
+		            <a th:href="@{/authorization/authorizationCheck(page=${authorizationPage.pageable.pageNumber - 1})}" 
+		               th:if="${authorizationPage.pageable.pageNumber > 0}">&lsaquo;</a>
+		
+		            <!-- 페이지 번호 반복 (현재 페이지 기준으로 앞뒤로 최대 3개) -->
+		            <span th:each="i : ${#numbers.sequence(authorizationPage.pageable.pageNumber > 0 ? authorizationPage.pageable.pageNumber : 1, authorizationPage.pageable.pageNumber + 2 < authorizationPage.totalPages ? authorizationPage.pageable.pageNumber + 2 : authorizationPage.totalPages)}">
+		                <a th:text="${i}" 
+		                   th:href="@{/authorization/authorizationCheck(page=${i - 1})}" 
+		                   th:classappend="${i == authorizationPage.pageable.pageNumber + 1} ? 'active'">1</a>
+		            </span>
+		
+		            <!-- 다음 페이지 링크: 마지막 페이지가 아닐 때만 표시 -->
+		            <a th:href="@{/authorization/authorizationCheck(page=${authorizationPage.pageable.pageNumber + 1})}" 
+		               th:if="${authorizationPage.pageable.pageNumber + 1 < authorizationPage.totalPages}">&rsaquo;</a>
+		        </div>
+		    </div>
+		</section>
 
-            <div class="main-content-custom">
-                <h3>결재 진행 목록</h3>
-                <table class="table-custom">
-                    <colgroup>
-                        <col width="10%">
-                        <col width="30%">
-                        <col width="20%">
-                        <col width="20%">
-                        <col width="30%">
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            <th>기안일</th>
-                            <th>결재 양식</th>
-                            <th>제목</th>
-                            <th>상태</th>
-                            <th>기안자</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resultList">
-                        <tr th:each="authorization : ${authorizationList}">
-                            <td th:text="${authorization.authorRegDate != null ? #temporals.format(authorization.authorRegDate, 'yyyy.MM.dd') : ''}"></td>
-                            <td th:text="${authorization.doctype}"></td>
-                            <td>
-                                <a href="javascript:void(0);" 
-                                   th:text="${authorization.authTitle}" 
-                                   th:onclick="'openApprovalModal(' + ${authorization.authorNo} + ')'">
-                                </a>
-                            </td>
-                            <td th:text="${authorization.authorStatus == 'P' ? '대기중' : (authorization.authorStatus == 'Y' ? '승인' : '반려')}"></td>
-							<td th:text="${authorization.memName}"></td>                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
 
         <!-- 모달 창 (결재 확인) -->
         <div id="approvalModal" class="modal-custom" style="display: none;">

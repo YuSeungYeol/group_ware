@@ -227,18 +227,22 @@ public class AuthorizationViewController {
 
 	// 결재 확인 관련 결재자, 참조자 승인 확인란
     @GetMapping("/authorization/authorizationCheck")
-    public String selectApprovalList(Model model) {
+    public String selectApprovalList(
+            @RequestParam(value = "page", defaultValue = "0") int page,  // 페이지 번호를 받음
+            @PageableDefault(size = 5) Pageable pageable,  // 페이지당 5개의 항목
+            Model model
+    ) {
         // 현재 로그인한 사용자의 ID를 SecurityContextHolder로부터 가져옴
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
             String memId = authentication.getName();  // 현재 로그인한 사용자의 ID를 가져옴
             System.out.println("로그인된 사용자 ID: " + memId);
 
-            // 서비스 메서드 호출 시 memId 전달, memId로 memNo 조회 후 처리
-            List<AuthorizationDto> authorizationList = authorizationService.selectAuthorizationListForApproversAndReferers(memId);
+            // 서비스 메서드 호출 시 memId 전달, 페이징 처리된 결과를 받음
+            Page<AuthorizationDto> authorizationPage = authorizationService.selectAuthorizationListForApproversAndReferers(memId, pageable);
 
             // 각 AuthorizationDto에 결재 경로 정보 추가
-            for (AuthorizationDto authorization : authorizationList) {
+            for (AuthorizationDto authorization : authorizationPage.getContent()) {
                 // ApprovalRoute 리스트를 가져옴
                 List<ApprovalRoute> approvalRoutes = approvalRouteRepository.findByAuthorization_AuthorNo(authorization.getAuthorNo());
 
@@ -261,8 +265,10 @@ public class AuthorizationViewController {
                 }
             }
 
-            // 모델에 결재 내역 리스트 추가
-            model.addAttribute("authorizationList", authorizationList);
+            // 모델에 페이징된 결재 내역 리스트 추가
+            model.addAttribute("authorizationPage", authorizationPage);
+            model.addAttribute("currentPage", authorizationPage.getNumber() + 1);  // 현재 페이지 번호
+            model.addAttribute("totalPages", authorizationPage.getTotalPages());   // 전체 페이지 수
 
             return "authorization/authorizationCheck";
         } else {
@@ -270,6 +276,8 @@ public class AuthorizationViewController {
             return "redirect:/login";  // 로그인 페이지로 리다이렉트
         }
     }
+
+
 
 
     // 기안 진행 목록 가져오기

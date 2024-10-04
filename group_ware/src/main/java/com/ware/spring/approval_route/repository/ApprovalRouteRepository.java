@@ -3,6 +3,8 @@ package com.ware.spring.approval_route.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.ware.spring.approval_route.domain.ApprovalRoute;
@@ -19,6 +21,9 @@ public interface ApprovalRouteRepository extends JpaRepository<ApprovalRoute, Lo
 
     // 참조자 정보 조회
     Optional<ApprovalRoute> findByAuthorization_AuthorNoAndMember_MemNoAndIsReferer(Long authorNo, Long memNo, String isReferer);
+	
+    // 결재 승인, 반려 창 페이징
+    Page<ApprovalRoute> findByMember_MemNo(Long memNo, Pageable pageable);
 
     
 }

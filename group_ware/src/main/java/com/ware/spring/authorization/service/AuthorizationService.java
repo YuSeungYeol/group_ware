@@ -237,55 +237,55 @@ public class AuthorizationService {
         return authorization;
     }
 
-    
-    public List<AuthorizationDto> selectAuthorizationListForApproversAndReferers(String memId) {
+    // 결재 확인 관련 결재자, 참조자 승인 확인란
+    public Page<AuthorizationDto> selectAuthorizationListForApproversAndReferers(String memId, Pageable pageable) {
         System.out.println("로그인한 사용자 ID: " + memId);
         Optional<Member> currentMember = memberRepository.findByMemId(memId);
         System.out.println("현재 로그인한 사용자 memNo: " + (currentMember.isPresent() ? currentMember.get().getMemNo() : "없음"));
 
         if (currentMember.isPresent()) {
             Long memNo = currentMember.get().getMemNo();
-            List<ApprovalRoute> approvalRoutes = approvalRouteRepository.findByMember_MemNo(memNo);
-            System.out.println("결재 경로: " + approvalRoutes);
+            // 페이징 처리된 결재 경로 가져오기
+            Page<ApprovalRoute> approvalRoutesPage = approvalRouteRepository.findByMember_MemNo(memNo, pageable);
 
-            return approvalRoutes.stream()
-                .map(approvalRoute -> {
-                    Authorization authorization = approvalRoute.getAuthorization();
-                    AuthorizationDto dto = AuthorizationDto.toDto(authorization);
+            // DTO로 변환
+            return approvalRoutesPage.map(approvalRoute -> {
+                Authorization authorization = approvalRoute.getAuthorization();
+                AuthorizationDto dto = AuthorizationDto.toDto(authorization);
 
-                    dto.setIsApprover(approvalRoute.getIsApprover());
-                    dto.setIsReferer(approvalRoute.getIsReferer());
+                dto.setIsApprover(approvalRoute.getIsApprover());
+                dto.setIsReferer(approvalRoute.getIsReferer());
 
-                    // ApprovalRouteDto로 변환하여 설정
-                    List<ApprovalRouteDto> routeDtos = approvalRouteRepository.findByAuthorization_AuthorNo(authorization.getAuthorNo())
-                        .stream()
-                        .map(route -> {
-                            ApprovalRouteDto routeDto = ApprovalRouteDto.toDto(route);
+                // ApprovalRouteDto로 변환하여 설정
+                List<ApprovalRouteDto> routeDtos = approvalRouteRepository.findByAuthorization_AuthorNo(authorization.getAuthorNo())
+                    .stream()
+                    .map(route -> {
+                        ApprovalRouteDto routeDto = ApprovalRouteDto.toDto(route);
 
-                            // 결재자 서명 추가
-                            if ("Y".equals(route.getIsApprover())) {
-                                routeDto.setApproverSignature(route.getApproverSignature());
-                            }
+                        // 결재자 서명 추가
+                        if ("Y".equals(route.getIsApprover())) {
+                            routeDto.setApproverSignature(route.getApproverSignature());
+                        }
 
-                            // 참조자 서명 추가
-                            if ("Y".equals(route.getIsReferer())) {
-                                routeDto.setRefererSignature(route.getRefererSignature());
-                            }
+                        // 참조자 서명 추가
+                        if ("Y".equals(route.getIsReferer())) {
+                            routeDto.setRefererSignature(route.getRefererSignature());
+                        }
 
-                            return routeDto;
-                        })
-                        .collect(Collectors.toList());
+                        return routeDto;
+                    })
+                    .collect(Collectors.toList());
 
-                    dto.setApprovalRoutes(routeDtos); // approvalRoute 목록을 DTO에 설정
-                    return dto;
-                })
-                .filter(dto -> !"T".equals(dto.getAuthorStatus()) && !"R".equals(dto.getAuthorStatus()))  // 임시 저장 및 회수 상태 제외
-                .collect(Collectors.toList());
+                dto.setApprovalRoutes(routeDtos); // approvalRoute 목록을 DTO에 설정
+                return dto;
+            });
         }
 
         System.out.println("로그인된 사용자 정보 없음");
-        return Collections.emptyList();
+        return Page.empty(); // 인증되지 않은 경우 빈 페이지 반환
     }
+
+
 
     
 
