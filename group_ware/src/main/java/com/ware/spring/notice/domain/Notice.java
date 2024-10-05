@@ -69,5 +69,9 @@ public class Notice {
 	
 	@Column(name="notice_schedule")
 	private String noticeSchedule;
+	
+	@Column(name="notice_alram")
+	private String noticeAlram;
+	
 }
   

@@ -234,6 +234,8 @@
                 .catch(error => console.error('Error fetching nav notifications:', error));
         });
 
+        
+        // 공지사항 알림
         document.addEventListener("DOMContentLoaded", function() {
             fetch("/notifications")
                 .then(response => response.json())
@@ -283,7 +285,33 @@
         });
 
 	
-        
+        // 공지사항 알람
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch(`/nav/notice-notifications`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("공지사항 알림 API 응답 데이터:", data);
+                    
+                    // 읽지 않은 공지사항이 있을 경우
+                    if (data.hasUnreadNotices) {
+                        const mainNoticeBadge = document.getElementById("main-notice-notification");
+                        const subNoticeBadge = document.getElementById("sub-notice-notification");
+
+                        if (mainNoticeBadge) {
+                            mainNoticeBadge.textContent = '●';  // 빨간 원 표시
+                            mainNoticeBadge.style.color = 'red';
+                            mainNoticeBadge.style.fontSize = '12px';
+                        }
+                        if (subNoticeBadge) {
+                            subNoticeBadge.textContent = '●';  // 빨간 원 표시
+                            subNoticeBadge.style.color = 'red';
+                            subNoticeBadge.style.fontSize = '12px';
+                        }
+                    }
+                })
+                .catch(error => console.error('공지사항 알림 가져오기 오류:', error));
+        });
+
 
 
 

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.ware.spring.member.domain.Member;
+import com.ware.spring.member.repository.MemberRepository;
 import com.ware.spring.notice.domain.Notice;
 import com.ware.spring.notice.domain.NoticeDto;
 import com.ware.spring.notice.repository.NoticeRepository;
@@ -20,10 +21,13 @@ import jakarta.transaction.Transactional;
 public class NoticeService {
 
     private final NoticeRepository noticeRepository;
+    private final MemberRepository memberRepository;
     
     @Autowired
-    public NoticeService(NoticeRepository noticeRepository) {
+    public NoticeService(NoticeRepository noticeRepository
+    						,MemberRepository memberRepository) {
         this.noticeRepository = noticeRepository;
+        this.memberRepository = memberRepository;
     }
     
     // Notice 목록을 조회하는 메서드가 데이터를 반환해야 합니다.
@@ -108,26 +112,38 @@ public class NoticeService {
     
 //    ALTER TABLE notice ADD COLUMN delete_yn CHAR(1) DEFAULT 'n';
     
-    // 읽지 않은 공지사항이 있는지 확인 (컬럼 사용 안함)
+    // 특정 사용자가 읽지 않은 공지사항이 있는지 확인
     public boolean hasUnreadNotices(Long memNo) {
-        
-    	return noticeRepository.existsByMember_MemNo(memNo);
+        return noticeRepository.existsByMember_MemNoAndNoticeAlram(memNo, "N");
     }
 
-    // 공지사항 목록 가져오기 (알림 확인용)
+    // 공지사항 알림 목록 가져오기 (읽지 않은 알림만)
     public List<Notice> getUnreadNotices(Long memNo) {
-        
-    	return noticeRepository.findByMember_MemNo(memNo);
+        return noticeRepository.findByMember_MemNoAndNoticeAlram(memNo, "N");
     }
 
-    // 공지사항 읽음 처리 (알림 제거 로직)
+    // 공지사항 읽음 처리
     public void clearNoticeNotification(Long noticeNo, Long memNo) {
-        
-    	Optional<Notice> noticeOpt = noticeRepository.findByNoticeNoAndMember_MemNo(noticeNo, memNo);
+        Optional<Notice> noticeOpt = noticeRepository.findByNotice_NoticeNoAndMember_MemNo(noticeNo, memNo);
         if (noticeOpt.isPresent()) {
+            Notice notice = noticeOpt.get();
+            notice.setNoticeAlram("Y");  // 알림 상태를 'Y'로 변경
+            noticeRepository.save(notice);
         }
     }
     
+//    // 공지사항 등록 후 모든 직원에게 알림 설정
+//    public void createNoticeForAllMembers(Notice notice) {
+//        List<Member> allMembers = memberRepository.findAll(); // 모든 회원 조회
+//        for (Member member : allMembers) {
+//            Notice noticeStatus = new Notice();  // NoticeStatus 객체 생성
+//            noticeStatus.setNotice(notice);  // 공지사항 설정
+//            noticeStatus.setMember(member);  // 각 회원 설정
+//            noticeStatus.setNoticeAlram("N");  // 새로운 공지사항이므로 'N'으로 설정
+//            noticeStatusRepository.save(noticeStatus);  // 저장
+//        }
+//    }
+//    
 }
 
 

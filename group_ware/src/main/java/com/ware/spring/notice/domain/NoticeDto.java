@@ -38,6 +38,8 @@ public class NoticeDto {
     private LocalDateTime noticeStartDate;  // LocalDate로 변경
     private LocalDateTime noticeEndDate;    // LocalDate로 변경
     private String noticeSchedule;      // 'Y' 또는 'N' 값을 저장하는 필드
+    
+    private String noticeAlram;
 
     // 엔티티로 변환하는 메서드
     public Notice toEntity() {
@@ -52,7 +54,8 @@ public class NoticeDto {
                 .deleteYn(deleteYn) 
                 .noticeStartDate(noticeStartDate)  
                 .noticeEndDate(noticeEndDate)      
-                .noticeSchedule(noticeSchedule)    
+                .noticeSchedule(noticeSchedule)
+                .noticeAlram(noticeAlram)
                 .build();
     }
    
@@ -69,7 +72,8 @@ public class NoticeDto {
                 .deleteYn(notice.getDeleteYn())
                 .noticeStartDate(notice.getNoticeStartDate())  
                 .noticeEndDate(notice.getNoticeEndDate())      
-                .noticeSchedule(notice.getNoticeSchedule())    
+                .noticeSchedule(notice.getNoticeSchedule()) 
+                .noticeAlram(notice.getNoticeAlram())
                 .build();
     }
 }

@@ -107,13 +107,13 @@ public class NoticeViewController {
 
         if (memberOpt.isPresent()) {
             Long memNo = memberOpt.get().getMemNo();
-            boolean hasUnreadNotices = noticeService.hasUnreadNotices(memNo); // 안 읽은 공지사항이 있는지 확인
+            boolean hasUnreadNotices = noticeService.hasUnreadNotices(memNo); // 해당 직원이 안 읽은 공지사항이 있는지 확인
             notifications.put("hasUnreadNotices", hasUnreadNotices);
         }
 
         return ResponseEntity.ok(notifications);
     }
 
-
+    
     
 }
