@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.ware.spring.approval_route.domain.ApprovalRoute;
 import com.ware.spring.approval_route.domain.ApprovalRouteDto;
 import com.ware.spring.approval_route.repository.ApprovalRouteRepository;
+import com.ware.spring.approval_route.service.ApprovalRouteService;
 import com.ware.spring.authorization.domain.Authorization;
 import com.ware.spring.authorization.domain.AuthorizationDto;
 import com.ware.spring.authorization.repository.AuthorizationRepository;
@@ -45,18 +46,21 @@ public class AuthorizationViewController {
     private final AuthorizationRepository authorizationRepository;
     private final MemberRepository memberRepository;
     private final ApprovalRouteRepository approvalRouteRepository;
+    private final ApprovalRouteService approvalRouteService; 
     
     @Autowired
     public AuthorizationViewController(AuthorizationService authorizationService, 
                                        MemberService memberService,
                                        AuthorizationRepository authorizationRepository
                                        , MemberRepository memberRepository
-                                       , ApprovalRouteRepository approvalRouteRepository) {
+                                       , ApprovalRouteRepository approvalRouteRepository
+                                       , ApprovalRouteService approvalRouteService) {
         this.authorizationService = authorizationService;
         this.memberService = memberService;
         this.authorizationRepository = authorizationRepository;
         this.memberRepository = memberRepository;
         this.approvalRouteRepository = approvalRouteRepository;
+        this.approvalRouteService = approvalRouteService;
     }
 
     // 결재 리스트 조회
@@ -337,5 +341,22 @@ public class AuthorizationViewController {
         return authorizationDto;
     }
 
+    
+    // 알림 정보 추가하는 메서드
+    private void addNavDataToModel(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String memId = authentication.getName();
+        Optional<Member> memberOpt = memberRepository.findByMemId(memId);
+
+        if (memberOpt.isPresent()) {
+            Long memNo = memberOpt.get().getMemNo();
+            boolean approvalNotification = approvalRouteService.hasApprovalNotifications(memNo);
+            boolean authorNotification = authorizationService.hasAuthorNotifications(memNo);
+
+            // 알림 정보를 모델에 추가
+            model.addAttribute("approvalNotification", approvalNotification);
+            model.addAttribute("authorNotification", authorNotification);
+        }
+    }
 
 }

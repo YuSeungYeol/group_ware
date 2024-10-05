@@ -568,5 +568,28 @@ public class AuthorizationService {
 	        return authorizationRepository.findByAuthorStatusIn(Arrays.asList("Y", "N"), pageable); // "Y": 승인, "N": 반려
 	    }
 
+	    // 기안자 알람
+	    public boolean hasAuthorNotifications(Long memNo) {
+	        return authorizationRepository.existsByMember_MemNoAndAuthorStatusNot(memNo, "P");
+	    }
+	    
+	    // 알림 해제 로직
+	    @Transactional
+	    public void clearAuthorNotification(Long authorNo, Long memNo) {
+	        // 문서가 memNo 사용자의 문서인지 확인
+	        Optional<Authorization> authorizationOpt = authorizationRepository.findByAuthorNoAndMember_MemNo(authorNo, memNo);
+
+	        if (authorizationOpt.isPresent()) {
+	            Authorization authorization = authorizationOpt.get();
+
+	            // 'Y'(승인) 또는 'N'(반려) 상태일 때 알림을 해제
+	            if ("Y".equals(authorization.getAuthorStatus()) || "N".equals(authorization.getAuthorStatus())) {
+	                // 이 부분에서는 DB 변경 없이 UI 상에서 알림만 해제
+	                // DB 상태는 그대로 두고 클라이언트에 알림 해제됨을 응답
+	                System.out.println("알림이 해제되었습니다: 문서 번호 " + authorNo);
+	            }
+	        }
+	    }
+
 
 }

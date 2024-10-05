@@ -429,3 +429,13 @@ li {
     color: black;
 }
 
+.accordion-content a.notification-parent .notification-dot {
+    background-color: red !important;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+

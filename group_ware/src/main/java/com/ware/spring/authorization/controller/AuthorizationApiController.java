@@ -474,10 +474,42 @@ public class AuthorizationApiController {
         }
     }
 
+    // 알람 관련
+    @GetMapping("/nav")
+    public ResponseEntity<Map<String, Boolean>> getNavNotifications() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String memId = authentication.getName();
+        Optional<Member> memberOpt = memberRepository.findByMemId(memId);
+
+        Map<String, Boolean> notifications = new HashMap<>();
+
+        if (memberOpt.isPresent()) {
+            Long memNo = memberOpt.get().getMemNo();
+            boolean approvalNotification = approvalRouteService.hasApprovalNotifications(memNo);
+            boolean authorNotification = authorizationService.hasAuthorNotifications(memNo);
+
+            notifications.put("approvalNotification", approvalNotification);
+            notifications.put("authorNotification", authorNotification);
+        }
+
+        return ResponseEntity.ok(notifications);
+    }
 
 
+    // 알림 제거 API
+    @GetMapping("/authorization/clearAuthorNotification/{authorNo}")
+    public ResponseEntity<Void> clearAuthorNotification(@PathVariable("authorNo") Long authorNo, Principal principal) {
+        String memId = principal.getName();
+        Optional<Member> memberOpt = memberRepository.findByMemId(memId);
 
-
+        if (memberOpt.isPresent()) {
+            Long memNo = memberOpt.get().getMemNo();
+            authorizationService.clearAuthorNotification(authorNo, memNo); // 알림 삭제 로직 실행
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 로그인된 사용자가 없는 경우
+        }
+    }
 
 
 

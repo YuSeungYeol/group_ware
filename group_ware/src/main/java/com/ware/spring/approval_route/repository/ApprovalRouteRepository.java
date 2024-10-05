@@ -24,6 +24,9 @@ public interface ApprovalRouteRepository extends JpaRepository<ApprovalRoute, Lo
 	
     // 결재 승인, 반려 창 페이징
     Page<ApprovalRoute> findByMember_MemNo(Long memNo, Pageable pageable);
+    
+    // 알람관련
+	boolean existsByMember_MemNoAndApprovalStatus(Long memNo, String string);
 
     
 }

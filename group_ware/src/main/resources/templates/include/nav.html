@@ -59,16 +59,21 @@
                     </div>
                 </div>
                 <div class="accordion-item">
-                    <button class="accordion-btn">전자결재</button>
+                    <button class="accordion-btn">
+                    	전자결재
+                    	<span id="main-notification" class="notification-badge"></span>
+                    </button>
                     <div class="accordion-content">
-                        <a th:href="@{/authorization/authorizationList}"
-                        
-                        >결재</a>
+                        <a th:href="@{/authorization/authorizationList}" id="author-list-link">
+                        	결재
+                        	<span th:if="${authorHasNotifications}" class="notification-dot"></span>
+                        </a>
                         <a th:href="@{/authorization/authorizationDocument}">결재 문서함</a>
                         <a th:href="@{/authorization/authorizationStorage}">임시 저장함</a>
-						<a th:href="@{/authorization/authorizationCheck}"
-						
-						>결재 확인</a> 
+						<a th:href="@{/authorization/authorizationCheck}" id="approval-check-link">
+							결재 확인
+							<span th:if="${approverHasNotifications}" class="notification-dot"></span>
+						</a> 
                         
                     </div>
                 </div>
@@ -129,5 +134,74 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
         <script th:src="@{/js/nav.js}"></script>
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch("/nav")
+                .then(response => response.json())
+                .then(data => {
+                    let mainNotificationShown = false; // 상위 전자결재에 알림 표시 여부
+                    
+                    // 결재 확인 알림 (approvalNotification이 true일 경우)
+                    if (data.approvalNotification) {
+                        const approvalLink = document.getElementById("approval-check-link");
+                        if (approvalLink) {
+                            const approvalBadge = document.createElement('span');
+                            approvalBadge.classList.add('notification-badge');
+                            approvalBadge.textContent = ''; // 텍스트 없이 원만 표시
+                            approvalBadge.style.position = 'absolute';
+                            approvalBadge.style.width = '5px';
+                            approvalBadge.style.height = '5px';
+                            approvalBadge.style.backgroundColor = 'red';
+                            approvalBadge.style.borderRadius = '50%';
+                            approvalLink.style.position = "relative";  // 부모 요소에 상대적 위치 설정
+                            approvalLink.style.textDecoration = 'none'; // 회색 밑줄 제거
+                            approvalLink.appendChild(approvalBadge);
+                            
+                            // 전자결재 상위에 알림 표시
+                            mainNotificationShown = true;
+                        }
+                    }
+
+                    // 기안자 알림 (authorNotification이 true일 경우)
+                    if (data.authorNotification) {
+                        const authorLink = document.getElementById("author-list-link");
+                        if (authorLink) {
+                            const authorBadge = document.createElement('span');
+                            authorBadge.classList.add('notification-badge');
+                            authorBadge.textContent = ''; // 텍스트 없이 원만 표시
+                            authorBadge.style.position = 'absolute';
+                            authorBadge.style.width = '5px';
+                            authorBadge.style.height = '5px';
+                            authorBadge.style.backgroundColor = 'red';
+                            authorBadge.style.borderRadius = '50%';
+                            authorLink.style.position = "relative";  // 부모 요소에 상대적 위치 설정
+                            authorLink.style.textDecoration = 'none'; // 회색 밑줄 제거
+                            authorLink.appendChild(authorBadge);
+                            
+                            // 전자결재 상위에 알림 표시
+                            mainNotificationShown = true;
+                        }
+                    }
+
+                    // 상위 전자결재에 알림 표시 (결재 또는 결재 확인 중 하나라도 있으면)
+                    if (mainNotificationShown) {
+                        const mainNotification = document.getElementById("main-notification");
+                        if (mainNotification) {
+                            mainNotification.textContent = '●';  // 빨간 원 표시
+                            mainNotification.style.color = 'red';
+                            mainNotification.style.fontSize = '12px';
+                            mainNotification.style.marginTop = '-5px'; // 살짝 상단으로 이동
+                            mainNotification.style.position = 'absolute'; // 위치 조정
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching notifications:', error));
+        });
+
+
+
+
+		</script>
+
     </th:block>
 </html>

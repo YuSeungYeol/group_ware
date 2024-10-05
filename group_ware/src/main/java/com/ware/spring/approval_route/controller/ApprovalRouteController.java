@@ -2,7 +2,10 @@ package com.ware.spring.approval_route.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
 
 import com.ware.spring.approval_route.domain.ApprovalRoute;
 import com.ware.spring.approval_route.domain.ApprovalRouteDto;
@@ -15,7 +18,10 @@ import com.ware.spring.authorization.service.AuthorizationService;
 import com.ware.spring.member.domain.Member;
 import com.ware.spring.member.repository.MemberRepository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -125,5 +131,26 @@ public class ApprovalRouteController {
         List<Member> employees = memberRepository.findByDistributor_DistributorNo(distributorId);
         return ResponseEntity.ok(employees);
     } 
+    
+    // 알람 관련
+    @GetMapping("/nav")
+    public ResponseEntity<Map<String, Boolean>> getNavNotifications() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String memId = authentication.getName();
+        Optional<Member> memberOpt = memberRepository.findByMemId(memId);
+
+        Map<String, Boolean> notifications = new HashMap<>();
+
+        if (memberOpt.isPresent()) {
+            Long memNo = memberOpt.get().getMemNo();
+            boolean approvalNotification = approvalRouteService.hasApprovalNotifications(memNo);
+            boolean authorNotification = authorizationService.hasAuthorNotifications(memNo);
+
+            notifications.put("approvalNotification", approvalNotification);
+            notifications.put("authorNotification", authorNotification);
+        }
+
+        return ResponseEntity.ok(notifications);
+    }
 
 }
