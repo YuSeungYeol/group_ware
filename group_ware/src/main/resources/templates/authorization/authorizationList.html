@@ -118,22 +118,21 @@
 	
 					<div class="pagination">
 					    <!-- 이전 페이지 링크: 2 페이지 이상일 때만 표시 -->
-					    <a th:href="@{/authorization/authorizationStorage(page=${tempListPage.pageable.pageNumber - 1})}" 
-					       th:if="${tempListPage.pageable.pageNumber > 0}">&lsaquo;</a>
+					    <a th:href="@{/authorization/authorizationList(completedPage=${completedPage.pageable.pageNumber - 1})}" 
+					       th:if="${completedPage.pageable.pageNumber > 0}">&lsaquo;</a>
 					
 					    <!-- 페이지 번호 반복 (현재 페이지 기준으로 앞뒤로 최대 3개) -->
-					    <span th:each="i : ${#numbers.sequence(tempListPage.pageable.pageNumber > 0 ? tempListPage.pageable.pageNumber : 1, tempListPage.pageable.pageNumber + 2 < tempListPage.totalPages ? tempListPage.pageable.pageNumber + 2 : tempListPage.totalPages)}">
+					    <span th:each="i : ${#numbers.sequence(completedPage.pageable.pageNumber > 0 ? completedPage.pageable.pageNumber : 1, completedPage.pageable.pageNumber + 2 < completedPage.totalPages ? completedPage.pageable.pageNumber + 2 : completedPage.totalPages)}">
 					        <a th:text="${i}" 
-					           th:href="@{/authorization/authorizationStorage(page=${i - 1})}" 
-					           th:classappend="${i == tempListPage.pageable.pageNumber + 1} ? 'active'">1</a>
+					           th:href="@{/authorization/authorizationList(completedPage=${i - 1})}" 
+					           th:classappend="${i == completedPage.pageable.pageNumber + 1} ? 'active'">1</a>
 					    </span>
 					
 					    <!-- 다음 페이지 링크: 마지막 페이지가 아닐 때만 표시 -->
-					    <a th:href="@{/authorization/authorizationStorage(page=${tempListPage.pageable.pageNumber + 1})}" 
-					       th:if="${tempListPage.pageable.pageNumber + 1 < tempListPage.totalPages}">&rsaquo;</a>
+					    <a th:href="@{/authorization/authorizationList(completedPage=${completedPage.pageable.pageNumber + 1})}" 
+					       th:if="${completedPage.pageable.pageNumber + 1 < completedPage.totalPages}">&rsaquo;</a>
 					</div>
 
-						
 	                <!-- 모달 창 -->
 	                <div id="section_wrap">
 	                    <form id="authorizationAddFrm" enctype="multipart/form-data">
