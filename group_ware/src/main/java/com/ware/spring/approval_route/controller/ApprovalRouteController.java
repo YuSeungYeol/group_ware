@@ -39,39 +39,6 @@ public class ApprovalRouteController {
         this.approvalRouteRepository = approvalRouteRepository;
     }
 
-    // 특정 authorNo에 대한 모든 결재자 및 참조자 조회
-//    @GetMapping("/{authorNo}")
-//    public ResponseEntity<List<ApprovalRouteDto>> getApprovalRoutes(@PathVariable("authorNo") Long authorNo) {
-//        List<ApprovalRouteDto> approvalRouteDtos = approvalRouteService.getApprovalRoutesByAuthorNo(authorNo);
-//
-//        for (ApprovalRouteDto dto : approvalRouteDtos) {
-//            // 결재자 정보 설정 (승인 상태와 무관)
-//            if ("Y".equals(dto.getIsApprover())) {  // 결재자 여부 확인
-//                Member approver = memberRepository.findById(dto.getMemNo())
-//                        .orElseThrow(() -> new RuntimeException("No approver found with MemNo: " + dto.getMemNo()));
-//                dto.setApproverName(approver.getMemName());
-//
-//                // Rank 객체가 null이 아닌지 확인 후 Rank 이름 설정
-//                if (approver.getRank() != null) {
-//                    dto.setApproverRankName(approver.getRank().getRankName());  // Rank 이름 설정
-//                }
-//            }
-//
-//            // 참조자 정보 설정 (승인 상태와 무관)
-//            if ("Y".equals(dto.getIsReferer())) {  // 참조자 여부 확인
-//                Member referer = memberRepository.findById(dto.getMemNo())
-//                        .orElseThrow(() -> new RuntimeException("No referer found with MemNo: " + dto.getMemNo()));
-//                dto.setRefererName(referer.getMemName());
-//
-//                // Rank 객체가 null이 아닌지 확인 후 Rank 이름 설정
-//                if (referer.getRank() != null) {
-//                    dto.setRefererRankName(referer.getRank().getRankName());  // Rank 이름 설정
-//                }
-//            }
-//        }
-//
-//        return ResponseEntity.ok(approvalRouteDtos);
-//    }
     // 기안 진행중인 문서 조회
     @GetMapping("/{authorNo}")
     public ResponseEntity<List<ApprovalRouteDto>> getApprovalRoutes(@PathVariable("authorNo") Long authorNo) {
@@ -142,11 +109,6 @@ public class ApprovalRouteController {
         return ResponseEntity.ok(approvalRouteDtos);
     }
 
-
-
-
-
-    
     
     // 특정 결재자 또는 참조자의 결재 상태 업데이트
     @PostMapping("/update")
