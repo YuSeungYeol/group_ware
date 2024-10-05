@@ -479,9 +479,12 @@ public class AuthorizationService {
 	            Long memNo = securityUser.getMember().getMemNo();  // 로그인한 사용자의 memNo 가져오기
 
 	            // 승인(Y) 또는 반려(N) 상태인 문서만 가져오기
-	            List<String> statuses = Arrays.asList("Y", "N"); // 승인, 반려 상태 필터링
+	            List<String> statuses = Arrays.asList("Y", "N", "C"); // 승인, 반려 상태 필터링
 	            List<Authorization> completedAuthorizationList = authorizationRepository.findByMember_MemNoAndAuthorStatusIn(memNo, statuses);
 
+	            System.out.println("Completed Authorization List: " + completedAuthorizationList);
+
+	            
 	            // DTO로 변환 및 결재 경로 추가
 	            return completedAuthorizationList.stream()
 	                .map(authorization -> {
@@ -499,6 +502,7 @@ public class AuthorizationService {
 	                .collect(Collectors.toList()); // 결과 리스트 반환
 	        }
 	        return Collections.emptyList(); // 인증되지 않은 경우 빈 리스트 반환
+	        
 	    }
 
 	    // 결재 경로를 회수된 상태로 업데이트하는 메서드
@@ -565,12 +569,12 @@ public class AuthorizationService {
 
 	    // 완료된 문서 목록 페이징 처리
 	    public Page<Authorization> getCompletedAuthorizations(Pageable pageable) {
-	        return authorizationRepository.findByAuthorStatusIn(Arrays.asList("Y", "N"), pageable); // "Y": 승인, "N": 반려
+	        return authorizationRepository.findByAuthorStatusIn(Arrays.asList("Y", "N", "C"), pageable); // "Y": 승인, "N": 반려
 	    }
 
 	    // 기안자 알람
 	    public boolean hasAuthorNotifications(Long memNo) {
-	        return authorizationRepository.existsByMember_MemNoAndAuthorStatusNot(memNo, "P");
+	        return authorizationRepository.existsByMember_MemNoAndAuthorStatusNot(memNo, "C");
 	    }
 	    
 	    // 알림 해제 로직
@@ -582,14 +586,15 @@ public class AuthorizationService {
 	        if (authorizationOpt.isPresent()) {
 	            Authorization authorization = authorizationOpt.get();
 
-	            // 'Y'(승인) 또는 'N'(반려) 상태일 때 알림을 해제
+	            // 'Y'(승인) 또는 'N'(반려) 상태일 때만 상태를 'C'로 변경하여 알림을 제거
 	            if ("Y".equals(authorization.getAuthorStatus()) || "N".equals(authorization.getAuthorStatus())) {
-	                // 이 부분에서는 DB 변경 없이 UI 상에서 알림만 해제
-	                // DB 상태는 그대로 두고 클라이언트에 알림 해제됨을 응답
+	                authorization.setAuthorStatus("C"); // 상태를 'C'로 변경
+	                authorizationRepository.save(authorization); // 상태 업데이트
 	                System.out.println("알림이 해제되었습니다: 문서 번호 " + authorNo);
 	            }
 	        }
 	    }
+
 
 
 }

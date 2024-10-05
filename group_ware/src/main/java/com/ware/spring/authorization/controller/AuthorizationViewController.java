@@ -303,6 +303,7 @@ public class AuthorizationViewController {
     @ResponseBody
     public List<AuthorizationDto> getCompletedDocuments() {
         return authorizationService.selectCompletedAuthorizationList();
+        
     }
 
     // 개별 문서 조회 API

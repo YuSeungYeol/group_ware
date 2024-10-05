@@ -94,9 +94,15 @@
                     </div>
                 </div>
                 <div class="accordion-item">
-                    <button class="accordion-btn">공지</button>
+                    <button class="accordion-btn">
+                    	공지
+                    	 <span id="main-notice-notification" class="notification-badge"></span>
+                    </button>
                     <div class="accordion-content">
-                        <a th:href="@{/notice/noticeList}">공지사항</a>
+                        <a th:href="@{/notice/noticeList}">
+                        	공지사항
+                        	<span id="sub-notice-notification" class="notification-badge"></span>
+                        </a>
                         <a th:href="@{/board/boardList}">게시판</a>
                     </div>
                 </div>
@@ -136,15 +142,18 @@
         <script th:src="@{/js/nav.js}"></script>
         <script>
         document.addEventListener("DOMContentLoaded", function() {
-            fetch("/nav")
+            fetch(`/nav?timestamp=${new Date().getTime()}`)
                 .then(response => response.json())
                 .then(data => {
+                    console.log("nav API 응답 데이터:", data); // 응답 데이터 확인
                     let mainNotificationShown = false; // 상위 전자결재에 알림 표시 여부
                     
                     // 결재 확인 알림 (approvalNotification이 true일 경우)
                     if (data.approvalNotification) {
+                        console.log("결재 알림 표시 중");
                         const approvalLink = document.getElementById("approval-check-link");
                         if (approvalLink) {
+                            console.log("approvalLink 요소 발견");
                             const approvalBadge = document.createElement('span');
                             approvalBadge.classList.add('notification-badge');
                             approvalBadge.textContent = ''; // 텍스트 없이 원만 표시
@@ -159,13 +168,23 @@
                             
                             // 전자결재 상위에 알림 표시
                             mainNotificationShown = true;
+                        } else {
+                            console.log("approvalLink 요소를 찾지 못함");
+                        }
+                    } else {
+                        // 결재 확인 알림이 없을 경우 배지 숨기기
+                        const approvalBadge = document.getElementById("approval-check-link").querySelector('.notification-badge');
+                        if (approvalBadge) {
+                            approvalBadge.style.display = 'none'; // 배지 숨김 처리
                         }
                     }
 
                     // 기안자 알림 (authorNotification이 true일 경우)
                     if (data.authorNotification) {
+                        console.log("기안자 알림 표시 중");
                         const authorLink = document.getElementById("author-list-link");
                         if (authorLink) {
+                            console.log("authorLink 요소 발견");
                             const authorBadge = document.createElement('span');
                             authorBadge.classList.add('notification-badge');
                             authorBadge.textContent = ''; // 텍스트 없이 원만 표시
@@ -180,11 +199,20 @@
                             
                             // 전자결재 상위에 알림 표시
                             mainNotificationShown = true;
+                        } else {
+                            console.log("authorLink 요소를 찾지 못함");
+                        }
+                    } else {
+                        // 기안자 알림이 없을 경우 배지 숨기기
+                        const authorBadge = document.getElementById("author-list-link").querySelector('.notification-badge');
+                        if (authorBadge) {
+                            authorBadge.style.display = 'none'; // 배지 숨김 처리
                         }
                     }
 
                     // 상위 전자결재에 알림 표시 (결재 또는 결재 확인 중 하나라도 있으면)
                     if (mainNotificationShown) {
+                        console.log("상위 전자결재에 알림 표시 중");
                         const mainNotification = document.getElementById("main-notification");
                         if (mainNotification) {
                             mainNotification.textContent = '●';  // 빨간 원 표시
@@ -192,11 +220,70 @@
                             mainNotification.style.fontSize = '12px';
                             mainNotification.style.marginTop = '-5px'; // 살짝 상단으로 이동
                             mainNotification.style.position = 'absolute'; // 위치 조정
+                        } else {
+                            console.log("mainNotification 요소를 찾지 못함");
+                        }
+                    } else {
+                        // 전자결재 상단 알림 배지 숨기기
+                        const mainNotification = document.getElementById("main-notification");
+                        if (mainNotification) {
+                            mainNotification.style.display = 'none'; // 배지 숨김 처리
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching nav notifications:', error));
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch("/notifications")
+                .then(response => response.json())
+                .then(data => {
+                    console.log("notifications API 응답 데이터:", data); // 응답 데이터 확인
+                    // 공지사항 알림 (읽지 않은 공지사항이 있을 경우)
+                    if (data.hasUnreadNotices) {
+                        console.log("공지사항 알림 표시 중");
+                        const mainNoticeBadge = document.getElementById("main-notice-notification");
+                        const subNoticeBadge = document.getElementById("sub-notice-notification");
+
+                        // 공지에 알림 표시
+                        if (mainNoticeBadge) {
+                            console.log("mainNoticeBadge 요소 발견");
+                            mainNoticeBadge.textContent = '●';  // 빨간 원 표시
+                            mainNoticeBadge.style.color = 'red';
+                            mainNoticeBadge.style.fontSize = '12px';
+                            mainNoticeBadge.style.marginLeft = '5px'; // 위치 조정
+                        } else {
+                            console.log("mainNoticeBadge 요소를 찾지 못함");
+                        }
+
+                        // 공지사항에 알림 표시
+                        if (subNoticeBadge) {
+                            console.log("subNoticeBadge 요소 발견");
+                            subNoticeBadge.textContent = '●';  // 빨간 원 표시
+                            subNoticeBadge.style.color = 'red';
+                            subNoticeBadge.style.fontSize = '12px';
+                            subNoticeBadge.style.marginLeft = '5px'; // 위치 조정
+                        } else {
+                            console.log("subNoticeBadge 요소를 찾지 못함");
+                        }
+                    } else {
+                        // 읽지 않은 공지사항이 없을 경우 알림 배지 숨기기
+                        const mainNoticeBadge = document.getElementById("main-notice-notification");
+                        const subNoticeBadge = document.getElementById("sub-notice-notification");
+                        
+                        if (mainNoticeBadge) {
+                            mainNoticeBadge.style.display = 'none'; // 배지 숨김 처리
+                        }
+                        if (subNoticeBadge) {
+                            subNoticeBadge.style.display = 'none'; // 배지 숨김 처리
                         }
                     }
                 })
                 .catch(error => console.error('Error fetching notifications:', error));
         });
+
+	
+        
 
 
 

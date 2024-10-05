@@ -177,7 +177,7 @@ public class ApprovalRouteService {
 
     // 결재자, 참조자 알람
     public boolean hasApprovalNotifications(Long memNo) {
-        return approvalRouteRepository.existsByMember_MemNoAndApprovalStatus(memNo, "P");
+        return approvalRouteRepository.existsByMember_MemNoAndApprovalStatus(memNo, "C");
     }
 
 

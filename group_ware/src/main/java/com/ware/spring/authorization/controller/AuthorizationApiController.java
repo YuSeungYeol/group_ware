@@ -485,6 +485,8 @@ public class AuthorizationApiController {
 
         if (memberOpt.isPresent()) {
             Long memNo = memberOpt.get().getMemNo();
+            
+            // 'C' 상태를 제외한 알림만 확인
             boolean approvalNotification = approvalRouteService.hasApprovalNotifications(memNo);
             boolean authorNotification = authorizationService.hasAuthorNotifications(memNo);
 

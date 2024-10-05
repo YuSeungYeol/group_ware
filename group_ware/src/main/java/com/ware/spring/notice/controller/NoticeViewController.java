@@ -1,13 +1,17 @@
 package com.ware.spring.notice.controller;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -92,4 +96,24 @@ public class NoticeViewController {
 		model.addAttribute("dto",dto);
 		return "notice/noticeUpdate";
 	}
+    
+    // 공지사항 알림 확인 API
+    @GetMapping("/nav/notice-notifications")
+    public ResponseEntity<Map<String, Boolean>> getNoticeNotifications(Principal principal) {
+        String username = principal.getName();
+        Optional<Member> memberOpt = memberRepository.findByMemId(username);
+
+        Map<String, Boolean> notifications = new HashMap<>();
+
+        if (memberOpt.isPresent()) {
+            Long memNo = memberOpt.get().getMemNo();
+            boolean hasUnreadNotices = noticeService.hasUnreadNotices(memNo); // 안 읽은 공지사항이 있는지 확인
+            notifications.put("hasUnreadNotices", hasUnreadNotices);
+        }
+
+        return ResponseEntity.ok(notifications);
+    }
+
+
+    
 }

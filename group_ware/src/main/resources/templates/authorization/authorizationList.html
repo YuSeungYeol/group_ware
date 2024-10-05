@@ -111,8 +111,7 @@
 											   th:onclick="'openCompletedApprovalModal(' + ${authorization.authorNo} + '); clearNotification(' + ${authorization.authorNo} + ');'">
 											</a>
 	                                    </td>
-	                                    <td th:text="${authorization.authorStatus == 'Y' ? '승인' : '반려'}"></td>
-	                                </tr>
+										<td th:text="${authorization.authorStatus == 'Y' ? '승인' : (authorization.authorStatus == 'N' ? '반려' : (authorization.authorStatus == 'C' ? '확인' : 'Unknown'))}"></td>
 	                            </th:block>
 	                        </tbody>
 	                    </table>
@@ -938,7 +937,7 @@
 		        }
 
 		        documents.forEach(doc => {
-		            if (doc.authorStatus === 'Y' || doc.authorStatus === 'N') {
+		            if (doc.authorStatus === 'Y' || doc.authorStatus === 'N' || doc.authorStatus === 'C') {  // C 상태 추가
 		                const row = document.createElement('tr');
 		                
 		                let formattedDate = '';
@@ -957,13 +956,14 @@
 		                    <td>${formattedDate}</td>
 		                    <td>${docTypeMap[doc.doctype] || doc.doctype}</td>
 		                    <td><a href="/authorization/${doc.authorNo}">${doc.authTitle != null ? doc.authTitle : '제목 없음'}</a></td>
-		                    <td>${doc.authorStatus === 'Y' ? '승인' : '반려'}</td>
+		                    <td>${doc.authorStatus === 'Y' ? '승인' : (doc.authorStatus === 'N' ? '반려' : (doc.authorStatus === 'C' ? '확인' : 'Unknown'))}</td>
 		                `;
 		                completeList.appendChild(row);
+
 		            }
 		        });
+		    }
 
-		 	}
 		
 		    // 기안 진행 목록 가져오기 
 		    function fetchDraftDocuments() {
@@ -1155,33 +1155,33 @@
 
 			// 완료 문서 알람 표기
 		    function clearNotification(authorNo) {
-		        console.log('clearNotification 호출됨, authorNo: ', authorNo);
-		        fetch(`/authorization/clearAuthorNotification/${authorNo}`, {
-		            method: 'GET',
-		            headers: {
-		                'X-CSRF-TOKEN': csrfToken
-		            }
-		        })
-		        .then(response => {
-		            if (response.ok) {
-		                console.log('알림이 성공적으로 제거되었습니다.');
-		                // 알림 배지를 숨김
-		                const authorBadge = document.getElementById("author-list-link").querySelector('.notification-badge');
-		                if (authorBadge) {
-		                    authorBadge.style.display = 'none';
-		                }
-		                const mainNotification = document.getElementById("main-notification");
-		                if (mainNotification) {
-		                    mainNotification.style.display = 'none';
-		                }
-		            } else {
-		                throw new Error('알림 제거 요청이 실패했습니다.');
-		            }
-		        })
-		        .catch(error => {
-		            console.error('Error clearing notification:', error);
-		        });
-		    }
+			    fetch(`/authorization/clearAuthorNotification/${authorNo}`, {
+			        method: 'GET',
+			        headers: {
+			            'X-CSRF-TOKEN': csrfToken
+			        }
+			    })
+			    .then(response => {
+			        if (response.ok) {
+			            console.log('알림이 성공적으로 제거되었습니다.');
+			            // 알림 배지를 숨김 처리
+			            const authorBadge = document.getElementById("author-list-link").querySelector('.notification-badge');
+			            if (authorBadge) {
+			                authorBadge.style.display = 'none';
+			            }
+			            const mainNotification = document.getElementById("main-notification");
+			            if (mainNotification) {
+			                mainNotification.style.display = 'none';
+			            }
+			        } else {
+			            throw new Error('알림 제거 요청이 실패했습니다.');
+			        }
+			    })
+			    .catch(error => {
+			        console.error('Error clearing notification:', error);
+			    });
+			}
+
 
 
 

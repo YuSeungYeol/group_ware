@@ -1,5 +1,8 @@
 package com.ware.spring.notice.repository;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +20,13 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
     // 제목으로 검색 및 삭제 여부 필터링
     Page<Notice> findByNoticeTitleContainingAndDeleteYn(String keyword, String deleteYn, Pageable pageable);
+
+    // 공지사항 알람 수신 확인
+    boolean existsByMember_MemNo(Long memNo);
+
+	List<Notice> findByMember_MemNo(Long memNo);
+
+	Optional<Notice> findByNoticeNoAndMember_MemNo(Long noticeNo, Long memNo);
+    
+    
 }

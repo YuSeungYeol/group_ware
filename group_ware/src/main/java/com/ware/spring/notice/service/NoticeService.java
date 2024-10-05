@@ -2,6 +2,7 @@ package com.ware.spring.notice.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,8 @@ import com.ware.spring.member.domain.Member;
 import com.ware.spring.notice.domain.Notice;
 import com.ware.spring.notice.domain.NoticeDto;
 import com.ware.spring.notice.repository.NoticeRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class NoticeService {
@@ -104,6 +107,27 @@ public class NoticeService {
 //    }
     
 //    ALTER TABLE notice ADD COLUMN delete_yn CHAR(1) DEFAULT 'n';
+    
+    // 읽지 않은 공지사항이 있는지 확인 (컬럼 사용 안함)
+    public boolean hasUnreadNotices(Long memNo) {
+        
+    	return noticeRepository.existsByMember_MemNo(memNo);
+    }
+
+    // 공지사항 목록 가져오기 (알림 확인용)
+    public List<Notice> getUnreadNotices(Long memNo) {
+        
+    	return noticeRepository.findByMember_MemNo(memNo);
+    }
+
+    // 공지사항 읽음 처리 (알림 제거 로직)
+    public void clearNoticeNotification(Long noticeNo, Long memNo) {
+        
+    	Optional<Notice> noticeOpt = noticeRepository.findByNoticeNoAndMember_MemNo(noticeNo, memNo);
+        if (noticeOpt.isPresent()) {
+        }
+    }
+    
 }
 
 

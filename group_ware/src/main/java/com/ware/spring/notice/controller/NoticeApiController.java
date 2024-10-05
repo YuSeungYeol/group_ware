@@ -3,9 +3,12 @@ package com.ware.spring.notice.controller;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -158,6 +161,22 @@ public class NoticeApiController {
 //        map.put("res_msg", "정상적으로 게시글이 삭제되었습니다.");
 //        return map;
 //    }
+    
+    /// 공지사항 알림 읽음 처리 API
+    @PostMapping("/clearNoticeNotification/{noticeId}")
+    public ResponseEntity<Void> clearNoticeNotification(@PathVariable("noticeId") Long noticeId, Principal principal) {
+        String username = principal.getName();
+        Optional<Member> memberOpt = memberRepository.findByMemId(username);
+
+        if (memberOpt.isPresent()) {
+            Long memNo = memberOpt.get().getMemNo();
+            // 공지사항 읽음 처리를 따로 하지 않음 (읽음 처리 로직이 필요 없다면 그대로 둠)
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 로그인된 사용자가 없으면 에러 처리
+        }
+    }
+
 
 }
 
