@@ -62,10 +62,10 @@ public class Notice {
 	private String deleteYn;
 	
 	@Column(name="notice_start_date")
-	private LocalDate noticeStartDate;
+	private LocalDateTime noticeStartDate;
 	
 	@Column(name="notice_end_date")
-	private LocalDate noticeEndDate;
+	private LocalDateTime noticeEndDate;
 	
 	@Column(name="notice_schedule")
 	private String noticeSchedule;

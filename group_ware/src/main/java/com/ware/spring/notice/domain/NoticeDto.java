@@ -35,8 +35,8 @@ public class NoticeDto {
     private String deleteYn;
     
     // 공지 기간 설정 관련 필드
-    private LocalDate noticeStartDate;  // LocalDate로 변경
-    private LocalDate noticeEndDate;    // LocalDate로 변경
+    private LocalDateTime noticeStartDate;  // LocalDate로 변경
+    private LocalDateTime noticeEndDate;    // LocalDate로 변경
     private String noticeSchedule;      // 'Y' 또는 'N' 값을 저장하는 필드
 
     // 엔티티로 변환하는 메서드
