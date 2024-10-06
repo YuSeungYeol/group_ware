@@ -1144,6 +1144,35 @@
 	                })
 	                .then(data => {
 	                    alert('문서가 회수되었습니다.');
+	                    
+	                    // 알림을 제거하는 fetch 호출 추가
+	                    fetch(`/authorization/clearAuthorNotification/${authorNo}`, {
+	                        method: 'GET',
+	                        headers: {
+	                            'X-CSRF-TOKEN': csrfToken
+	                        }
+	                    })
+	                    .then(response => {
+	                        if (response.ok) {
+	                            console.log('알림이 성공적으로 제거되었습니다.');
+	                            // 알림 배지 숨기기 로직
+	                            const authorBadge = document.getElementById("author-list-link").querySelector('.notification-badge');
+	                            if (authorBadge) {
+	                                authorBadge.style.display = 'none';
+	                            }
+	                            const mainNotification = document.getElementById("main-notification");
+	                            if (mainNotification) {
+	                                mainNotification.style.display = 'none';
+	                            }
+	                        } else {
+	                            throw new Error('알림 제거 요청이 실패했습니다.');
+	                        }
+	                    })
+	                    .catch(error => {
+	                        console.error('Error clearing notification:', error);
+	                    });
+
+	                    // 페이지 리디렉션
 	                    window.location.href = "/authorization/authorizationList";
 	                })
 	                .catch(error => {
@@ -1152,6 +1181,7 @@
 	                });
 	            }
 	        }
+
 
 			// 완료 문서 알람 표기
 		    function clearNotification(authorNo) {

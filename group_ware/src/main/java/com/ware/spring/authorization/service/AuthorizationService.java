@@ -532,6 +532,8 @@ public class AuthorizationService {
 
 	        // 결재 경로도 'R'로 변경
 	        approvalRouteService.updateApprovalRouteToRecalled(authorNo);
+	        
+	        
 	    }
 
 	    @Transactional
@@ -587,7 +589,7 @@ public class AuthorizationService {
 	            Authorization authorization = authorizationOpt.get();
 
 	            // 'Y'(승인) 또는 'N'(반려) 상태일 때만 상태를 'C'로 변경하여 알림을 제거
-	            if ("Y".equals(authorization.getAuthorStatus()) || "N".equals(authorization.getAuthorStatus())) {
+	            if ("Y".equals(authorization.getAuthorStatus()) || "N".equals(authorization.getAuthorStatus()) || "R".equals(authorization.getAuthorStatus())) {
 	                authorization.setAuthorStatus("C"); // 상태를 'C'로 변경
 	                authorizationRepository.save(authorization); // 상태 업데이트
 	                System.out.println("알림이 해제되었습니다: 문서 번호 " + authorNo);
