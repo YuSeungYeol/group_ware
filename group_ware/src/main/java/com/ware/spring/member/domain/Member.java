@@ -5,8 +5,6 @@ import java.time.LocalDate;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -77,7 +75,6 @@ public class Member {
 
     @ManyToOne
     @JoinColumn(name = "distributor_no")
-    @JsonIgnore  // 순환 참조 방지(결재를 위한)
     private Distributor distributor;
 
     @Column(name="emp_no")

@@ -24,7 +24,6 @@
 				</form>
 				
 				<form th:action="@{/member/list}" method="get" class="search-form">
-    <!-- 기존 필터 값을 유지한 상태로 검색할 수 있도록 hidden input 추가 -->
 				    <input type="hidden" name="statusFilter" th:value="${statusFilter}">
 				    
 				    <select id="searchType" name="searchType">

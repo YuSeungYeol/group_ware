@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{include/layout}">
+    <th:block layout:fragment="content">
+        <link rel="stylesheet" th:href="@{/css/vehicle/list.css}"/>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+        <section id="vehicle-container">
+            <h1>차량 목록</h1>
+            <form id="searching" th:action="@{/vehicle}" method="get">
+                <div class="search-container">
+                    <div class="search-elements">
+                        <select name="searchType">
+                            <option value="vehicleModel" th:selected="${searchType == 'vehicleModel'}">차량 모델명</option>
+                            <option value="vehicleFuel" th:selected="${searchType == 'vehicleFuel'}">연료 종류</option>
+                            <option value="vehicleStatus" th:selected="${searchType == 'vehicleStatus'}">출고 가능 여부</option>
+                        </select>
+                        <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어 입력">
+                        <button type="submit">검색</button>
+                    </div>
+                    <div class="delete-section">
+                        <button type="button" id="deleteButton" disabled onclick="confirmDelete()">등록 해제</button>
+                    </div>
+                </div>
+            </form>
+
+            <table>
+                <colgroup>
+                    <col width="20%">
+                    <col width="15%">
+                    <col width="10%">
+                    <col width="10%">
+                    <col width="15%">
+                    <col width="20%">
+                    <col width="10%">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>차량 모델명</th>
+                    <th>출시일</th>
+                    <th>연료 종류</th>
+                    <th>배기량</th>
+                    <th>최고 출력</th>
+                    <th>출고 가능 여부</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="vehicleTableBody">
+                <tr th:each="vehicle : ${vehicles}" th:data-id="${vehicle.vehicleNo}">
+                    <td th:text="${vehicle.vehicleModel}">차량 모델명</td>
+                    <td th:text="${vehicle.vehicleReg}">출시일</td>
+                    <td th:text="${vehicle.vehicleFuel}">연료 종류</td>
+                    <td th:text="${vehicle.vehicleDisplacement}">배기량</td>
+                    <td th:text="${vehicle.vehicleRpm}">최고 출력</td>
+                    <td th:text="${vehicle.vehicleStatus}">출고 가능 여부</td>
+                    <td>
+						 	<a th:href="@{'/vehicle/' + ${vehicle.vehicleNo} + '/detail'}" class="detail-link">상세보기</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <script>
+            let selectedRow = null;
+            let selectedVehicleId = null;
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const tableBody = document.getElementById('vehicleTableBody');
+                const deleteButton = document.getElementById('deleteButton');
+
+                tableBody.addEventListener('click', function (event) {
+                    const targetRow = event.target.closest('tr');
+
+                    if (selectedRow) {
+                        selectedRow.classList.remove('selected');
+                    }
+
+                    if (targetRow && targetRow !== selectedRow) {
+                        selectedRow = targetRow;
+                        selectedVehicleId = targetRow.getAttribute('data-id');
+                        selectedRow.classList.add('selected');
+                        deleteButton.disabled = false;
+                    } else {
+                        selectedRow = null;
+                        selectedVehicleId = null;
+                        deleteButton.disabled = true;
+                    }
+                });
+            });
+
+            function confirmDelete() {
+                if (!selectedVehicleId) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '차량 선택 오류',
+                        text: '먼저 삭제할 차량을 선택해 주세요.'
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    title: '차량 삭제',
+                    text: '선택한 차량을 삭제하려면 차량 모델명을 입력해주세요.',
+                    input: 'text',
+                    inputPlaceholder: '차량 모델명 입력',
+                    showCancelButton: true,
+                    confirmButtonText: '확인',
+                    cancelButtonText: '취소',
+                    preConfirm: (inputValue) => {
+                        if (!inputValue) {
+                            Swal.showValidationMessage('차량 모델명을 입력해야 합니다.');
+                        }
+                        return inputValue;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const inputModel = result.value;
+                        const vehicleModel = selectedRow.querySelector('td:nth-child(1)').textContent.trim();
+
+                        if (inputModel !== vehicleModel) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: '차량 모델명 불일치',
+                                text: '입력한 차량 모델명이 선택한 차량의 모델명과 일치하지 않습니다.'
+                            });
+                        } else {
+                            deleteVehicle(selectedVehicleId);
+                        }
+                    }
+                });
+            }
+
+            function deleteVehicle(vehicleId) {
+                fetch(`/api/vehicle/delete/${vehicleId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.res_code === '200') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '삭제 완료',
+                                text: data.res_msg
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: '삭제 실패',
+                                text: data.res_msg
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '오류 발생',
+                            text: '차량 삭제 중 오류가 발생했습니다. ' + error.message
+                        });
+                    });
+            }
+        </script>
+    </th:block>
+</html>

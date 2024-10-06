@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{include/layout}">
+
+    <th:block layout:fragment="content">
+        <link th:href="@{/css/commute/commute_status_single.css}" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <!-- 연도 선택 -->
+
+        <!-- 월별 근태 현황을 보여줄 컨테이너 -->
+        <div class="status_container">
+        <div class="year-selector">
+            <button id="prevYearBtn">&lt;</button>
+            <span id="currentYear">2024년도 근태현황</span>
+            <button id="nextYearBtn">&gt;</button>
+        </div>
+            <h2>월별 근무 시간</h2>
+            <!-- 월별 근무 시간을 렌더링할 캔버스 -->
+            <canvas id="monthlyWorkingTimeChart" width="400" height="200"></canvas>
+            
+            <h2>1년 근무 시간 및 총 지각 횟수</h2>
+            <!-- 누적 근무 시간 및 총 지각 횟수를 렌더링할 원형 차트 -->
+            <canvas id="totalSummaryChart" width="400" height="200"></canvas>
+        </div>
+        <script th:src="@{/js/commute_status_single.js}"></script>
+    </th:block>
+</html>

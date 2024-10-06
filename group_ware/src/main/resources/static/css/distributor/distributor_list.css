@@ -1,0 +1,166 @@
+/* 전체 레이아웃 */
+.list-container {
+    width: 70%;
+    margin-left: 270px;
+    margin-top: 100px;
+    margin-right: 100px;
+    padding: 2px 30px 20px 30px;
+    background-color: #F6F4FA;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 검색 폼과 필터 폼을 한 줄에 배치 */
+.form-container {
+    display: flex;
+    justify-content: space-between; /* 좌우로 분리 */
+    align-items: center; /* 세로 중앙 정렬 */
+    margin-bottom: 15px; /* 간격 추가 */
+}
+u{
+	color:#808080;
+	font-weight: bold;
+}
+/* 검색 폼 스타일 */
+.search-form {
+    display: flex;
+    align-items: center;
+}
+
+.search-form select,
+#search_distributor_input {
+    margin-right: 5px; /* 검색 입력 필드와 버튼 사이 간격 */
+}
+
+/* 필터 폼 스타일 */
+.filter-form {
+    display: flex;
+    align-items: center;
+}
+
+/* 제목 스타일 */
+.word h3 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* 테이블 스타일 */
+.distributor_list table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* 테이블 헤더 */
+.distributor_list th {
+    background-color: #808080b3;
+    color: white;
+    font-weight: bold;
+    text-align: left;
+    padding: 12px;
+    font-size: 16px;
+    border-bottom: 2px solid #ddd;
+    cursor: pointer; /* 정렬 가능하도록 커서 변경 */
+}
+
+/* 테이블 본문 */
+.distributor_list td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+    color: #333;
+}
+
+/* 폐점된 지점 스타일 */
+.closed-distributor td {
+    text-decoration: line-through;
+    text-align: center;
+    color: #888; /* 폐점 지점의 텍스트 색을 연하게 */
+}
+
+/* 테이블 줄 바꿈 색 */
+.distributor_list tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* 테이블 행에 마우스를 올렸을 때 효과 */
+.distributor_list tr:hover {
+    background-color: #ddd;
+}
+
+/* 페이지네이션 */
+.pagination {
+    text-align: center;
+    margin: 20px;
+}
+
+.pagination a {
+    margin: 0 5px;
+    padding: 8px 16px;
+    background-color: #EFEFEF;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.pagination a:hover {
+    background-color: #ddd;
+}
+
+.pagination a.active {
+    background-color: #808080b3;
+    color: white;
+}
+
+/* 정렬 방향 표시 */
+th.asc:after {
+    content: " ↑";
+}
+
+th.desc:after {
+    content: " ↓";
+}
+
+/* 검색 입력 필드 스타일 */
+#search_distributor_input {
+    padding: 6px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* 검색 버튼 스타일 */
+#search_distributor_button {
+    background-color: #EFEFEF;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+#search_distributor_button:hover {
+    background-color: #ddd;
+}
+
+/* 검색 타입 선택 스타일 */
+#searchType {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* 상태 필터 스타일 */
+#statusFilter {
+    margin-left: 3px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}

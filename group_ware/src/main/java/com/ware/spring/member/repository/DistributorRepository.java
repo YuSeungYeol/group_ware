@@ -2,6 +2,8 @@ package com.ware.spring.member.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,4 +19,13 @@ public interface DistributorRepository extends JpaRepository<Distributor, Long> 
     List<Distributor> findAllWithMembers();
     
 
+    Page<Distributor> findByDistributorNameContaining(String name, Pageable pageable);
+
+    Page<Distributor> findByDistributorNameContainingAndDistributorStatus(String name, int status, Pageable pageable);
+
+    Page<Distributor> findByDistributorAddrContaining(String address, Pageable pageable);
+
+    Page<Distributor> findByDistributorAddrContainingAndDistributorStatus(String address, int status, Pageable pageable);
+
+    Page<Distributor> findByDistributorStatus(int status, Pageable pageable);
 }

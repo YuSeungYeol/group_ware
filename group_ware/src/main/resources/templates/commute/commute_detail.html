@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{include/layout}">
+
+<th:block layout:fragment="content">
+    <link th:href="@{/css/commute/commute_detail.css}" rel="stylesheet" type="text/css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:src="@{/js/commute_status_list.js}"></script>
+
+    <div class="commute-container">
+        <h3>근태 현황</h3>
+
+
+        <div class="chart-container">
+            <h4>주간 근무 시간</h4>
+			<canvas id="weeklyChart" width="400" height="200"></canvas>
+            <button id="weeklyPrevious">이전 주</button>
+            <button id="weeklyNext">다음 주</button>
+        </div>
+
+
+
+        <div class="chart-container">
+            <h4>연간 근무 시간 요약</h4>
+            <canvas id="annualChart" width="400" height="200"></canvas>
+            <button id="annualPrevious">이전 연도</button>
+            <button id="annualNext">다음 연도</button>
+        </div>
+
+        <input type="hidden" id="memNo" th:value="${member.memNo}"/>
+    </div>
+</th:block>
+
+</html>

@@ -2,6 +2,8 @@ package com.ware.spring.member.domain;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,26 +28,34 @@ public class Distributor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="distributor_no")
+    @Column(name = "distributor_no")
     private Long distributorNo;
 
-    @Column(name="distributor_name")
+    @Column(name = "distributor_name")
     private String distributorName;
 
-    @Column(name="distributor_phone")
+    @Column(name = "distributor_phone")
     private String distributorPhone;
 
-    @Column(name="distributor_addr")
+    @Column(name = "distributor_addr")
     private String distributorAddr;
 
-    @Column(name="distributor_latitude")
+    @Column(name = "distributor_addr_detail")
+    private String distributorAddrDetail;
+
+    @Column(name = "distributor_latitude")
     private double distributorLatitude;
 
-    @Column(name="distributor_longitude")
+    @Column(name = "distributor_longitude")
     private double distributorLongitude;
 
-    @Column(name="distributor_status")
+    @Column(name = "distributor_status")
     private int distributorStatus;
+
+    @JsonIgnore
     @OneToMany(mappedBy = "distributor")
-    private List<Member> members; 
+    private List<Member> members;
+
+
+
 }

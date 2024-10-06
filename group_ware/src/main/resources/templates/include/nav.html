@@ -31,7 +31,7 @@
                 <!-- 버튼 부분 -->        
                     <div class="buttons">
                         <button class="btn" id="mypageButton">마이페이지</button>
-                        <button class="btn">근태현황</button>
+                        <button class="btn" id="statusButton">근태현황</button>
                     </div>
 
                 </aside>
@@ -51,11 +51,12 @@
                         <a th:href="@{/folder/list}">부서드라이브</a>
                     </div>
                 </div>
+                <div class="accordion-item" sec:authorize="hasAnyAuthority( 'ROLE_지점대표', 'ROLE_대표')">
                 <div class="accordion-item">
                     <button class="accordion-btn">지점 정보</button>
                     <div class="accordion-content">
-                        <a href="#">매장정보</a>
-                        <a href="#">지점등록</a>
+                        <a th:href="@{/distributor/list}">지점정보</a>
+						<a th:href="@{/distributor/register}">지점등록</a>
                     </div>
                 </div>
                 <div class="accordion-item">
@@ -80,7 +81,7 @@
                 <div class="accordion-item" sec:authorize="hasAnyAuthority( 'ROLE_지점대표', 'ROLE_대표')">
                     <button class="accordion-btn">직원관리</button>
                     <div class="accordion-content">
-                        <a href="#">근태조회</a>
+                        <a th:href="@{/commute/list}">근태조회</a>
                         <!-- 회원등록 링크는 ROLE_차장 이상만 볼 수 있도록 제한 -->
                         <a th:href="@{/member/register}">회원등록</a>
                         <a th:href="@{/member/list}">회원수정</a>
@@ -89,8 +90,8 @@
                   <div class="accordion-item" sec:authorize="hasAnyAuthority('ROLE_차장', 'ROLE_지점대표', 'ROLE_대표')">
                     <button class="accordion-btn">차량관리</button>
                     <div class="accordion-content">
-                        <a href="#">차량조회</a>
-                        <a href="#">차량등록</a>
+                        <a th:href="@{/vehicle/list}">차량조회</a>
+						<a th:href="@{/vehicle/register}">차량등록</a>
                     </div>
                 </div>
                 <div class="accordion-item">

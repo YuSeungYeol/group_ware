@@ -2,19 +2,15 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{include/layout}">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Member Info</title>
-    <link rel="stylesheet" th:href="@{/css/member/member_info.css}">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery 사용 -->
-</head>
-
 <th:block layout:fragment="content">
+   
+    <link th:href="@{/css/member/member_info.css}" rel="stylesheet" type="text/css">
     <div class="member-info-container">
         <h2>직원 정보 수정</h2>
         
-        <form id="editForm" enctype="multipart/form-data"> <!-- form 태그에 action을 추가하지 않음 -->
+        <form id="editForm" enctype="multipart/form-data"> 
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        
             <div class="member-detail">
                 <label>사원번호 </label>
                 <input type="text" id="memNo" name="memNo" th:value="${member.empNo}" readonly>
@@ -76,6 +72,10 @@
     <script>
     // 폼 데이터를 JSON으로 변환하여 서버로 전송하는 함수
     function submitForm() {
+        // CSRF 토큰 가져오기
+        const token = $("meta[name='_csrf']").attr("content");
+        const header = $("meta[name='_csrf_header']").attr("content");
+
         // 폼의 데이터를 가져와서 JSON으로 변환
         const memberData = {
             memNo: $("#memNo").val(),
@@ -90,9 +90,12 @@
         // JSON 데이터를 POST 요청으로 서버에 전송
         $.ajax({
             type: "POST",
-            url: "/api/members/edit",  // API 엔드포인트에 POST 요청
+            url: "/api/member/edit",  // API 엔드포인트에 POST 요청
             contentType: "application/json",
             data: JSON.stringify(memberData),  // 데이터를 JSON으로 변환하여 전송
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token);  // CSRF 토큰을 헤더에 설정
+            },
             success: function(response) {
                 alert("회원 정보가 성공적으로 수정되었습니다.");
                 window.location.href = "/member/list";  // 성공 시 목록 페이지로 리다이렉트
@@ -102,7 +105,8 @@
             }
         });
     }
-    </script>
+</script>
+
 </th:block>
 
 </html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{include/layout}">
+    <th:block layout:fragment="content">
+        <link rel="stylesheet" th:href="@{/css/vehicle/sales.css}"/>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <section id="distributor-sales-container">
+            <h1>우리 지점 판매량</h1>
+
+            <!-- 개인 판매량 순위 (Top 5) -->
+            <div class="chart-container">
+                <h2>개인 판매량 순위 (Top 5)</h2>
+                <canvas id="individualSalesChart"></canvas>
+            </div>
+
+            <!-- 차량별 판매량 순위 (Top 5) -->
+            <div class="chart-container">
+                <h2>차량별 판매량 순위 (Top 5)</h2>
+                <canvas id="vehicleSalesChart"></canvas>
+            </div>
+
+            <!-- 이전 달과 이번 달의 판매량 차이 -->
+            <div class="chart-container">
+                <h2>이전 달과 이번 달의 판매량 차이</h2>
+                <canvas id="salesDifferenceChart"></canvas>
+            </div>
+
+            <!-- 월별 판매량 차트 -->
+            <div class="chart-container">
+                <h2>월별 판매량</h2>
+                <canvas id="monthlySalesChart"></canvas>
+            </div>
+        </section>
+
+        <script th:inline="javascript">
+            document.addEventListener('DOMContentLoaded', function () {
+                // 개인 판매량 데이터 불러오기
+                fetch('/api/vehicle/sales/members/top5') // 수정된 경로
+                    .then(response => response.json())
+                    .then(data => {
+                        const individualSalesData = {
+                            labels: data.map(item => item.memberName),
+                            datasets: [{
+                                label: '판매량',
+                                data: data.map(item => item.totalSales),
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 1
+                            }]
+                        };
+
+                        const ctxIndividual = document.getElementById('individualSalesChart').getContext('2d');
+                        new Chart(ctxIndividual, {
+                            type: 'bar',
+                            data: individualSalesData,
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    });
+
+                // 차량별 판매량 데이터 불러오기
+                fetch('/api/vehicle/sales/top5') // 수정된 경로
+                    .then(response => response.json())
+                    .then(data => {
+                        const vehicleSalesData = {
+                            labels: data.map(item => item.vehicleModel),
+                            datasets: [{
+                                label: '판매량',
+                                data: data.map(item => item.totalSales),
+                                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                                borderColor: 'rgba(153, 102, 255, 1)',
+                                borderWidth: 1
+                            }]
+                        };
+
+                        const ctxVehicle = document.getElementById('vehicleSalesChart').getContext('2d');
+                        new Chart(ctxVehicle, {
+                            type: 'bar',
+                            data: vehicleSalesData,
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    });
+
+                // 이전 달과 이번 달의 판매량 차이 불러오기
+                const currentMonth = 10; // 예시: 현재 월
+                const previousMonth = 9; // 예시: 이전 월
+                const year = 2024; // 예시: 현재 연도
+
+                fetch(`/api/vehicle/sales/monthly/top5?month=${currentMonth}&year=${year}`) // 수정된 경로
+                    .then(response => response.json())
+                    .then(data => {
+                        const salesDifferenceData = {
+                            labels: data.map(item => item.vehicleModel),
+                            datasets: [{
+                                label: '판매량 차이',
+                                data: data.map(item => item.totalSales),
+                                backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                                borderColor: 'rgba(255, 159, 64, 1)',
+                                borderWidth: 1
+                            }]
+                        };
+
+                        const ctxDifference = document.getElementById('salesDifferenceChart').getContext('2d');
+                        new Chart(ctxDifference, {
+                            type: 'bar',
+                            data: salesDifferenceData,
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    });
+
+                // 월별 판매량 데이터 불러오기
+                const fetchMonthlySales = async () => {
+                    const responses = await Promise.all(Array.from({ length: 12 }, (_, i) => 
+                        fetch(`/api/vehicle/sales/monthly/top5?month=${i + 1}&year=${year}`)
+                    ));
+                    const data = await Promise.all(responses.map(response => response.json()));
+                    return data; // 월별 데이터 배열
+                };
+
+                // 판매량 차트 그리기
+                const drawSalesChart = async () => {
+                    const monthlyData = await fetchMonthlySales();
+                    const salesData = {
+                        labels: Array.from({ length: 12 }, (_, i) => (i + 1) + '월'),
+                        datasets: [{
+                            label: '판매량',
+                            data: monthlyData.map(data => data.reduce((sum, item) => sum + item.totalSales, 0)),
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    };
+
+                    const ctxMonthly = document.getElementById('monthlySalesChart').getContext('2d');
+                    new Chart(ctxMonthly, {
+                        type: 'bar',
+                        data: salesData,
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                };
+
+                drawSalesChart();
+            });
+        </script>
+    </th:block>
+</html>

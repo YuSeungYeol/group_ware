@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{include/layout}">
+
+    <th:block layout:fragment="content">
+        <link th:href="@{/css/distributor/distributor_list.css}" rel="stylesheet" type="text/css">
+        
+        <div class="list-container">
+            <div class="word">
+                <h3>지점 목록</h3>
+            </div>
+
+            <div class="form-container">
+                <!-- 필터링 폼 -->
+               <form th:action="@{/distributor/list}" id="filterForm" method="get" class="filter-form">
+				    <label for="statusFilter">상태 필터</label>
+				    <select id="statusFilter" name="statusFilter" onchange="this.form.submit()">
+				        <option value="1" th:selected="${statusFilter == '1'}">운영중 지점 보기</option>
+				        <option value="2" th:selected="${statusFilter == '2'}">폐장 지점 보기</option>
+				        <option value="all" th:selected="${statusFilter == 'all'}">모두 보기</option>
+				    </select>
+				</form>
+				
+				<!-- 검색 폼 -->
+				<form th:action="@{/distributor/list}" method="get" class="search-form">
+				    <select id="searchType" name="searchType">
+				        <option value="name" th:selected="${searchType == 'name'}">이름</option>
+				        <option value="address" th:selected="${searchType == 'address'}">주소</option>
+				    </select>
+				    <input id="search_distributor_input" type="text" name="searchText" placeholder="검색어 입력" th:value="${searchText}" />
+				    <button id="search_distributor_button" type="submit">검색</button>
+				</form>
+            </div>
+
+            <div class="distributor_list">
+                <table>
+                    <colgroup>
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="30%">
+                        <col width="10%">
+                        <col width="10%">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">이름</th>
+                            <th onclick="sortTable(1)">전화번호</th>
+                            <th onclick="sortTable(2)">주소</th>
+                            <th>상세보기</th>
+                            <th>상태</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 서버에서 데이터를 렌더링 -->
+                        <tr th:each="distributor : ${distributorList}"        
+                        th:classappend="${distributor.distributorStatus == 2} ? 'closed-distributor'">
+                            <td th:text="${distributor.distributorName}"></td>
+                            <td th:text="${distributor.distributorPhone}"></td>
+                            <td th:text="${distributor.distributorAddr}"></td>
+							<td>
+                                <a th:href="@{'/distributor/dashboard/' + ${distributor.distributorNo}}" target="_blank"><u>상세보기</u></a>
+						    </td>                            
+						    <td th:text="${distributor.distributorStatus == 1 ? '운영중' : '폐점'}"></td>
+  
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <!-- Pagination -->
+                <div class="center" th:if="${totalPages > 1}">
+                    <div class="pagination"
+                         th:with="
+                         pageNumber = ${page.pageable.pageNumber},
+                         totalPages = ${page.totalPages},
+                         startPage = ${startPage},
+                         endPage = ${endPage}
+                         ">
+
+                        <!-- 이전 페이지 링크 -->
+                        <th:block th:if="${pageNumber > 0}">
+                            <a th:href="@{/distributor/list(page=${pageNumber - 1})}">&lt;</a>
+                        </th:block>
+
+                        <!-- 페이지 번호 반복 -->
+                        <th:block th:each="pageNum: ${#numbers.sequence(startPage, endPage)}">
+                            <a th:text="${pageNum}"
+                               th:href="@{/distributor/list(page=${pageNum - 1})}"
+                               th:classappend="${pageNum == pageNumber + 1} ? 'active'">1</a>
+                        </th:block>
+
+                        <!-- 다음 페이지 링크 -->
+                        <th:block th:if="${pageNumber < totalPages - 1}">
+                            <a th:href="@{/distributor/list(page=${pageNumber + 1})}">&gt;</a>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 테이블 정렬 관련 스크립트 -->
+  <!-- JavaScript -->
+<script>
+    // 검색 기능을 위한 JavaScript 함수 추가
+    function searchDistributors() {
+        // 검색어와 필터 값 가져오기
+        var searchText = document.getElementById('search_distributor_input').value;
+        var searchType = document.getElementById('searchType').value;
+        var statusFilter = document.getElementById('statusFilter').value;
+
+        // 검색 조건에 맞게 페이지 이동
+        var url = '/distributor/list?searchType=' + searchType + '&searchText=' + encodeURIComponent(searchText) + '&statusFilter=' + statusFilter;
+        
+        // 현재 페이지를 검색 결과 페이지로 변경
+        window.location.href = url;
+
+        // 폼의 기본 제출 방지
+        return false;
+    }
+
+    function sortTable(columnIndex) {
+        var table, rows, switching, i, x, y, shouldSwitch, direction, switchcount = 0;
+        table = document.querySelector(".distributor_list table");
+        switching = true;
+        direction = "asc"; // 기본 정렬 방향
+
+        // 모든 th 요소에서 기존 정렬 클래스 제거
+        var headers = table.querySelectorAll("th");
+        headers.forEach(function(header) {
+            header.classList.remove("asc", "desc");
+        });
+
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+
+            // 테이블의 각 행을 반복
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("TD")[columnIndex];
+                y = rows[i + 1].getElementsByTagName("TD")[columnIndex];
+                
+                if (direction === "asc") {
+                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                } else if (direction === "desc") {
+                    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+                switchcount++;
+            } else {
+                if (switchcount === 0 && direction === "asc") {
+                    direction = "desc";
+                    switching = true;
+                }
+            }
+        }
+
+        // 클릭한 열에 정렬 방향 클래스 추가
+        if (direction === "asc") {
+            headers[columnIndex].classList.add("asc");
+        } else {
+            headers[columnIndex].classList.add("desc");
+        }
+    }
+</script>
+
+    </th:block>
+</html>

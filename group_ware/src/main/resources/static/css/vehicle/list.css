@@ -1,18 +1,12 @@
-section {
-    font-family: 'Noto Sans', sans-serif;
-    margin-left: 220px; 
-    margin-top: 60px;
-    padding: 0;
-    color: #333;
-    position: relative;
-}
 
-.content {
-    margin-left: 220px; 
+
+#vehicle-container {
+    margin-left: 270px; 
+    margin-right: 100px; 
     padding : 20px;
     box-sizing: border-box;
-    min-height: 100vh;
     background-color: #f4f4f4;
+    
 }
 
 h1 {
@@ -120,43 +114,4 @@ a.track-link {
 a.track-link:hover {
     background-color: #007bff;
     color: white;
-}
-
-/* 페이지네이션 스타일 */
-.pagination {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.pagination ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    display: inline-block;
-}
-
-.pagination ul li {
-    display: inline;
-    margin: 0 5px;
-}
-
-.pagination ul li a {
-    text-decoration: none;
-    padding: 8px 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    color: #333;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.pagination ul li a:hover {
-    background-color: #333;
-    color: white;
-}
-
-.pagination ul li a.active {
-    background-color: #333;
-    color: white;
-    pointer-events: none;
 }

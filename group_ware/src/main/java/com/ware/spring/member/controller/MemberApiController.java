@@ -215,13 +215,10 @@ public class MemberApiController {
 
         return ResponseEntity.ok(response);
     }
+    @ResponseBody
     @PostMapping("/edit")
-    public ResponseEntity<String> editMember(@RequestBody Member member) {
-        try {
-            memberService.editMember(member);  // 서비스에서 Member 객체로 수정 처리
-            return ResponseEntity.ok("회원 정보가 성공적으로 수정되었습니다.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 정보 수정 중 오류가 발생했습니다.");
+    public ResponseEntity<?> editMember(@RequestBody MemberDto memberDto) {
+    	return ResponseEntity.ok("Member edited successfully");
         }
     }
-}
+

@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +25,6 @@ public class DistributorApiController {
 
     private final DistributorService distributorService;
     private final DistributorRepository distributorRepository;
-
     @Autowired
     public DistributorApiController(DistributorService distributorService, DistributorRepository distributorRepository) {
         this.distributorService = distributorService;
@@ -40,8 +42,7 @@ public class DistributorApiController {
     public List<MemberDto> getMembersByDistributor(@RequestParam("distributorNo") Long distributorNo) {
         return distributorService.getMembersByDistributor(distributorNo);
     }
-    
-    // 결재 관련하여 리스트 업을 위해 생성
+ // 결재 관련하여 리스트 업을 위해 생성
     @GetMapping("/getAll")
     public ResponseEntity<List<DistributorDto>> getAllDistributorsList() {
         List<Distributor> distributors = distributorRepository.findAll();
@@ -51,8 +52,17 @@ public class DistributorApiController {
                 .distributorName(distributor.getDistributorName())
                 .build())
             .collect(Collectors.toList());
-
         return ResponseEntity.ok(distributorDtos);
+    }
+    @PostMapping("/register")
+    public ResponseEntity<String> registerDistributor(@RequestBody DistributorDto distributorDto) {
+        try {
+            distributorService.registerDistributor(distributorDto);
+            return ResponseEntity.ok("지점 등록이 완료되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("지점 등록 중 오류가 발생했습니다: " + e.getMessage());
+        }
     }
 }
 

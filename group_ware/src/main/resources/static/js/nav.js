@@ -1,3 +1,4 @@
+
 // 이메일 복사 기능
 function copyToClipboard() {
     // 이메일 엘리먼트 가져오기
@@ -157,12 +158,14 @@ function fetchMemberProfile(memberId) {
         })
         .catch(error => console.error('Error fetching member profile:', error));
 }
-
+document.getElementById("statusButton").addEventListener("click", function() {
+        window.location.href = "/commute/status_single";
+    });
 // 멤버 정보를 모달로 표시
 	function showMemberProfile(member) {
 	    const modalContent = `
 	        <div class="profile-modal-content"> <!-- profile-modal-content 클래스 추가 -->
-	       		<span class="close">&times;</span>
+	       		<span id="closeProfileModal" class="close">&times;</span>
 	        	<div class="profile-image-container">
 	                <img src="/profile/${member.distributor_name}/${member.profile_saved}" alt="Profile Image" class="md-profile-img"> <!-- 원형 이미지 -->
 	            </div>
@@ -185,9 +188,10 @@ function fetchMemberProfile(memberId) {
 	    modal.style.display = "block";  // 모달 열기
 	}
 
-document.getElementById("messageBtn").addEventListener("click", function(){
-	window.location.href = "/chat/room/list";
-});
+	$(document).on("click", "#messageBtn", function(){
+		window.location.href = "/chat/room/list";
+	})
+
 
 document.addEventListener('DOMContentLoaded', function () {
     // 모든 .close 요소에 대해 클릭 이벤트 리스너 추가
@@ -199,6 +203,12 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+	$(document).on('click', '#closeProfileModal', function() {
+	    document.getElementById('profileModal').style.display = 'none';  // 프로필 모달 닫기
+	});
+	$(document).on('click', '.close', function() {
+	    document.getElementById('organizationModal').style.display = 'none';  // 조직도 모달 닫기
+	});
 
     // 외부 클릭 시 모달 닫기
     window.onclick = function(event) {

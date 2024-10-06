@@ -13,7 +13,6 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .then(data => {
             memNo = data;  // 로그인된 사용자의 memNo 설정
-            console.log("로그인된 사용자의 memNo:", memNo);
             
             checkTodayCommute(memNo);  // 오늘 출근 기록 확인 로직 추가
         })
@@ -22,7 +21,16 @@ document.addEventListener("DOMContentLoaded", function() {
             Swal.fire("오류", "사용자 정보를 불러올 수 없습니다.", "error");
         });
 });
-
+function resetButtonsToInitialState() {
+    // 출근 버튼 활성화, 퇴근 및 외출 버튼 비활성화
+    document.getElementById("btnStartWork").disabled = false;
+    document.getElementById("btnEndWork").disabled = true;
+    document.getElementById("btnOut").disabled = true;
+    document.getElementById("btnOut").innerText = "착 석";
+    document.getElementById("btnOut").classList.remove("blue");
+    document.getElementById("btnOut").classList.remove("purple");
+    document.getElementById("btnOut").classList.add("gray");
+}
 // 오늘 출근 기록 확인 API 호출
 function checkTodayCommute(memNo) {
     fetch("/api/commute/checkTodayCommute?memNo=" + memNo)
@@ -110,16 +118,25 @@ function startWork() {
         if (!response.ok) {
             throw new Error("출근 기록 실패");
         }
-        return response.text();
+        return response.json();
     })
     .then(data => {
         // 출근 성공 시 알림
-        Swal.fire({
-            title: '출근이 완료되었습니다!',
-            text: data,
-            icon: 'success',
-            confirmButtonText: '확인'
-        });
+        if (data.isLate === 'Y') {
+            Swal.fire({
+                title: '지각입니다!',
+                text: '오늘은 지각 처리되었습니다.',
+                icon: 'warning',
+                confirmButtonText: '확인'
+            });
+        } else {
+            Swal.fire({
+                title: '출근이 완료되었습니다!',
+                text: '정상 출근 처리되었습니다.',
+                icon: 'success',
+                confirmButtonText: '확인'
+            });
+        }
 
         // 출근 상태 저장
         localStorage.setItem("workStatus", "started");
@@ -143,16 +160,13 @@ function startWork() {
         });
     });
 }
-
 // 타이머를 시작하는 함수 (백그라운드에서 실행)
 function startTimer() {
-    console.log("타이머 시작!");
 
     // 1초마다 실행되는 인터벌 함수
     timer = setInterval(function() {
         secondsElapsed++;
         localStorage.setItem("secondsElapsed", secondsElapsed);  // 경과 시간 저장
-
     }, 1000);  // 1000ms (1초)마다 실행
 }
 

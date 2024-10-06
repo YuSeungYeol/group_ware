@@ -1,14 +1,208 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-     layout:decorate="~{include/layout}">
-     <th:block layout:fragment="content">
-       	<link th:href="@{/css/home.css}" rel="stylesheet" type="text/css">
-       	<section>
-			 <div id = "content">
-		        <h1>Welcome to the Main Content</h1>
-		        <p>This is where the main content will be displayed.</p>
-   			 </div>
-		</section>
-     </th:block>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{include/layout}">
+    <th:block layout:fragment="content">
+        <link rel="stylesheet" th:href="@{/css/home.css}"/>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <div class="home-content">
+<div class="chart-container">
+    <canvas id="individualSalesChart"></canvas>
+    <div class="chart-navigation">
+        <button id="prevYearBtn">&lt;</button>
+        <span id="currentYearLabel">2024년</span>
+        <button id="nextYearBtn">&gt;</button>
+    </div>
+</div>
+
+<div class="chart-container">
+    <canvas id="monthlyComparisonChart"></canvas>
+    <div class="chart-navigation">
+        <button id="prevMonthBtn">&lt;</button>
+        <span id="currentMonthLabel">1월</span>
+        <button id="nextMonthBtn">&gt;</button>
+    </div>
+</div>
+
+        </div>
+
+   <script th:inline="javascript">
+    // 월별 개인 판매량 데이터
+    let monthlyIndividualSales = /*[[${monthlyIndividualSales}]]*/ {};
+    let monthlyIndividualSalePrices = /*[[${monthlyIndividualSalePrices}]]*/ {};
+    
+    // 월별 개인 판매량 및 매출액 데이터 설정
+    let individualSalesLabels = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+    let individualSalesData = [];
+    let individualSalePricesData = [];
+
+    // 월별 데이터를 차트 데이터로 변환
+    for (let i = 1; i <= 12; i++) {
+        individualSalesData.push(monthlyIndividualSales[i] || 0);
+        individualSalePricesData.push(monthlyIndividualSalePrices[i] || 0);
+    }
+
+    // 현재 연도 및 월 설정
+    let currentYear = new Date().getFullYear();  // 현재 연도
+    let currentMonthIndex = new Date().getMonth();  // 현재 월 인덱스 (0부터 시작)
+
+    const currentYearLabel = document.getElementById('currentYearLabel');
+    const currentMonthLabel = document.getElementById('currentMonthLabel');
+
+    // 연도별 개인 판매량 차트 생성
+    const individualSalesChartCtx = document.getElementById('individualSalesChart').getContext('2d');
+    let individualSalesChart;
+
+    function updateYearlyChart() {
+        // 연도 라벨 업데이트
+        currentYearLabel.textContent = `${currentYear}년`;
+
+        // 차트 업데이트
+        if (individualSalesChart) {
+            individualSalesChart.destroy();
+        }
+        individualSalesChart = new Chart(individualSalesChartCtx, {
+            type: 'bar',
+            data: {
+                labels: individualSalesLabels,
+                datasets: [
+                    {
+                        label: '판매 대수',
+                        data: individualSalesData,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        yAxisID: 'y-sales'
+                    },
+                    {
+                        label: '매출액',
+                        data: individualSalePricesData,
+                        backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1,
+                        yAxisID: 'y-sales-price'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    'y-sales': {
+                        beginAtZero: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                        },
+                        max: 20 // 왼쪽 Y축 최대값 설정
+                    },
+                    'y-sales-price': {
+                        beginAtZero: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                        },
+                        max: 1000000000, // 오른쪽 Y축 최대값 설정 (10억)
+                        grid: {
+                            drawOnChartArea: false // 오른쪽 Y축에 대한 격자선 제거
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 월별 개인 판매량 차트 생성
+    const monthlyComparisonChartCtx = document.getElementById('monthlyComparisonChart').getContext('2d');
+    let monthlyComparisonChart;
+
+    function updateMonthlyComparisonChart() {
+        const currentMonthSalesCount = individualSalesData[currentMonthIndex];
+        const currentMonthSalePrice = individualSalePricesData[currentMonthIndex];
+        currentMonthLabel.textContent = individualSalesLabels[currentMonthIndex];
+
+        if (monthlyComparisonChart) {
+            monthlyComparisonChart.destroy();
+        }
+        monthlyComparisonChart = new Chart(monthlyComparisonChartCtx, {
+            type: 'bar',
+            data: {
+                labels: ['이번 달'],
+                datasets: [
+                    {
+                        label: '이번 달 판매 대수',
+                        data: [currentMonthSalesCount],
+                        backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 1,
+                        yAxisID: 'y-sales'
+                    },
+                    {
+                        label: '이번 달 매출액',
+                        data: [currentMonthSalePrice],
+                        backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1,
+                        yAxisID: 'y-sales-price'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    'y-sales': {
+                        beginAtZero: true,
+                        position: 'left',
+                        max: 20 // 왼쪽 Y축 최대값 설정
+                    },
+                    'y-sales-price': {
+                        beginAtZero: true,
+                        position: 'right',
+                        max: 1000000000,
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 이전 연도로 이동
+    document.getElementById('prevYearBtn').addEventListener('click', () => {
+        currentYear--;
+        updateYearlyChart();
+    });
+
+    // 다음 연도로 이동
+    document.getElementById('nextYearBtn').addEventListener('click', () => {
+        currentYear++;
+        updateYearlyChart();
+    });
+
+    // 이전 달로 이동
+    document.getElementById('prevMonthBtn').addEventListener('click', () => {
+        if (currentMonthIndex > 0) {
+            currentMonthIndex--;
+        } else {
+            currentMonthIndex = 11; // 12월로 이동
+        }
+        updateMonthlyComparisonChart();
+    });
+
+    // 다음 달로 이동
+    document.getElementById('nextMonthBtn').addEventListener('click', () => {
+        if (currentMonthIndex < 11) {
+            currentMonthIndex++;
+        } else {
+            currentMonthIndex = 0; // 1월로 이동
+        }
+        updateMonthlyComparisonChart();
+    });
+
+    // 초기 차트 렌더링
+    updateYearlyChart();
+    updateMonthlyComparisonChart();
+</script>
+
+    </th:block>
 </html>

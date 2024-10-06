@@ -38,7 +38,7 @@ public class WebSecurityConfig {
                     .requestMatchers("/login", "/css/**", "/image/**").permitAll()  // 모두에게 허용
                     .requestMatchers("/api/member/register").hasAnyAuthority("ROLE_차장", "ROLE_지점대표", "ROLE_대표")  // 인증된 사용자만 접근 가능
                     .requestMatchers("/member/register").hasAnyAuthority("ROLE_차장", "ROLE_지점대표", "ROLE_대표")  // 인증된 사용자만 접근 가능
-                    .requestMatchers("/authorization/**", "/approval/**", "/notice/**","/board/**","chat/**").authenticated()
+                    .requestMatchers("/authorization/**", "/approval/**", "/notice/**","/board/**","/chat/**","/api/**","/commute/**","/vehicle/**").authenticated()
                     .anyRequest().authenticated()
             )
             .formLogin(login -> 

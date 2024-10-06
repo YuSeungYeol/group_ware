@@ -1,12 +1,14 @@
 package com.ware.spring.commute.domain;
 
+import java.sql.Time;
+import java.time.LocalDateTime;
+
 import com.ware.spring.member.domain.Member;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -20,8 +22,10 @@ public class CommuteDto {
     private LocalDateTime commuteOnEndTime;
     private String commuteFlagBlue;
     private String commuteFlagPurple;
-    private LocalDateTime commuteOutTime;
+    private Time commuteOutTime;
+    private String isLate;  // 지각 여부 (Y/N)
 
+    
     // 엔티티로 변환하는 메서드
     public Commute toEntity() {
         return Commute.builder()
@@ -32,6 +36,7 @@ public class CommuteDto {
                 .commuteFlagBlue(this.commuteFlagBlue)
                 .commuteFlagPurple(this.commuteFlagPurple)
                 .commuteOutTime(this.commuteOutTime)
+                .isLate(this.isLate)
                 .build();
     }
 
@@ -45,6 +50,7 @@ public class CommuteDto {
                 .commuteFlagBlue(commute.getCommuteFlagBlue())
                 .commuteFlagPurple(commute.getCommuteFlagPurple())
                 .commuteOutTime(commute.getCommuteOutTime())
+                .isLate(commute.getIsLate())
                 .build();
     }
 }

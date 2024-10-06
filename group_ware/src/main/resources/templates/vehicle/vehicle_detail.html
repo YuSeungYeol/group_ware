@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{include/layout}">
+    <th:block layout:fragment="content">
+        <link rel="stylesheet" th:href="@{/css/vehicle/vehicle_detail.css}"/>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+        <div class="vehicle-detail-container">
+                <h1>
+				    <span th:text="${vehicle.vehicleModel}" ></span>
+				    <span th:text="${vehicle.vehicleSize.vehicleSize}" style="font-size: small; margin-left: 3px;"></span>
+				</h1>
+            <!-- 차량 사진 -->
+            <div class="vehicle-image">
+                <img th:src="@{${vehicle.vehicleProfile}}" alt="차량 이미지" class="vehicle-img"/>
+            </div>
+
+            <!-- 차량 정보 -->
+            <div class="vehicle-info-container">
+                <div class="vehicle-info-header">
+				</div>
+                <div class="vehicle-info">
+                    <p><strong>가격</strong> <span th:text="${vehicle.vehiclePrice}"></span> 원 ~</p>
+                    <p><strong>출시일</strong> <span th:text="${vehicle.vehicleReg}"></span></p>
+                    <p><strong>연료</strong> <span th:text="${vehicle.vehicleFuel}"></span></p>
+                    <p><strong>효율</strong> <span th:text="${vehicle.vehicleEfficiency}"></span></p>
+                    <p><strong>배기량</strong> <span th:text="${vehicle.vehicleDisplacement}"></span></p>
+                    <p><strong>출력</strong> <span th:text="${vehicle.vehicleRpm}"></span> </p>
+                    <p><strong>상태</strong> <span th:text="${vehicle.vehicleStatus}"></span></p>
+                    <p><strong>재고</strong> <span th:text="${vehicle.vehicleInventory}"></span></p>
+    				<p><strong>판매량</strong> <span th:text="${vehicleSalesCount}"></span></p> <!-- 판매량 추가 -->
+                </div>
+            </div>
+
+            <!-- 목록으로 돌아가기 버튼 -->
+            <div class="btn-container">
+                <a th:href="@{/vehicle/list}" class="btn-back">목록으로 돌아가기</a>
+            </div>
+        </div>
+    </th:block>
+</html>
