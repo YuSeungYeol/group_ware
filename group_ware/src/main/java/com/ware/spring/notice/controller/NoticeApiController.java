@@ -163,19 +163,19 @@ public class NoticeApiController {
 //    }
     
 	 // 공지사항 알림 읽음 처리 API
-	 @PostMapping("/clearNoticeNotification/{noticeId}")
-	 public ResponseEntity<Void> clearNoticeNotification(@PathVariable("noticeId") Long noticeId, Principal principal) {
-	     String username = principal.getName();
-	     Optional<Member> memberOpt = memberRepository.findByMemId(username);
-	
-	     if (memberOpt.isPresent()) {
-	         Long memNo = memberOpt.get().getMemNo();
-	         noticeService.clearNoticeNotification(noticeId, memNo); // 해당 직원의 읽음 처리 로직 실행
-	         return ResponseEntity.ok().build();
-	     } else {
-	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 로그인된 사용자가 없으면 에러 처리
-	     }
-	 }
+//	 @PostMapping("/clearNoticeNotification/{noticeId}")
+//	 public ResponseEntity<Void> clearNoticeNotification(@PathVariable("noticeId") Long noticeId, Principal principal) {
+//	     String username = principal.getName();
+//	     Optional<Member> memberOpt = memberRepository.findByMemId(username);
+//	
+//	     if (memberOpt.isPresent()) {
+//	         Long memNo = memberOpt.get().getMemNo();
+//	         noticeService.clearNoticeNotification(noticeId, memNo); // 해당 직원의 읽음 처리 로직 실행
+//	         return ResponseEntity.ok().build();
+//	     } else {
+//	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 로그인된 사용자가 없으면 에러 처리
+//	     }
+//	 }
 
 
 }

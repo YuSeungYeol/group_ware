@@ -46,15 +46,21 @@ public class FolderApiController {
     
     @ResponseBody
     @PostMapping("/folder/uploadFile")
-    public Map<String, String> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam(value = "folderNo", required = false) Long folderNo,
-    									@AuthenticationPrincipal Member member) {
+    public Map<String, String> uploadFile(@RequestParam("file") MultipartFile file, 
+                                          @RequestParam(value = "folderNo", required = false) Long folderNo,
+                                          @RequestParam(value = "isPersonalDrive", required = true) boolean isPersonalDrive,
+                                          @AuthenticationPrincipal SecurityUser securityUser) {
         Map<String, String> resultMap = new HashMap<>();
         resultMap.put("res_code", "404");
         resultMap.put("res_msg", "파일 업로드 중 오류가 발생하였습니다.");
 
+        Member member = null;
+        if (isPersonalDrive) {
+            member = securityUser.getMember();  // 개인 드라이브일 때만 member 가져오기
+        }
+
         FolderDto folderDto = null;
 
-        // folderNo가 null이거나 0인 경우 기본 경로로 처리
         if (folderNo != null && folderNo != 0) {
             folderDto = folderService.selecetFolderOne(folderNo);
             if (folderDto == null) {
@@ -63,12 +69,10 @@ public class FolderApiController {
             }
         }
 
-        // FolderDto를 Folder 엔티티로 변환
         Folder folder = (folderDto != null) ? folderDto.toEntity() : null;
-        
-        boolean isPersonalDrive = true;
+
         // 파일 업로드 서비스 호출
-        String newFileName = fileService.upload(file, folder, member,isPersonalDrive);
+        String newFileName = fileService.upload(file, folder, member, isPersonalDrive);
 
         if (newFileName != null) {
             resultMap.put("res_code", "200");
@@ -90,41 +94,38 @@ public class FolderApiController {
         List<Long> fileNos = request.get("fileNos");
 
         // 폴더 삭제 처리
-        if(folderNos != null && !folderNos.isEmpty()) {
-        	for (Long folderNo : folderNos) {
-        		FolderDto folderDto = new FolderDto();
-        		folderDto.setFolder_no(folderNo);           
-        		folderDto.setDel_yn("Y");
-        		
-        		int result = folderService.updateFolder(folderDto);
-        		if (result > 0) {
-        			resultMap.put("res_code", "200");
-        			resultMap.put("res_msg", "폴더 삭제가 성공하였습니다.");
-        		} else {
-        			resultMap.put("res_code", "404");
-        			resultMap.put("res_msg", "일부 폴더 삭제가 실패하였습니다.");
-        			break;  // 하나라도 실패하면 중지하고 오류 메시지를 반환합니다.
-        		}
-        	}
+        if (folderNos != null && !folderNos.isEmpty()) {
+            for (Long folderNo : folderNos) {
+                try {
+                    // 재귀적으로 하위 폴더 및 파일들도 삭제 처리
+                    folderService.updateFolderAndFilesDelYn(folderNo, "Y");
+                    resultMap.put("res_code", "200");
+                    resultMap.put("res_msg", "폴더 삭제가 성공하였습니다.");
+                } catch (Exception e) {
+                    resultMap.put("res_code", "404");
+                    resultMap.put("res_msg", "일부 폴더 삭제가 실패하였습니다.");
+                    break;  // 하나라도 실패하면 중지하고 오류 메시지를 반환합니다.
+                }
+            }
         }
-        
+
         // 파일 삭제 처리
-        if(fileNos != null && !fileNos.isEmpty()) {
-        	for (Long fileNo : fileNos) {
-        		FileDto fileDto = new FileDto();
-        		fileDto.setFile_no(fileNo);
-        		fileDto.setDel_yn("Y");
-        		
-        		int result = fileService.updateFile(fileDto);
-        		if(result > 0) {
-        			resultMap.put("res_code", "200");
-        			resultMap.put("res_msg", "파일 삭제가 성공하였습니다.");
-        		}else {
-        			resultMap.put("res_code", "404");
-        			resultMap.put("res_msg", "일부 파일 삭제가 실패하였습니다.");
-        			break;
-        		}
-        	}
+        if (fileNos != null && !fileNos.isEmpty()) {
+            for (Long fileNo : fileNos) {
+                FileDto fileDto = new FileDto();
+                fileDto.setFile_no(fileNo);
+                fileDto.setDel_yn("Y");
+
+                int result = fileService.updateFile(fileDto);
+                if (result > 0) {
+                    resultMap.put("res_code", "200");
+                    resultMap.put("res_msg", "파일 삭제가 성공하였습니다.");
+                } else {
+                    resultMap.put("res_code", "404");
+                    resultMap.put("res_msg", "일부 파일 삭제가 실패하였습니다.");
+                    break;
+                }
+            }
         }
 
         return resultMap;
@@ -221,7 +222,7 @@ public class FolderApiController {
     	resultMap.put("folders", folderDtos);
     	
     	// 개인 파일 리스트 조회
-    	List<FileDto> fileDtos = fileService.getFilesByFolderAndMemberNo(parentFolderNo ,member.getMemNo());
+    	List<FileDto> fileDtos = fileService.getFilesByFolderAndMemberNo(parentFolderNo, member.getMemNo(), true);
     	resultMap.put("files", fileDtos);
     	
     	return resultMap;

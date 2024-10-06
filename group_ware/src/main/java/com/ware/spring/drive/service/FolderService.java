@@ -37,17 +37,30 @@ public class FolderService {
     
     @Transactional
     public void updateFolderAndFilesDelYn(Long folderNo, String delYn) {
-    	  System.out.println("Method updateFolderAndFilesDelYn called with folderNo: " + folderNo + ", delYn: " + delYn);
-        // 폴더 업데이트
-        folderRepository.updateDelYnByFolderNo(folderNo);
-        
-        // 해당 폴더의 파일들 업데이트
-        List<Files> files = fileRepository.findByFolderFolderNoAndDelYn(folderNo, "N");
-        for (Files file : files) {
-            FileDto fileDto = new FileDto().toDto(file);
-            fileDto.setDel_yn(delYn);
-            Files updateFile = fileDto.toEntity();
-            fileRepository.save(updateFile);
+        try {
+            System.out.println("Method updateFolderAndFilesDelYn called with folderNo: " + folderNo + ", delYn: " + delYn);
+
+            // 폴더 업데이트
+            folderRepository.updateDelYnByFolderNo(folderNo);
+
+            // 해당 폴더의 파일들 업데이트
+            List<Files> files = fileRepository.findByFolderFolderNoAndDelYn(folderNo, "N");
+            for (Files file : files) {
+                FileDto fileDto = new FileDto().toDto(file);
+                fileDto.setDel_yn(delYn);
+                Files updateFile = fileDto.toEntity();
+                fileRepository.save(updateFile);
+            }
+
+            // 하위 폴더 업데이트 (재귀적으로 처리)
+            List<Folder> subFolders = folderRepository.findByParentFolder_FolderNo(folderNo);
+            for (Folder subFolder : subFolders) {
+                updateFolderAndFilesDelYn(subFolder.getFolderNo(), delYn);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace(); // 예외 로그 출력
+            throw new RuntimeException("폴더 삭제 중 문제가 발생했습니다."); // 예외를 다시 던져서 트랜잭션을 롤백
         }
     }
     

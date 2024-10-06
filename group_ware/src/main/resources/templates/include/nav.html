@@ -107,11 +107,15 @@
                     </div>
                 </div>
             </nav>
-
+			
            <!-- 조직도 모달 -->
             <div class="bottom-buttons">
                 <button class="btn" id="organizationBtn">조직도(주소록)</button>
-                <button class="btn" id="messageBtn">메신저</button>
+                <input type="hidden" id="sender_id" th:value="${#authentication.principal.username}">
+                <button class="btn" id="messageBtn">
+				    메신저
+				    <span id="messageNotification" class="notification-dot" style="display:none;"></span>
+				</button>
             </div>
 
             <div id="organizationModal" class="modal1">
@@ -236,7 +240,7 @@
 
         
         // 공지사항 알림
-        document.addEventListener("DOMContentLoaded", function() {
+/*         document.addEventListener("DOMContentLoaded", function() {
             fetch("/notifications")
                 .then(response => response.json())
                 .then(data => {
@@ -310,8 +314,71 @@
                     }
                 })
                 .catch(error => console.error('공지사항 알림 가져오기 오류:', error));
+        }); */
+		
+        
+        let navWebSocket = null;
+        function setupNavWebSocket() {
+            if (!navWebSocket || navWebSocket.readyState === WebSocket.CLOSED) {
+                navWebSocket = new WebSocket('ws://localhost:8095/chatting/all');
+                navWebSocket.onopen = () => {
+                    console.log("Nav WebSocket connection opened.");
+                };
+                navWebSocket.onmessage = () => {
+                    console.log("Message received in Nav WebSocket.");
+                    checkUnreadMessagesForNav();  // Nav에서 메시지 수신시 처리
+                };
+                navWebSocket.onclose = () => {
+                    console.warn("Nav WebSocket connection closed.");
+                };
+            }
+        }
+        // 페이지 로드 시 WebSocket 상태 확인 및 연결
+        document.addEventListener('DOMContentLoaded', () => {
+            const websocketStatus = sessionStorage.getItem('websocketStatus');
+            if (websocketStatus === 'closed' || !websocketStatus) {
+                console.log("Detail WebSocket closed, opening Nav WebSocket...");
+                setupNavWebSocket();
+            }
         });
-
+        // 읽지 않은 메시지가 있는지 서버에서 확인하는 함수
+        function checkUnreadMessagesForNav() {
+            fetch('/chat/room/list/data', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const chatRooms = Array.isArray(data) ? data : data.content;
+                let hasUnreadMessages = false;
+                const currentUser = document.getElementById('sender_id') ? document.getElementById('sender_id').value : null;
+                // 읽지 않은 메시지가 있는지 확인
+                chatRooms.forEach(chatRoom => {
+                    if (chatRoom.is_receiver_read === 'N' && chatRoom.receiver_id === currentUser) {
+                        hasUnreadMessages = true;
+                    }
+                });
+                // 읽지 않은 메시지가 있으면 빨간 동그라미 표시
+                const notificationDot = document.getElementById('messageNotification');
+                if (hasUnreadMessages) {
+                    notificationDot.style.display = 'inline';
+                } else {
+                    notificationDot.style.display = 'none';
+                }
+            })
+            .catch(error => console.error('Error fetching chat room data:', error));
+        }
+        // 페이지 로드 시 호출하여 읽지 않은 메시지 확인
+        document.addEventListener('DOMContentLoaded', () => {
+            checkUnreadMessagesForNav(); // 네비게이션용 읽지 않은 메시지 확인
+        });
 
 
 

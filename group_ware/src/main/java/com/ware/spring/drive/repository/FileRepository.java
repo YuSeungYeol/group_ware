@@ -32,4 +32,8 @@ public interface FileRepository extends JpaRepository<Files, Long>{
 	@Transactional
 	@Query("UPDATE Files f SET f.delYn = :delYn WHERE f.folder.folderNo = :folderNo")
 	void updateDelYnByFolderNo(@Param("folderNo") Long folderNo, @Param("delYn") String delYn);
+	
+	List<Files> findByFolderIsNullAndMemberIsNullAndDelYn(String delYn);
+	
+	List<Files> findByFolder_FolderNoAndMemberIsNullAndDelYn(Long folderNo, String delYn);
 }

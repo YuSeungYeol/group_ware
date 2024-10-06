@@ -97,22 +97,22 @@ public class NoticeViewController {
 		return "notice/noticeUpdate";
 	}
     
-    // 공지사항 알림 확인 API
-    @GetMapping("/nav/notice-notifications")
-    public ResponseEntity<Map<String, Boolean>> getNoticeNotifications(Principal principal) {
-        String username = principal.getName();
-        Optional<Member> memberOpt = memberRepository.findByMemId(username);
-
-        Map<String, Boolean> notifications = new HashMap<>();
-
-        if (memberOpt.isPresent()) {
-            Long memNo = memberOpt.get().getMemNo();
-            boolean hasUnreadNotices = noticeService.hasUnreadNotices(memNo); // 해당 직원이 안 읽은 공지사항이 있는지 확인
-            notifications.put("hasUnreadNotices", hasUnreadNotices);
-        }
-
-        return ResponseEntity.ok(notifications);
-    }
+//    // 공지사항 알림 확인 API
+//    @GetMapping("/nav/notice-notifications")
+//    public ResponseEntity<Map<String, Boolean>> getNoticeNotifications(Principal principal) {
+//        String username = principal.getName();
+//        Optional<Member> memberOpt = memberRepository.findByMemId(username);
+//
+//        Map<String, Boolean> notifications = new HashMap<>();
+//
+//        if (memberOpt.isPresent()) {
+//            Long memNo = memberOpt.get().getMemNo();
+//            boolean hasUnreadNotices = noticeService.hasUnreadNotices(memNo); // 해당 직원이 안 읽은 공지사항이 있는지 확인
+//            notifications.put("hasUnreadNotices", hasUnreadNotices);
+//        }
+//
+//        return ResponseEntity.ok(notifications);
+//    }
 
     
     

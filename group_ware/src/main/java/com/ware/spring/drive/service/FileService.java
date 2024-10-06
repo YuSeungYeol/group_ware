@@ -39,7 +39,7 @@ public class FileService {
 	        }
 
 	        UUID uuid = UUID.randomUUID();
-	        String uniqueName = uuid.toString().replaceAll("-", "") + fileExt;
+	        String uniqueName = uuid.toString().replaceAll("-", "");
 
 	        // 개인 드라이브와 공용 드라이브 구분
 	        String folderPath;
@@ -49,22 +49,25 @@ public class FileService {
 	            folderPath = (folder != null) ? folder.getFolderUploadPath() : "C:/uploads";
 	        }
 
-	        File saveFile = new File(folderPath + File.separator + uniqueName);
+	        File saveFile = new File(folderPath + File.separator + uniqueName + fileExt);
 
 	        if (!saveFile.exists()) {
 	            saveFile.mkdirs();
+	        }else {
+	        	uniqueName += "_1";
 	        }
+	        uniqueName += fileExt;
 
 	        file.transferTo(saveFile);
 
-	        // 파일 정보 DB 저장
+	        // 전체 드라이브일 때는 member 없이 파일 정보 저장
 	        FileDto dto = FileDto.builder()
 	            .folder(folder)
 	            .file_ori_name(oriFileName)
 	            .file_new_name(uniqueName)
 	            .file_path(folderPath)
 	            .del_yn("N")
-	            .member(member)
+	            .member(isPersonalDrive ? member : null)  // 전체 드라이브일 경우 member는 null
 	            .build();
 
 	        fileRepository.save(dto.toEntity());
@@ -134,6 +137,7 @@ public class FileService {
 						.fileRegDate(file.getFileRegDate())
 						.delYn("Y")
 						.folder(file.getFolder())
+						.member(file.getMember())  // mem_no 유지
 						.build();
 				
 				fileRepository.save(updatedFile);
@@ -148,17 +152,26 @@ public class FileService {
 		return result;
 	}
 	
-	public List<FileDto> getFilesByFolderAndMemberNo(Long folderNo, Long memNo) {
+	public List<FileDto> getFilesByFolderAndMemberNo(Long folderNo, Long memNo, boolean isPersonalDrive) {
 	    List<Files> files;
-
-	    if (folderNo == null) {
-	        // 최상위 폴더에 있는 파일들 조회
-	    	files = fileRepository.findByFolderIsNullAndMember_MemNoAndDelYn(memNo, "N");
-	    } else {
-	        // 특정 폴더 안의 파일 조회
-	    	files = fileRepository.findByFolder_FolderNoAndMember_MemNoAndDelYn(folderNo, memNo, "N");
-	    }
 	    
+	    if (isPersonalDrive) {
+	        // 개인 드라이브에서 조회
+	        if (folderNo == null) {
+	            // 최상위 폴더에 있는 파일들 조회 (개인 드라이브)
+	            files = fileRepository.findByFolderIsNullAndMember_MemNoAndDelYn(memNo, "N");
+	        } else {
+	            // 특정 폴더 안의 파일 조회 (개인 드라이브)
+	            files = fileRepository.findByFolder_FolderNoAndMember_MemNoAndDelYn(folderNo, memNo, "N");
+	        }
+	    } else {
+	        // 전체 드라이브에서 조회 (memNo가 null인 파일들만 조회)
+	        if (folderNo == null) {
+	            files = fileRepository.findByFolderIsNullAndMemberIsNullAndDelYn("N");
+	        } else {
+	            files = fileRepository.findByFolder_FolderNoAndMemberIsNullAndDelYn(folderNo, "N");
+	        }
+	    }
 	 // 디버그 로그 추가
 	    System.out.println("조회된 파일 개수: " + files.size());
 	    

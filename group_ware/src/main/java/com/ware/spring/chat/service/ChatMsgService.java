@@ -31,6 +31,23 @@ public class ChatMsgService {
 	}
 	
 
+	@Transactional
+	public void updateReceiverReadStatus(Long roomNo, String readStatus) {
+	    ChatRoom chatRoom = chatRoomRepository.findByroomNo(roomNo);
+	    
+	    // roomNo에 해당하는 모든 메시지를 읽음 처리
+	    List<ChatMsg> messages = chatMsgRepository.findAllByChatRoom(chatRoom);
+	    
+	    for (ChatMsg msg : messages) {
+	        if (!msg.getIsReceiverRead().equals(readStatus)) {
+	            ChatMsgDto msgDto = new ChatMsgDto().toDto(msg);
+	            msgDto.setIs_receiver_read(readStatus);
+	            ChatMsg updatedMsg = msgDto.toEntity();
+	            chatMsgRepository.save(updatedMsg);
+	        }
+	    }
+	}
+	
 	
 	// 채팅메시지 생성
 	public int createChatMsg(ChatMsgDto dto) {

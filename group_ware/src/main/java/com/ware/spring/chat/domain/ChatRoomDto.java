@@ -30,6 +30,8 @@ public class ChatRoomDto {
 	      private String not_me_name;
 	      private String not_me_id;
 	      
+	      private String receiver_id;
+	      private String sender_id;
 	      private String is_receiver_read;
 	      
 	      public ChatRoom toEntity() {

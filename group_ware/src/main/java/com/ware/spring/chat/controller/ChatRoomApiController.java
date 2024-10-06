@@ -1,20 +1,17 @@
 package com.ware.spring.chat.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -50,18 +47,30 @@ public class ChatRoomApiController {
 		
 		return resultMap;
 	}
-	// JSON 형식으로 데이터를 반환하도록 수정된 컨트롤러
 	@GetMapping("/chat/room/list/data")
-	@ResponseBody // 이 어노테이션을 추가하여 JSON 형식으로 응답
-	public ResponseEntity<Page<ChatRoomDto>> selectListChatRoom(
-	        @PageableDefault(page = 0, size = 10, sort = "lastDate", direction = Sort.Direction.DESC) Pageable pageable) {
+	@ResponseBody
+	public ResponseEntity<List<ChatRoomDto>> selectListChatRoom() {
 	    
+	    // 현재 인증된 사용자의 정보를 가져옴
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	    User user = (User) authentication.getPrincipal();
-	    String memId = user.getUsername();
+	    Object principal = authentication.getPrincipal();
+	    String memId;
+
+	    // principal이 UserDetails 타입인 경우 처리
+	    if (principal instanceof UserDetails) {
+	        UserDetails userDetails = (UserDetails) principal;
+	        memId = userDetails.getUsername();
+	    } 
+	    // principal이 String 타입인 경우 처리
+	    else if (principal instanceof String) {
+	        memId = (String) principal;
+	    } else {
+	        // 예상치 못한 타입인 경우의 처리
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+	    }
 	    
 	    // 서비스에서 채팅방 리스트를 가져옴
-	    Page<ChatRoomDto> resultList = chatRoomService.selectChatRoomList(pageable, memId);
+	    List<ChatRoomDto> resultList = chatRoomService.selectChatRoomList(memId);
 	    
 	    // JSON 형식으로 반환
 	    return ResponseEntity.ok(resultList);

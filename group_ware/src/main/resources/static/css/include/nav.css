@@ -439,3 +439,16 @@ li {
     border-radius: 50%;
 }
 
+#messageBtn {
+    position: relative;
+}
+
+.notification-dot {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    border-radius: 50%;
+}

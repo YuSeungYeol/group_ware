@@ -44,23 +44,28 @@ public class ChatViewController {
 		
 		
 		ChatRoomDto dto = chatRoomService.selectChatRoomOne(room_no, memId);
+	    if (dto == null) {
+	        throw new RuntimeException("ChatRoomDto를 찾을 수 없습니다.");
+	    }
+		
 		model.addAttribute("dto",dto);
 		
 		List<ChatMsgDto> resultList = chatMsgService.selectChatMsgList(room_no, memId);
 		model.addAttribute("resultList",resultList);
 		
+		List<ChatRoomDto> chatRoomList = chatRoomService.selectChatRoomList(memId);
+		model.addAttribute("chatRoomList",chatRoomList);
 		
 		return "chat/detail";
 	}
 	
 	@GetMapping("/chat/room/list")
-	public String selectChatRoom(Model model, @PageableDefault(page=0, size=10, sort="lastDate", direction=Sort.Direction.DESC)
-					Pageable pageable) {
+	public String selectChatRoom(Model model) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		User user = (User)authentication.getPrincipal();
 		String memId = user.getUsername();
 		
-		Page<ChatRoomDto> resultList = chatRoomService.selectChatRoomList(pageable, memId);
+		List<ChatRoomDto> resultList = chatRoomService.selectChatRoomList(memId);
 		model.addAttribute("resultList",resultList);
 		
 		return "chat/list";

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -13,6 +14,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ware.spring.chat.domain.ChatMsgDto;
+import com.ware.spring.chat.repository.ChatMsgRepository;
 import com.ware.spring.chat.service.ChatMsgService;
 
 @Component
@@ -24,9 +26,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     // 모든 채팅방의 메시지를 수신하기 위한 공통 채널 세션 관리
     private final List<WebSocketSession> commonChannelSessions = new ArrayList<>();
 
+    private final ChatMsgRepository chatMsgRepository;
     @Autowired
-    public ChatWebSocketHandler(ChatMsgService chatMsgService) {
+    public ChatWebSocketHandler(ChatMsgRepository chatMsgRepository, ChatMsgService chatMsgService) {
         this.chatMsgService = chatMsgService;
+        this.chatMsgRepository = chatMsgRepository;
     }
 
     @Override
@@ -78,11 +82,18 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                     if (wsSession.getId().equals(session.getId())) {
                         msg.setIs_from_sender("Y"); // 송신자로 설정
                     } else {
-                        msg.setIs_from_sender("N"); // 수신자로 설정
+                        msg.setIs_from_sender("N"); // 수신자로 설정}
                     }
                     if (wsSession.isOpen()) {
                         wsSession.sendMessage(new TextMessage(objMapper.writeValueAsString(msg)));
                     }
+                    
+                }
+                
+                // 모든 사용자가 방에 있을 때 읽음 처리
+                List<WebSocketSession> roomSessionsForRoom = roomSessions.get(roomNo);
+                if (roomSessionsForRoom != null && roomSessionsForRoom.size() == 2) {  // 1:1 채팅방에서 두 사용자가 모두 연결된 경우
+                    chatMsgService.updateReceiverReadStatus(roomNo, "Y");
                 }
 
                 // 공통 채널 세션에도 메시지 전송

@@ -63,8 +63,4 @@
     text-align: center;
     color: #777;
 }
-.unread-indicator {
-    color: red; /* 빨간색으로 표시 */
-    font-size: 16px; /* 동그라미 크기 */
-	align-items: center;
-}
+

@@ -10,38 +10,42 @@
                 <button id="uploadFileBtn" class="btn btn-primary">파일 업로드</button>
 
                 <!-- 폴더 생성 폼 -->
-                <div id="folderForm" style="display: none; margin-top: 20px;">
+                <div id="folderForm" style="display: none;">
                     <label for="folderNameInput">새폴더명 : </label>
                     <input type="text" id="folderNameInput" placeholder="폴더명을 입력하세요." required>
-                    <button id="submitFolderBtn" type="submit" class="btn btn-success">생성</button>
+                    <button id="submitFolderBtn" type="submit" class="btn btn-primary">생성</button>
                 </div>
 
                 <!-- 파일 업로드 폼 -->
-                <div id="fileUploadForm" style="display: none; margin-top: 20px;">
+                <div id="fileUploadForm" style="display: none;">
                     <label for="fileInput">파일 선택 : </label>
                     <input type="file" id="fileInput" required>
-                    <button id="submitFileBtn" type="submit" class="btn btn-success">업로드</button>
+                    <button id="submitFileBtn" type="submit" class="btn btn-primary">업로드</button>
                 </div>
 				
                 <!-- 폴더 및 파일 리스트 -->
                 <div id="folderContent">
                     <table>
                         <colgroup>
-                            <col width="15%">
-                            <col width="70%">
-                            <col width="15%">
+                            <col width="10%">
+                            <col width="0%">
+                            <col width="55%">
+                            <col width="10%">
+                            <col width="25%">
                         </colgroup>
                         <thead>
                             <tr>
                                 <th><input type="checkbox" id="selectAllCheckbox"></th>
+                                <th></th>
                                 <th>이름</th>
+                                <th>확장자</th>
                                 <th>등록날짜</th>
                             </tr>
                         </thead>
 						<tbody id="folderList">
 						    <!-- 돌아가기 링크를 위한 행 -->
 						    <tr id="backLinkRow" style="display: none;">
-						        <td colspan="3"><a href="#" id="backLink">이전으로 돌아가기</a></td>
+						        <td colspan="5"><a href="#" id="backLink">이전으로 돌아가기</a></td>
 						    </tr>
 						
 						    <!-- 폴더 목록 표시 -->
@@ -49,6 +53,7 @@
 						    
 						        <tr th:each="folder : ${resultList}" th:if="${folder.parentFolder == null && folder.del_yn == 'N' }">
 						            <td><input type="checkbox" class="folderCheckbox" th:value="${folder.folder_no}"></td>
+						            <td><img th:src="@{/image/폴더1.png}" alt="Folder Icon" class="folderIcon"></td>
 						            <td><a href="#" class="folderLink" th:data-folder-no="${folder.folder_no}" th:text="${folder.folder_name}"></a></td>
 						            <td th:text="${#temporals.format(folder.folder_reg_date, 'yy-MM-dd')}"></td>
 						        </tr>
@@ -58,6 +63,7 @@
 						    <th:block th:if="${!#lists.isEmpty(fileList)}">
 						       <tr th:each="folder : ${resultList}" th:if="${folder.parentFolder == null && folder.del_yn.equals('N')}">
 						            <td><input type="checkbox" class="fileCheckbox" th:value="${file.file_no}"></td>
+						             <td><img th:src="@{/image/파일.png}" alt="File Icon" class="fileIcon"></td>
 						            <td>
 						                <!-- 파일 다운로드 링크 추가 -->
 						                <a href="#" class="fileDownloadLink"
@@ -72,7 +78,7 @@
 						    <!-- 폴더 및 파일이 없을 때 -->
 						    <th:block th:if="${#lists.isEmpty(resultList) && #lists.isEmpty(fileList)}">
 						        <tr>
-						            <td colspan="3">폴더나 파일이 없습니다.</td>
+						            <td colspan="5">폴더나 파일이 없습니다.</td>
 						        </tr>
 						    </th:block>
 						</tbody>
@@ -134,15 +140,20 @@
 			            	if(folder.del_yn === 'N'){
 			                const tr = document.createElement('tr');
 			                const checkbox = document.createElement('td');
+			                const image = document.createElement('td');  // 이미지 태그를 담을 td 생성
 			                const name = document.createElement('td');
+			                const ext = document.createElement('td');
 			                const date = document.createElement('td');
 			
 			                checkbox.innerHTML = `<input type="checkbox" class="folderCheckbox" value="${folder.folder_no}">`;
+			                image.innerHTML = `<img src="/image/폴더1.png" alt="Folder Icon" class="folderIcon">`;  // 이미지 태그 추가
 			                name.innerHTML = `<a href="#" class="folderLink" data-folder-no="${folder.folder_no}">${folder.folder_name}</a>`;
 			                date.innerText = new Date(folder.folder_reg_date).toISOString().split('T')[0];
 			
 			                tr.appendChild(checkbox);
+			                tr.appendChild(image);
 			                tr.appendChild(name);
+			                tr.appendChild(ext);
 			                tr.appendChild(date);
 			                folderListElement.appendChild(tr);
 			            	}
@@ -156,15 +167,26 @@
 			            data.files.forEach(file => {
 			                const tr = document.createElement('tr');
 			                const checkbox = document.createElement('td');
+			                const image = document.createElement('td');  // 이미지 태그를 담을 td 생성
 			                const name = document.createElement('td');
+			                const ext = document.createElement('td');  // 확장자를 담을 td 생성
 			                const date = document.createElement('td');
 
+			                // 파일명과 확장자를 분리
+			                let fileName = file.file_ori_name;
+			                let fileBaseName = fileName.substring(0, fileName.lastIndexOf('.'));  // 확장자 제외한 파일명
+			                let fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);  // 확장자
+
 			                checkbox.innerHTML = `<input type="checkbox" class="fileCheckbox" value="${file.file_no}">`;
-			                name.innerHTML = `<a href="/folder/downloadFile?fileNo=${file.file_no}">${file.file_ori_name}</a>`;
+			                name.innerHTML = `<a href="/folder/downloadFile?fileNo=${file.file_no}">${fileBaseName}</a>`;
+			                ext.innerHTML = fileExtension;  // 확장자 추가
 			                date.innerText = new Date(file.file_reg_date).toISOString().split('T')[0];
+			                image.innerHTML = `<img src="/image/파일.png" alt="File Icon" class="fileIcon">`;  // 이미지 태그 추가
 
 			                tr.appendChild(checkbox);
+			                tr.appendChild(image);
 			                tr.appendChild(name);
+			                tr.appendChild(ext);  // 확장자를 추가
 			                tr.appendChild(date);
 			                folderListElement.appendChild(tr);
 			            });
@@ -233,9 +255,13 @@
 
             // 폴더 생성 버튼 이벤트 핸들러
             createFolderBtn.addEventListener('click', function () {
-                folderForm.style.display = folderForm.style.display === 'none' ? 'block' : 'none';
+                if (folderForm.style.display === 'none') {
+                    folderForm.style.display = 'block';   // 폴더 생성 폼을 표시
+                    fileUploadForm.style.display = 'none';  // 파일 업로드 폼은 숨김
+                } else {
+                    folderForm.style.display = 'none';  // 폴더 생성 폼 숨기기
+                }
             });
-
             // 폴더 생성 요청
             submitFolderBtn.addEventListener('click', function () {
                 const folderName = document.getElementById('folderNameInput').value;
@@ -268,9 +294,14 @@
             });
 
             // 파일 업로드 버튼 이벤트 핸들러
-            uploadFileBtn.addEventListener('click', function () {
-                fileUploadForm.style.display = fileUploadForm.style.display === 'none' ? 'block' : 'none';
-            });
+			uploadFileBtn.addEventListener('click', function () {
+			    if (fileUploadForm.style.display === 'none') {
+			        fileUploadForm.style.display = 'block';  // 파일 업로드 폼을 표시
+			        folderForm.style.display = 'none';  // 폴더 생성 폼은 숨김
+			    } else {
+			        fileUploadForm.style.display = 'none';  // 파일 업로드 폼 숨기기
+			    }
+			});
 
             submitFileBtn.addEventListener('click', function () {
                 const file = fileInput.files[0];
