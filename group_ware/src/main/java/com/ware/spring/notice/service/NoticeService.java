@@ -13,7 +13,9 @@ import com.ware.spring.member.domain.Member;
 import com.ware.spring.member.repository.MemberRepository;
 import com.ware.spring.notice.domain.Notice;
 import com.ware.spring.notice.domain.NoticeDto;
+import com.ware.spring.notice.domain.NoticeStatus;
 import com.ware.spring.notice.repository.NoticeRepository;
+import com.ware.spring.notice.repository.NoticeStatusRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -22,12 +24,16 @@ public class NoticeService {
 
     private final NoticeRepository noticeRepository;
     private final MemberRepository memberRepository;
+    private final NoticeStatusRepository noticeStatusRepository; 
     
     @Autowired
     public NoticeService(NoticeRepository noticeRepository
-    						,MemberRepository memberRepository) {
+    						,MemberRepository memberRepository
+    						,NoticeStatusRepository noticeStatusRepository) {
         this.noticeRepository = noticeRepository;
         this.memberRepository = memberRepository;
+        this.noticeStatusRepository = noticeStatusRepository;
+        
     }
     
     // Notice 목록을 조회하는 메서드가 데이터를 반환해야 합니다.
@@ -46,12 +52,10 @@ public class NoticeService {
         Notice notice = dto.toEntity();
         notice.setMember(member);
 
-        // noticeSchedule 값이 null이면 기본값을 "N"으로 설정
         if (dto.getNoticeSchedule() == null) {
             notice.setNoticeSchedule("N");
         }
 
-        // 일정이 설정된 경우만 날짜를 설정
         if ("Y".equals(dto.getNoticeSchedule())) {
             notice.setNoticeStartDate(dto.getNoticeStartDate());
             notice.setNoticeEndDate(dto.getNoticeEndDate());
@@ -61,7 +65,8 @@ public class NoticeService {
         }
 
         return noticeRepository.save(notice);
-    }   
+    }  
+   
 
 
     // 공지사항 상세화면 
@@ -110,40 +115,45 @@ public class NoticeService {
 //        }
 //    }
     
-//    ALTER TABLE notice ADD COLUMN delete_yn CHAR(1) DEFAULT 'n';
+    // 공지사항 등록 후 모든 직원에게 알림 설정
+    @Transactional
+    public void createNoticeForAllMembers(Notice notice) {
+        System.out.println("createNoticeForAllMembers 메서드 실행됨.");
+        List<Member> allMembers = memberRepository.findAll();
+        for (Member member : allMembers) {
+            System.out.println("Member: " + member.getMemNo());
+            NoticeStatus noticeStatus = NoticeStatus.builder()
+                .notice(notice)
+                .member(member)
+                .isRead("N")
+                .build();
+            noticeStatusRepository.save(noticeStatus);
+            System.out.println("공지사항 상태 저장 완료: " + member.getMemNo());
+        }
+    }
+
+
+    // 특정 회원의 읽지 않은 공지사항 확인
+    public List<NoticeStatus> getUnreadNoticesForMember(Long memNo) {
+        return noticeStatusRepository.findByMember_MemNoAndIsRead(memNo, "N");
+    }
     
-//    // 특정 사용자가 읽지 않은 공지사항이 있는지 확인
-//    public boolean hasUnreadNotices(Long memNo) {
-//        return noticeRepository.existsByMember_MemNoAndNoticeAlram(memNo, "N");
-//    }
-//
-//    // 공지사항 알림 목록 가져오기 (읽지 않은 알림만)
-//    public List<Notice> getUnreadNotices(Long memNo) {
-//        return noticeRepository.findByMember_MemNoAndNoticeAlram(memNo, "N");
-//    }
-//
-//    // 공지사항 읽음 처리
-//    public void clearNoticeNotification(Long noticeNo, Long memNo) {
-//        Optional<Notice> noticeOpt = noticeRepository.findByNotice_NoticeNoAndMember_MemNo(noticeNo, memNo);
-//        if (noticeOpt.isPresent()) {
-//            Notice notice = noticeOpt.get();
-//            notice.setNoticeAlram("Y");  // 알림 상태를 'Y'로 변경
-//            noticeRepository.save(notice);
-//        }
-//    }
+    // NoticeService.java에 추가
+    public boolean hasUnreadNotices(Long memNo) {
+        // NoticeStatusRepository를 사용하여 해당 사용자가 읽지 않은 공지사항이 있는지 확인
+        return noticeStatusRepository.existsByMember_MemNoAndIsRead(memNo, "N");
+    }
     
-//    // 공지사항 등록 후 모든 직원에게 알림 설정
-//    public void createNoticeForAllMembers(Notice notice) {
-//        List<Member> allMembers = memberRepository.findAll(); // 모든 회원 조회
-//        for (Member member : allMembers) {
-//            Notice noticeStatus = new Notice();  // NoticeStatus 객체 생성
-//            noticeStatus.setNotice(notice);  // 공지사항 설정
-//            noticeStatus.setMember(member);  // 각 회원 설정
-//            noticeStatus.setNoticeAlram("N");  // 새로운 공지사항이므로 'N'으로 설정
-//            noticeStatusRepository.save(noticeStatus);  // 저장
-//        }
-//    }
-//    
+    @Transactional
+    public void markNoticeAsRead(Long noticeNo, Long memNo) {
+        Optional<NoticeStatus> noticeStatusOpt = noticeStatusRepository.findByNotice_NoticeNoAndMember_MemNo(noticeNo, memNo);
+        if (noticeStatusOpt.isPresent()) {
+            NoticeStatus noticeStatus = noticeStatusOpt.get();
+            noticeStatus.setIsRead("Y");
+            noticeStatusRepository.save(noticeStatus);
+        }
+    }
+
 }
 
 

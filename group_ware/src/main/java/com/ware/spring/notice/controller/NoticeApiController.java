@@ -23,6 +23,7 @@ import jakarta.servlet.http.HttpSession;
 
 import com.ware.spring.member.domain.Member;
 import com.ware.spring.member.repository.MemberRepository;
+import com.ware.spring.notice.domain.Notice;
 import com.ware.spring.notice.domain.NoticeDto;
 
 
@@ -48,7 +49,6 @@ public class NoticeApiController {
 
         // 로그인한 사용자 정보 가져오기
         String username = principal != null ? principal.getName() : ((Member) session.getAttribute("loggedInUser")).getMemId();
-
         Member loggedInMember = memberRepository.findByMemId(username)
             .orElseThrow(() -> new RuntimeException("로그인된 사용자를 찾을 수 없습니다."));
 
@@ -63,27 +63,29 @@ public class NoticeApiController {
 
         // 체크박스 값이 'Y'인지 확인
         if ("Y".equals(dto.getNoticeSchedule())) {
-            // 공지 시작일과 종료일이 모두 입력되었는지 확인
             if (dto.getNoticeStartDate() == null || dto.getNoticeEndDate() == null) {
                 resultMap.put("res_msg", "공지 시작일과 종료일을 입력하세요.");
                 return resultMap;
             }
         } else {   
-            // 체크박스가 체크되지 않은 경우 날짜 필드는 무시
             dto.setNoticeStartDate(null);
             dto.setNoticeEndDate(null);
         }
 
-        if (noticeService.createNotice(dto, loggedInMember) != null) {
+        Notice createdNotice = noticeService.createNotice(dto, loggedInMember);
+
+        if (createdNotice != null) {
+            System.out.println("공지사항이 성공적으로 생성되었습니다: " + createdNotice.getNoticeNo());
+            
+            // 공지사항 상태 저장: 모든 사용자에게 알림 추가
+            noticeService.createNoticeForAllMembers(createdNotice);
+            
             resultMap.put("res_code", "200");
             resultMap.put("res_msg", "게시글이 성공적으로 등록되었습니다.");
         }
 
         return resultMap;
     }
-
-
-
 
     // 공지사항 수정
     @ResponseBody
@@ -114,7 +116,7 @@ public class NoticeApiController {
         return resultMap;
     }
 
- // 공지사항 삭제
+    // 공지사항 삭제
     @ResponseBody
     @DeleteMapping("/notice/{notice_no}")
     public Map<String, String> deleteNotice(@PathVariable("notice_no") Long notice_no, Principal principal) {
@@ -142,40 +144,24 @@ public class NoticeApiController {
 
         return map;
     }
-
-
-    // 공지사항 삭제(삭제 여부 Y,N)
-//    @ResponseBody
-//    @DeleteMapping("/notice/{notice_no}")
-//    public Map<String, String> deleteNotice(@PathVariable("notice_no") Long notice_no) {
-//        Map<String, String> map = new HashMap<>();
-//        map.put("res_code", "404");
-//        map.put("res_msg", "게시글 삭제 중 오류가 발생했습니다.");
-//
-//        // 공지사항 삭제 여부 업데이트 (실제 삭제가 아닌 delete_yn을 'y'로 업데이트)
-//        Notice notice = noticeRepository.findById(notice_no).orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다."));
-//        notice.setDeleteYn("y");
-//        noticeRepository.save(notice);
-//
-//        map.put("res_code", "200");
-//        map.put("res_msg", "정상적으로 게시글이 삭제되었습니다.");
-//        return map;
-//    }
     
-	 // 공지사항 알림 읽음 처리 API
-//	 @PostMapping("/clearNoticeNotification/{noticeId}")
-//	 public ResponseEntity<Void> clearNoticeNotification(@PathVariable("noticeId") Long noticeId, Principal principal) {
-//	     String username = principal.getName();
-//	     Optional<Member> memberOpt = memberRepository.findByMemId(username);
-//	
-//	     if (memberOpt.isPresent()) {
-//	         Long memNo = memberOpt.get().getMemNo();
-//	         noticeService.clearNoticeNotification(noticeId, memNo); // 해당 직원의 읽음 처리 로직 실행
-//	         return ResponseEntity.ok().build();
-//	     } else {
-//	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 로그인된 사용자가 없으면 에러 처리
-//	     }
-//	 }
+    @PostMapping("/clearNoticeNotification/{noticeNo}")
+    public ResponseEntity<Void> clearNoticeNotification(@PathVariable("noticeNo") Long noticeNo, Principal principal) {
+        String username = principal.getName();
+        Optional<Member> memberOpt = memberRepository.findByMemId(username);
+
+        if (memberOpt.isPresent()) {
+            Long memNo = memberOpt.get().getMemNo();
+            noticeService.markNoticeAsRead(noticeNo, memNo);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+
+
+    
 
 
 }

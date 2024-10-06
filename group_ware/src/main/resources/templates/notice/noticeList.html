@@ -42,11 +42,13 @@
 					        </tr>
 					    </th:block>
 					    <th:block th:if="${!#lists.isEmpty(resultList.content)}">
-					        <tr th:each="notice, noticeStat : ${resultList.content}">
+					        <tr th:each="notice, noticeStat : ${resultList.content}" th:attr="data-notice-no=${notice.noticeNo}">
 					            <td th:text="${noticeStat.index + 1}"></td>
 					            <td>
-					                <a th:href="@{/notice/{no}(no=${notice.noticeNo})}" th:text="${notice.noticeTitle}"></a>
-					            </td>
+									<a th:href="@{/notice/{no}(no=${notice.noticeNo})}" 
+									   th:text="${notice.noticeTitle}">
+									</a>
+								</td>
 					            <td th:text="${#temporals.format(notice.noticeRegDate, 'yy-MM-dd')}"></td>
 					            <td th:text="${notice.noticeView}"></td>
 					        </tr>
@@ -57,6 +59,41 @@
 				th:onclick="|location.href='@{/notice/noticeCreate}'|">
 			</div>
 		</div>
-	</section>
+	 </section>
+	 <script>
+	 document.addEventListener("DOMContentLoaded", function() {
+		    // 공지사항 클릭 시 읽음 처리
+		    document.querySelectorAll('.notice-item').forEach(item => {
+		        item.addEventListener('click', function(event) {
+		            event.preventDefault(); // 기본 동작 방지
+		            const noticeNo = this.getAttribute('data-notice-no');
+		            const csrfToken = document.getElementById('csrfToken').value;
+		            console.log("공지사항 클릭됨 - noticeNo: " + noticeNo);
+		            
+		            fetch(`/clearNoticeNotification/${noticeNo}`, {
+		                method: 'POST',
+		                headers: {
+		                    'X-CSRF-TOKEN': csrfToken, // CSRF 토큰 추가
+		                    'Content-Type': 'application/json' // 요청 타입 설정
+		                }
+		            })
+		            .then(response => {
+		                if (response.ok) {
+		                    console.log('공지사항 읽음 처리 완료');
+		                    // 여기서 상세 페이지로 이동하는 로직을 추가할 수 있음
+		                    window.location.href = this.getAttribute('href'); // 상세 페이지로 이동
+		                } else {
+		                    console.error('공지사항 읽음 처리 실패');
+		                }
+		            })
+		            .catch(error => console.error('공지사항 읽음 처리 요청 중 오류 발생:', error));
+		        });
+		    });
+		});
+
+
+
+
+	 </script>
      </th:block>
 </html>

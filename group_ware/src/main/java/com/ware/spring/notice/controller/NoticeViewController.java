@@ -23,6 +23,7 @@ import com.ware.spring.member.domain.Member;
 import com.ware.spring.member.repository.MemberRepository;
 import com.ware.spring.notice.domain.Notice;
 import com.ware.spring.notice.domain.NoticeDto;
+import com.ware.spring.notice.domain.NoticeStatusDto;
 import com.ware.spring.notice.service.NoticeService;
 
 import jakarta.servlet.http.HttpSession;
@@ -97,23 +98,42 @@ public class NoticeViewController {
 		return "notice/noticeUpdate";
 	}
     
-//    // 공지사항 알림 확인 API
-//    @GetMapping("/nav/notice-notifications")
-//    public ResponseEntity<Map<String, Boolean>> getNoticeNotifications(Principal principal) {
-//        String username = principal.getName();
-//        Optional<Member> memberOpt = memberRepository.findByMemId(username);
-//
-//        Map<String, Boolean> notifications = new HashMap<>();
-//
-//        if (memberOpt.isPresent()) {
-//            Long memNo = memberOpt.get().getMemNo();
-//            boolean hasUnreadNotices = noticeService.hasUnreadNotices(memNo); // 해당 직원이 안 읽은 공지사항이 있는지 확인
-//            notifications.put("hasUnreadNotices", hasUnreadNotices);
-//        }
-//
-//        return ResponseEntity.ok(notifications);
-//    }
+    // 특정 회원의 읽지 않은 공지사항 목록 확인 API
+    @GetMapping("/unread")
+    public ResponseEntity<List<NoticeStatusDto>> getUnreadNotices(Principal principal) {
+        // Principal에서 사용자의 아이디(memId) 가져오기
+        String memId = principal.getName();
 
-    
+        // memId로 Member 조회
+        Member member = memberRepository.findByMemId(memId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+
+        Long memNo = member.getMemNo();  // memNo 가져오기
+
+        // 읽지 않은 공지사항 목록 조회
+        List<NoticeStatusDto> unreadNotices = noticeService.getUnreadNoticesForMember(memNo)
+                .stream()
+                .map(NoticeStatusDto::fromEntity)
+                .toList();
+        
+        return ResponseEntity.ok(unreadNotices);
+    }
+
+    // 알림을 보여주는 페이지에 공지사항 알림 데이터를 전달
+    @GetMapping("/nav/notice-notifications")
+    public ResponseEntity<Map<String, Boolean>> getNoticeNotifications(Principal principal) {
+        String username = principal.getName();
+        Optional<Member> memberOpt = memberRepository.findByMemId(username);
+
+        Map<String, Boolean> notifications = new HashMap<>();
+
+        if (memberOpt.isPresent()) {
+            Long memNo = memberOpt.get().getMemNo();
+            boolean hasUnreadNotices = noticeService.hasUnreadNotices(memNo); // 안 읽은 공지사항이 있는지 확인
+            notifications.put("hasUnreadNotices", hasUnreadNotices);
+        }
+
+        return ResponseEntity.ok(notifications);
+    }
     
 }
