@@ -82,7 +82,8 @@ public class WebSecurityConfig {
                 "/api/commute/**",
                 "/chat/**",
 				"/chatting/**",
-				"/clearNoticeNotification/**"
+				"/clearNoticeNotification/**",
+				"/notice/**"
                 
             )
         )

@@ -68,8 +68,6 @@ public class NoticeViewController {
     }   
 
     // 공지사항 상세화면
-
-    
     @GetMapping("/notice/{notice_no}")
     public String selectNoticeOne(Model model, 
     		@PathVariable("notice_no") Long notice_no, Principal principal) {
