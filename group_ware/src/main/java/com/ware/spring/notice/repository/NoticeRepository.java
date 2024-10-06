@@ -21,5 +21,5 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
     // 제목으로 검색 및 삭제 여부 필터링
     Page<Notice> findByNoticeTitleContainingAndDeleteYn(String keyword, String deleteYn, Pageable pageable);
 
-    
+    List<Notice> findAllBynoticeNo(Long noticeNo);
 }

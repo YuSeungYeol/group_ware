@@ -9,7 +9,7 @@
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
 }
 
 .modal-content {
@@ -17,15 +17,15 @@
     margin: auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 400px;
+    width: 500px; /* 모달 창 너비 */
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* 그림자 추가 */
     position: relative;
 }
 
 .modal-content h2 {
-    margin-bottom: 10px;
-    font-size: 24px;
+    margin-bottom: 15px;
+    font-size: 22px;
     color: #007bff;
 }
 
@@ -34,46 +34,66 @@
     flex-direction: column;
 }
 
+/* 폼 그룹 레이아웃 */
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    display: flex; /* 가로 정렬 */
+    align-items: center;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
+    font-size: 14px;
     color: #333;
     font-weight: bold;
+    width: 30%; /* 라벨 너비 조정 */
 }
 
 .form-group input[type="text"],
 .form-group textarea {
-    width: calc(100% - 10px);
-    padding: 8px;
+    width: calc(70% - 10px); /* 입력 필드 너비 */
+    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
 
-.form-group input[type="checkbox"] {
-    margin-right: 5px;
-}
-
+/* 인라인 그룹 레이아웃 */
 .inline-group {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 15px;
 }
 
+.inline-group label {
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+.inline-group input[type="text"] {
+    width: 45%; /* 두 개의 입력 필드를 50%씩 할당 */
+    padding: 8px;
+}
+
+.inline-group .calendar-icon {
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+/* 버튼 그룹 스타일 */
 .buttons {
     display: flex;
     justify-content: space-between;
+    margin-top: 20px;
 }
 
 .buttons button {
-    padding: 10px 20px;
+    padding: 12px 20px;
     border: none;
     border-radius: 4px;
     font-size: 16px;
     cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
 .buttons .save-button {
@@ -81,17 +101,26 @@
     color: #fff;
 }
 
+.buttons .save-button:hover {
+    background-color: #0056b3;
+}
+
 .buttons .cancel-button {
     background-color: #ccc;
     color: #333;
 }
 
+.buttons .cancel-button:hover {
+    background-color: #999;
+}
+
+/* 모달 헤더 스타일 */
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #e5e5e5;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .modal-header h2 {
@@ -100,7 +129,7 @@
 
 .close {
     cursor: pointer;
-    font-size: 20px;
+    font-size: 24px;
 }
 
 .close:hover {
@@ -109,18 +138,78 @@
 
 /* Timepicker 스타일 */
 .timepicker {
-    width: 100px; /* 원하는 크기로 조정 */
+    width: 100px; /* 시간을 입력하는 필드의 크기 */
     padding: 5px;
     font-size: 14px;
 }
 
-/* Inline-group 조정 */
-.inline-group select {
-    flex: 1;
-    margin-right: 10px;
+.short-input {
+    width: 150px; /* 날짜 입력 필드 크기 */
 }
 
-.inline-group label {
-    margin: 0 10px;
+/* 일요일 날짜: 빨간색 */
+.fc .fc-day-sun a {
+    color: red;
 }
 
+/* 토요일 날짜: 파란색 */
+.fc .fc-day-sat a {
+    color: blue;
+}
+
+/* Color Picker 스타일 */
+.color-picker {
+    display: flex;
+    gap: 10px;
+}
+
+.color-picker label {
+    position: relative;
+    cursor: pointer;
+}
+
+.color-box {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s ease;
+}
+
+.color-picker input[type="radio"] {
+    display: none;
+}
+
+.color-picker input[type="radio"]:checked + .color-box {
+    border-color: black;
+    transform: scale(1.1);
+}
+
+/* 시간 선택 목록 스타일 */
+.time-select-list {
+    display: none; /* 기본적으로 목록을 숨김 */
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    position: absolute;
+    width: 100px; /* 입력 필드와 동일한 너비 */
+    background-color: #fff;
+    z-index: 1000; /* 다른 요소 위에 표시 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    margin-top: 5px;
+    padding: 0;
+}
+
+.time-select-list li {
+    padding: 8px;
+    cursor: pointer;
+    list-style-type: none; /* 기본 목록 스타일 제거 */
+    text-align: center;
+    border-bottom: 1px solid #e6e6e6;
+}
+
+.time-select-list li:hover {
+    background-color: #f0f0f0;
+}

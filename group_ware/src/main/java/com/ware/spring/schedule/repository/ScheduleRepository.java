@@ -11,5 +11,5 @@ import com.ware.spring.schedule.domain.Schedule;
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     
     List<Schedule> findByMemberMemId(String memId);
-
+    
 }

@@ -153,6 +153,11 @@ public class NoticeService {
             noticeStatusRepository.save(noticeStatus);
         }
     }
+    
+    // 캘린더 관련 조회
+    public Notice findByNoticeNo(Long noticeNo) {
+    	return noticeRepository.findByNoticeNo(noticeNo);
+    }
 
 }
 

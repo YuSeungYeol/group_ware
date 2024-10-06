@@ -6,6 +6,7 @@ import java.time.LocalTime;
 
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ware.spring.member.domain.Member;
 
 import jakarta.persistence.Column;
@@ -16,6 +17,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,9 +37,10 @@ public class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "schedule_no")
     private Long schedule_no;
-    
+
     @ManyToOne
     @JoinColumn(name = "mem_no")
+    @JsonIgnore
     private Member member;
 
     @Column(name = "start_date")
@@ -61,6 +64,14 @@ public class Schedule {
     @Column(name = "schedule_new_date")
     @UpdateTimestamp
     private LocalDateTime schedule_new_date;
+
+    @Column(name = "schedule_background_color", length = 7) // 추가된 필드
+    private String schedule_background_color;
+
+    @Column(name = "notification_minutes")
+    private Integer notification_minutes;
+    
+    // 업데이트 메서드 (DTO를 통해 값 갱신)
     public void update(ScheduleDto dto) {
         this.start_date = dto.getStart_date();
         this.end_date = dto.getEnd_date();
@@ -68,6 +79,8 @@ public class Schedule {
         this.end_time = dto.getEnd_time();
         this.schedule_title = dto.getSchedule_title();
         this.schedule_content = dto.getSchedule_content();
+        this.schedule_background_color = dto.getSchedule_background_color();
+        this.notification_minutes = dto.getNotification_minutes(); // 알림 시간 필드 추가
     }
     
 }

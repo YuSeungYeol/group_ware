@@ -1,4 +1,5 @@
 package com.ware.spring.schedule.controller;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +13,7 @@ import com.ware.spring.member.repository.MemberRepository;
 import com.ware.spring.schedule.service.ScheduleService;
 
 @Controller
-@RequestMapping("/calendar/calendar")
+@RequestMapping("/calendar")
 public class ScheduleViewController {
 
     @Autowired
@@ -38,12 +39,10 @@ public class ScheduleViewController {
         Member loggedInMember = memberRepository.findByMemId(username)
             .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다: " + username));
 
-        // 로그인된 사용자의 일정을 가져와서 모델에 추가
-        model.addAttribute("events", scheduleService.getSchedulesForUser(username));
+        // 로그인된 사용자의 일정과 공지사항을 가져와서 모델에 추가
+        model.addAttribute("events", scheduleService.getAllSchedulesAndNotices(username));
         model.addAttribute("member", loggedInMember);
 
         return "/calendar/calendar";  // templates/calendar/calendar.html 파일 반환
     }
-
-    
 }
