@@ -33,7 +33,7 @@ public class ChatRoomService {
 		this.memberRepository = memberRepositroy;
 		this.chatMsgRepository = chatMsgRepository;
 	}
-	
+	 
 	public ChatRoomDto selectChatRoomOne(Long roomNo, String memId) {
 		ChatRoom chatRoom = chatRoomRepository.findByroomNo(roomNo);
 		

@@ -86,7 +86,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                     }
                     if (wsSession.isOpen()) {
                         wsSession.sendMessage(new TextMessage(objMapper.writeValueAsString(msg)));
-                    }
+                     }
                     
                 }
                 

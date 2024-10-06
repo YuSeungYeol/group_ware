@@ -27,7 +27,7 @@ public class ChatMsgDto {
 	private LocalDateTime send_date;
 	
 	private ChatRoom chatRoom;
-	
+	 
 	private String chat_type;
 	private String sender_id;
 	private String receiver_id;

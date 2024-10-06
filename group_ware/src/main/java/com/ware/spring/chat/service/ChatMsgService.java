@@ -29,7 +29,7 @@ public class ChatMsgService {
 		this.chatMsgRepository = chatMsgRepository;
 		this.memberRepository = memberRepository;
 	}
-	
+	 
 
 	@Transactional
 	public void updateReceiverReadStatus(Long roomNo, String readStatus) {

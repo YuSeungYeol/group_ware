@@ -33,7 +33,7 @@ public class ChatRoom {
 	
 	@Column(name="room_name")
 	private String roomName;
-	
+	 
 	@Column(name="from_id")
 	private String fromId;
 	

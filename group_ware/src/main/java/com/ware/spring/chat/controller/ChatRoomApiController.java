@@ -68,7 +68,7 @@ public class ChatRoomApiController {
 	        // 예상치 못한 타입인 경우의 처리
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	    }
-	    
+	     
 	    // 서비스에서 채팅방 리스트를 가져옴
 	    List<ChatRoomDto> resultList = chatRoomService.selectChatRoomList(memId);
 	    

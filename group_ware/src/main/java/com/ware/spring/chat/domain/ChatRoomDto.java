@@ -26,7 +26,7 @@ public class ChatRoomDto {
 	      private LocalDateTime room_reg_date;
 	      private String last_msg;
 	      private LocalDateTime last_date;
-	      
+	       
 	      private String not_me_name;
 	      private String not_me_id;
 	      

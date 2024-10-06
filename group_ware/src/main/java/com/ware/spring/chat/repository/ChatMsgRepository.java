@@ -22,6 +22,6 @@ public interface ChatMsgRepository extends JpaRepository<ChatMsg, Long>{
             "WHERE room_no = ?1 " +
             "AND is_from_sender = 'N'", nativeQuery = true)
 	ChatMsg findByReceiverId(String receiverId);
-	
+	 
 	 List<ChatMsg> findAllByChatRoom(ChatRoom chatRoom);
 }

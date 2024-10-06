@@ -35,7 +35,7 @@ public class ChatViewController {
 		this.chatRoomService = chatRoomService;
 		this.chatMsgService = chatMsgService;
 	}
-	
+	 
 	@GetMapping("/chat/{room_no}")
 	public String startChatting(@PathVariable("room_no") Long room_no, Model model) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
