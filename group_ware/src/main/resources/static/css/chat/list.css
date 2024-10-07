@@ -1,4 +1,4 @@
-.chat-container {
+#section-warp {
     display: flex; /* Flexbox로 자식 요소들을 나란히 배치 */
     gap: 20px; /* 목록 사이 간격 */
     padding: 20px;
@@ -7,15 +7,26 @@
     box-sizing: border-box; /* 패딩과 경계를 포함한 박스 크기 계산 */
 }
 
-.chat-list, .group-chat-list {
+
+
+
+
+.chat-list, .list-container {
     flex: 1; /* 두 목록이 동일한 너비와 높이를 가지도록 설정 */
-    background-color: #f9f9ff; /* 배경색 추가 */
+    background-color: white; /* 배경색 추가 */
     padding: 20px;
     border-radius: 8px; /* 모서리를 둥글게 */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
     display: flex;
     flex-direction: column; /* 세로 정렬 */
     justify-content: space-between; /* 내용을 위아래로 균등하게 배치 */
+    
+}
+
+
+
+.chat-container, .list-container {
+    flex: 1; /* 좌우 공간을 균등하게 */
 }
 
 .chat-item-header {
@@ -49,6 +60,7 @@
     border-radius: 8px;
     margin-bottom: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border: 1px solid #ddd;
 }
 
 .chat-item:last-child, .group-chat-item:last-child {
@@ -63,4 +75,148 @@
     text-align: center;
     color: #777;
 }
+/* 버튼 스타일 */
+.btn-create-chat {
+    background-color: rgba(209,201,240,0.6); /* 기본 배경색을 녹색으로 */
+    color: black; /* 텍스트 색상 */
+    border: none;
+    padding: 12px 25px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px; /* 둥근 모서리 */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease; /* 부드러운 효과 */
+}
 
+.btn-create-chat:hover {
+    background-color: rgba(209,201,240,0.6); /* 호버 시 더 어두운 녹색 */
+    transform: scale(1.05); /* 호버 시 살짝 확대 */
+}
+
+.btn-create-chat:active {
+    background-color: rgba(209,201,240,0.6); /* 클릭 시 더 어두운 색상 */
+    transform: scale(1); /* 클릭 시 원래 크기로 */
+}
+
+.btn-create-chat:focus {
+    outline: none; /* 포커스 시 외곽선 제거 */
+    box-shadow: 0 0 5px #007BFF; /* 포커스 시 살짝 그림자 효과 */
+}
+
+/* 직원 목록 헤더 */
+.word h3 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* 필터 및 검색 폼 스타일 */
+.form-container,
+.member_list {
+    margin-bottom: 0; /* 하단 마진 제거 */
+    padding-bottom: 0; /* 하단 패딩 제거 */
+}
+
+.form-container label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    margin-right: 10px;
+}
+
+.filter-form select,
+.search-form select,
+.search-form input {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: border-color 0.3s ease;
+}
+
+.filter-form select:focus,
+.search-form select:focus,
+.search-form input:focus {
+    border-color: #f1f1f1;
+}
+
+.search-form button {
+    padding: 8px 15px;
+    background-color: white;
+    color: black;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.search-form button:hover {
+    background-color: #f1f1f1;
+}
+
+/* 테이블 스타일 */
+.member_list table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.member_list th,
+.member_list td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+.member_list th {
+    background-color: rgba(209,201,240,0.6);
+    font-weight: bold;
+    color: #555;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+
+.member_list tbody tr{
+    background-color: white;
+}
+
+.member_list tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.pagination {
+    margin-top: auto; /* 자동으로 위쪽 여백을 차지하게 설정 */
+    padding-top: 10px; /* 적당한 여백 추가 */
+    justify-content: center; /* 가로 가운데 정렬 */
+}
+
+/* 페이징 스타일 */
+.pagination a {
+    margin: 0 5px;
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    color: #333;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.pagination a.active {
+    background-color: rgba(209,201,240,0.6);
+    color: black;
+    border-color: #f1f1f1;
+}
+
+.pagination a:hover {
+    background-color: #f1f1f1;
+}
+
+.list-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* 전체 높이를 사용하도록 설정 */
+    justify-content: space-between; /* 상단과 하단 사이에 공간 분배 */
+    margin-right: 100px; /* 사이드바 너비만큼 왼쪽에 공간 확보 */
+}
