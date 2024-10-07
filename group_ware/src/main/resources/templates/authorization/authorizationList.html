@@ -10,7 +10,7 @@
 	    <!-- CSRF 토큰 추가 -->
 	    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" id="csrfToken">
 	    <input type="hidden" id="authorNo" name="authorNo" th:value="${authorization != null ? authorization.authorNo : ''}" />
-	    <input type="hidden" id="empNo" name="empNo" th:value="${empNo}">
+
 	    
 	
 	    <div class="main-content-custom">
@@ -375,7 +375,7 @@
 		            <input type="file" name="content" class="file-custom">
 		        </div>
 		        <br>
-				<button id="completedCloseBtn" class="btn-custom">확인</button> <!-- custom 클래스 추가 -->
+				<button id="completedCloseBtn" class="btn-custom" onclick="clearNotification(authorNo)">확인</button>
 				<button id="savePdfButton" class="btn-custom">PDF로 저장</button>
 		    </div>
 		</div>
@@ -1193,6 +1193,12 @@
 
 		    // 완료 문서 알람 표기
 			function clearNotification(authorNo) {
+			    // 로그 추가: authorNo 확인
+			    console.log('clearNotification 호출됨, authorNo:', authorNo);
+			
+			    // CSRF Token 로그 추가
+			    console.log('CSRF Token:', csrfToken);
+			
 			    fetch(`/authorization/clearAuthorNotification/${authorNo}`, {
 			        method: 'GET',
 			        headers: {
@@ -1200,16 +1206,29 @@
 			        }
 			    })
 			    .then(response => {
+			        // 응답 상태 코드 로그 추가
+			        console.log('응답 상태 코드:', response.status);
+			
 			        if (response.ok) {
 			            console.log('알림이 성공적으로 제거되었습니다.');
+			            
 			            // 알림 배지를 숨김 처리
 			            const authorBadge = document.getElementById("author-list-link").querySelector('.notification-badge');
+			            console.log('authorBadge 요소:', authorBadge);  // 알림 배지 확인
 			            if (authorBadge) {
 			                authorBadge.style.display = 'none';
+			                console.log('알림 배지가 숨겨졌습니다.');
+			            } else {
+			                console.log('알림 배지 요소를 찾을 수 없습니다.');
 			            }
+			
 			            const mainNotification = document.getElementById("main-notification");
+			            console.log('mainNotification 요소:', mainNotification);  // 메인 알림 확인
 			            if (mainNotification) {
 			                mainNotification.style.display = 'none';
+			                console.log('메인 알림이 숨겨졌습니다.');
+			            } else {
+			                console.log('메인 알림 요소를 찾을 수 없습니다.');
 			            }
 			        } else {
 			            throw new Error('알림 제거 요청이 실패했습니다.');
@@ -1219,6 +1238,7 @@
 			        console.error('Error clearing notification:', error);
 			    });
 			}
+
 
 
 

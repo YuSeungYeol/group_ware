@@ -570,26 +570,35 @@ public class AuthorizationService {
 
 	    // 기안자 알람
 	    public boolean hasAuthorNotifications(Long memNo) {
-	        return authorizationRepository.existsByMember_MemNoAndAuthorStatusNot(memNo, "C");
+	        return authorizationRepository.existsByMember_MemNoAndAuthorStatusNotAndAuthorStatusNot(memNo, "C", "T");
 	    }
 	    
 	    // 알림 해제 로직
 	    @Transactional
 	    public void clearAuthorNotification(Long authorNo, Long memNo) {
+	        System.out.println("clearAuthorNotification 메서드 호출됨, authorNo: " + authorNo + ", memNo: " + memNo);
+	        
 	        // 문서가 memNo 사용자의 문서인지 확인
 	        Optional<Authorization> authorizationOpt = authorizationRepository.findByAuthorNoAndMember_MemNo(authorNo, memNo);
+	        System.out.println("authorizationOpt.isPresent(): " + authorizationOpt.isPresent());
 
 	        if (authorizationOpt.isPresent()) {
 	            Authorization authorization = authorizationOpt.get();
+	            System.out.println("현재 문서 상태: " + authorization.getAuthorStatus());
 
 	            // 'Y'(승인) 또는 'N'(반려) 상태일 때만 상태를 'C'로 변경하여 알림을 제거
 	            if ("Y".equals(authorization.getAuthorStatus()) || "N".equals(authorization.getAuthorStatus()) || "R".equals(authorization.getAuthorStatus())) {
 	                authorization.setAuthorStatus("C"); // 상태를 'C'로 변경
 	                authorizationRepository.save(authorization); // 상태 업데이트
-	                System.out.println("알림이 해제되었습니다: 문서 번호 " + authorNo);
+	                System.out.println("상태가 'C'로 변경되었습니다. 문서 번호: " + authorNo);
+	            } else {
+	                System.out.println("알림 상태를 'C'로 변경할 수 없습니다. 현재 상태: " + authorization.getAuthorStatus());
 	            }
+	        } else {
+	            System.out.println("Authorization을 찾을 수 없습니다. 문서 번호: " + authorNo);
 	        }
 	    }
+
 
 
 

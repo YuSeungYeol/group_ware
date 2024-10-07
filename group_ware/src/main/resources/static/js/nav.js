@@ -77,16 +77,32 @@ function generateTree(distributors) {
         return;
     }
 
-    const treeData = distributors.map(distributor => ({
-        "id": `distributor_${distributor.distributorNo}`,  // distributorNo를 ID로 설정
-        "text": distributor.distributorName,  // 지점 이름
-        "children": distributor.members.map(member => ({  // 각 지점의 멤버를 children으로 추가
-            "id": `member_${member.mem_no}`,  // 멤버 ID
-            "text": `${member.mem_name} ${member.rank_name}`,  // 멤버 이름과 직급
-            "icon": "fa fa-user"  // 아이콘 추가
-        })),
-        "state": { "opened": false }  // 기본적으로 닫힌 상태로 표시
-    }));
+	const treeData = distributors.map(distributor => ({
+	    "id": `distributor_${distributor.distributorNo}`,  // distributorNo를 ID로 설정
+	    "text": distributor.distributorName,  // 지점 이름
+	    "children": distributor.members.map(member => {
+	        // 멤버의 근무 상태에 따라 아이콘 색상 결정
+	        let workStatusIcon = "";
+	        if (member.workStatus === "출근") {
+	            workStatusIcon = "<span class='status-icon' style='background-color: green; border-radius: 50%; width: 10px; height: 10px; display: inline-block;'></span>"; // 출근 (초록색)
+	        } else if (member.workStatus === "퇴근") {
+	            workStatusIcon = "<span class='status-icon' style='background-color: red; border-radius: 50%; width: 10px; height: 10px; display: inline-block;'></span>"; // 퇴근 (빨간색)
+	        } else if (member.workStatus === "착석") {
+	            workStatusIcon = "<span class='status-icon' style='background-color: gray; border-radius: 50%; width: 10px; height: 10px; display: inline-block;'></span>"; // 착석 (회색)
+	        } else if (member.workStatus === "외근" || member.workStatus === "외출" || member.workStatus === "식사") {
+	            workStatusIcon = "<span class='status-icon' style='background-color: purple; border-radius: 50%; width: 10px; height: 10px; display: inline-block;'></span>"; // 외근, 외출, 식사 (보라색)
+	        }
+
+	        // 멤버 이름, 직급과 상태 아이콘을 추가
+	        return {
+	            "id": `member_${member.mem_no}`,  // 멤버 ID
+	            "text": `${member.mem_name} ${member.rank_name} ${workStatusIcon}`,  // 멤버 이름, 직급, 상태 아이콘
+	            "icon": "fa fa-user",  // 유저 아이콘 추가
+	        };
+	    }),
+	    "state": { "opened": false }  // 기본적으로 닫힌 상태로 표시
+	}));
+
 
     // jstree 적용
     $('#organizationTree').jstree({

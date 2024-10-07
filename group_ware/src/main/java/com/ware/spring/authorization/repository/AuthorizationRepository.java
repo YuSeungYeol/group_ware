@@ -35,10 +35,11 @@ public interface AuthorizationRepository extends JpaRepository<Authorization, Lo
     Page<Authorization> findByAuthorStatusIn(List<String> statuses, Pageable pageable);
 
     // 알람 관련
-	boolean existsByMember_MemNoAndAuthorStatusNot(Long memNo, String string);
+    boolean existsByMember_MemNoAndAuthorStatusNotAndAuthorStatusNot(Long memNo, String status1, String status2);
 
 	// 알람 삭제
 	Optional<Authorization> findByAuthorNoAndMember_MemNo(Long authorNo, Long memNo);
+
 
 	
 
