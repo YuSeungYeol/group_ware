@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Page Not Found</title>
+    <link th:href="@{/css/error/error.css}" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <!-- 에러 페이지 전체 컨테이너 -->
+    <div class="error-container">
+        <!-- 배경 이미지 -->
+        <div class="background-image"></div>
+
+        <!-- 열리는 애니메이션 요소 -->
+        <div class="white-background" id="white-background-left"></div>
+        <div class="white-background" id="white-background-right"></div>
+
+        <!-- 에러 메시지가 있는 부분 -->
+        <div class="error-box hidden" id="error-box">
+            <h1>해당 페이지가 존재하지 않습니다.</h1>
+            <p>죄송합니다. 찾으시는 페이지가 존재하지 않습니다.</p>
+            <button onclick="goBack()">홈으로 돌아가기</button>
+        </div>
+    </div>
+
+    <!-- 스크립트 -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // 배경 열림 애니메이션 시작
+            function openBackground() {
+                const leftBg = document.getElementById("white-background-left");
+                const rightBg = document.getElementById("white-background-right");
+                const errorBox = document.getElementById("error-box");
+
+                leftBg.classList.add("open-left");
+                rightBg.classList.add("open-right");
+
+                setTimeout(() => {
+                    errorBox.classList.remove("hidden");
+                    errorBox.classList.add("show");
+                }); // 애니메이션 시간에 맞춰 에러 박스 표시
+            }
+
+            setTimeout(openBackground, 500); 
+        });
+
+        function goBack() {
+            const leftBg = document.getElementById("white-background-left");
+            const rightBg = document.getElementById("white-background-right");
+            const errorBox = document.getElementById("error-box");
+
+            // 에러 박스가 위로 사라지는 애니메이션
+            errorBox.classList.add("slide-up");
+
+            // 즉시 리다이렉트
+            leftBg.classList.remove("open-left");
+            rightBg.classList.remove("open-right");
+            leftBg.classList.add("close-left");
+            rightBg.classList.add("close-right");
+
+            window.location.href = "/"; // 애니메이션 없이 즉시 홈으로 이동
+        }
+    </script>
+</body>
+</html>
