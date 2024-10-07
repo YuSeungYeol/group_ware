@@ -1,6 +1,8 @@
 package com.ware.spring.member.service;
 
+import java.lang.reflect.Member;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.ware.spring.commute.domain.Commute;
 import com.ware.spring.member.domain.Distributor;
 import com.ware.spring.member.domain.DistributorDto;
 import com.ware.spring.member.domain.MemberDto;
@@ -111,6 +114,8 @@ public class DistributorService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 지점을 찾을 수 없습니다. 지점 번호: " + distributorNo));
         return DistributorDto.toDto(distributor);
     }
+    
+ 
 }
 
 

@@ -14,12 +14,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.ware.spring.commute.domain.Commute;
 import com.ware.spring.member.domain.Distributor;
 import com.ware.spring.member.domain.Member;
 import com.ware.spring.member.domain.Rank;
 import com.ware.spring.member.repository.DistributorRepository;
 import com.ware.spring.member.repository.MemberRepository;
 import com.ware.spring.member.repository.RankRepository;
+import com.ware.spring.member.service.DistributorService;
 import com.ware.spring.member.service.MemberService;
 import com.ware.spring.security.vo.SecurityUser;
 
@@ -31,13 +33,16 @@ public class MemberViewController {
     private final MemberRepository memberRepository;
     private final RankRepository rankRepository;
     private final DistributorRepository distributorRepository;
+    private final DistributorService distributorService; 
 
     @Autowired
-    public MemberViewController(MemberService memberService,MemberRepository memberRepository, RankRepository rankRepository, DistributorRepository distributorRepository) {
+    public MemberViewController(MemberService memberService,MemberRepository memberRepository, RankRepository rankRepository, DistributorRepository distributorRepository
+    		,DistributorService distributorService) {
         this.memberRepository = memberRepository;
         this.rankRepository = rankRepository;
         this.distributorRepository = distributorRepository;
         this.memberService = memberService;
+        this.distributorService = distributorService;
     }
 
     
@@ -138,6 +143,7 @@ public class MemberViewController {
         // member_info.html로 이동
         return "member/member_info";
     }
+
 
 
 }

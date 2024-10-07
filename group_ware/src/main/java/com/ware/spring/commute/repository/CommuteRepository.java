@@ -74,4 +74,6 @@ public interface CommuteRepository extends JpaRepository<Commute, Long> {
     	                                     @Param("endDate") LocalDateTime endDate);
     	@Query("SELECT c FROM Commute c WHERE c.member.memNo = :memNo AND c.commuteOnStartTime BETWEEN :startDateTime AND :endDateTime")
     	    List<Commute> findCommutesByMemberAndDateRange(@Param("memNo") Long memNo, @Param("startDateTime") LocalDateTime startDateTime, @Param("endDateTime") LocalDateTime endDateTime);
+
+		Optional<Commute> findByMemNo(Long memNo);
 }

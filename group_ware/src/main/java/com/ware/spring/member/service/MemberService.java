@@ -19,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ware.spring.commute.domain.Commute;
+import com.ware.spring.commute.repository.CommuteRepository;
 import com.ware.spring.member.domain.Distributor;
 import com.ware.spring.member.domain.Member;
 import com.ware.spring.member.domain.MemberDto;
@@ -35,12 +37,14 @@ public class MemberService {
     private final RankRepository rankRepository;
     private final PasswordEncoder passwordEncoder;
 
+
     @Autowired
     public MemberService(MemberRepository memberRepository, DistributorRepository distributorRepository, RankRepository rankRepository, PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
         this.distributorRepository = distributorRepository;
         this.rankRepository = rankRepository;
         this.passwordEncoder = passwordEncoder;
+
     }
 
     // 사원번호 생성 로직
@@ -326,4 +330,6 @@ public class MemberService {
         existingMember.setMemOff(memberDto.getMem_off());
         memberRepository.save(existingMember);
     }
+    
+
 }
