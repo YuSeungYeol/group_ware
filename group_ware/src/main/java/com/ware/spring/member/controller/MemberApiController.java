@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -215,10 +216,22 @@ public class MemberApiController {
 
         return ResponseEntity.ok(response);
     }
-    @ResponseBody
+    
     @PostMapping("/edit")
-    public ResponseEntity<?> editMember(@RequestBody MemberDto memberDto) {
-    	return ResponseEntity.ok("Member edited successfully");
+    public ResponseEntity<?> editMember(
+        @RequestPart("memberData") MemberDto memberDto,
+        @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+        try {
+            // 회원 정보 업데이트 로직
+            memberService.editMember(memberDto, profileImage);
+            return ResponseEntity.ok().body("회원 정보가 성공적으로 수정되었습니다.");
+        } catch (Exception e) {
+            // 예외 발생 시 구체적인 메시지 로그에 출력
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("회원 정보 수정 중 오류가 발생했습니다. 오류: " + e.getMessage());
         }
     }
+}
+
 

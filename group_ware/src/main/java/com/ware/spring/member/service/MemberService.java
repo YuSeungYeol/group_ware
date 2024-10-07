@@ -298,4 +298,32 @@ public class MemberService {
     	}
     	return memberDtoList;
     }
+    
+    public void editMember(MemberDto memberDto, MultipartFile profilePicture) throws IOException {
+        // 사원번호가 아니라 회원 번호(mem_no)로 회원 찾기
+        Member existingMember = memberRepository.findByMemNo(memberDto.getMem_no())
+            .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다: " + memberDto.getMem_no()));
+        System.out.println("Received member data: " + memberDto);
+        // 공통 로직: 필수 필드 유지, 회원 정보 수정
+        existingMember.setMemName(memberDto.getMem_name());
+        existingMember.setMemPhone(memberDto.getMem_phone());
+        existingMember.setMemEmail(memberDto.getMem_email());
+        // 직급과 지점 수정
+        Rank rank = rankRepository.findById(memberDto.getRank_no())
+            .orElseThrow(() -> new IllegalArgumentException("해당 직급을 찾을 수 없습니다."));
+        existingMember.setRank(rank);
+        Distributor distributor = distributorRepository.findById(memberDto.getDistributor_no())
+            .orElseThrow(() -> new IllegalArgumentException("해당 지점을 찾을 수 없습니다."));
+        existingMember.setDistributor(distributor);
+        // 프로필 사진 처리
+        if (profilePicture != null && !profilePicture.isEmpty()) {
+            String savedFileName = saveProfilePicture(profilePicture, existingMember.getDistributor().getDistributorName(), existingMember.getMemName());
+            existingMember.setProfileSaved(savedFileName);
+        } else {
+            existingMember.setProfileSaved(existingMember.getProfileSaved());  // 기존 사진 유지
+        }
+        // 기타 정보 수정 및 저장
+        existingMember.setMemOff(memberDto.getMem_off());
+        memberRepository.save(existingMember);
+    }
 }
