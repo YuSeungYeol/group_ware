@@ -33,8 +33,14 @@ table.table-custom tbody td {
     border-bottom: 1px solid #ddd;
 }
 
-table.table-custom tbody tr:nth-child(odd) {
-    background-color: rgba(209, 201, 240, 0.3);
+table.table-custom tbody a {
+    color: inherit; /* 부모 요소(기본 글씨 색상)와 동일하게 */
+    text-decoration: none; /* 밑줄 제거 */
+}
+
+table.table-custom tbody a:hover {
+    color: #333; /* 마우스 올렸을 때 색상 */
+    text-decoration: underline; /* 마우스 올렸을 때 밑줄 표시 */
 }
 
 table.table-custom tbody tr:hover {

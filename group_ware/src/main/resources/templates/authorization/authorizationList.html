@@ -1191,9 +1191,8 @@
 	            }
 	        }
 
-
-			// 완료 문서 알람 표기
-		    function clearNotification(authorNo) {
+		    // 완료 문서 알람 표기
+			function clearNotification(authorNo) {
 			    fetch(`/authorization/clearAuthorNotification/${authorNo}`, {
 			        method: 'GET',
 			        headers: {
@@ -1220,6 +1219,7 @@
 			        console.error('Error clearing notification:', error);
 			    });
 			}
+
 
 
 

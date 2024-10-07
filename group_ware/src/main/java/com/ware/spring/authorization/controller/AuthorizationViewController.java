@@ -89,15 +89,6 @@ public class AuthorizationViewController {
         return "authorization/authorizationList";
     }
 
-
-
-
-
-
-
-
-
-
     @GetMapping("/authorization/authorizationCreate")
     public String createAuthorizationPage(Model model, Principal principal) {
         // 로그인한 사용자의 사용자명(ID)을 가져옴

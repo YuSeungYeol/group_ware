@@ -106,7 +106,7 @@
                                 </tr>
                             </tbody>
                         </table>
-
+						<br>
                         <!-- 문서 타입에 따른 필드 설정 -->
                         <div id="leaveFields" th:if="${authorization != null and authorization.doctype == 'off Report'}">
                             <label>휴가 구분</label>
@@ -169,7 +169,7 @@
                                 <textarea class="ckeditor_change" th:utext="${authorization != null ? authorization.authContent : ''}"></textarea>
                             </div>
                         </div>
-
+						<br>
                         <!-- File Upload -->
                         <div>
                             <input type="file" name="content" class="file-custom">
