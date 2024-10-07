@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Sort;  
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ import com.ware.spring.authorization.service.AuthorizationService;
 import com.ware.spring.member.domain.Member;
 import com.ware.spring.member.repository.MemberRepository;
 import com.ware.spring.member.service.MemberService;
+import com.ware.spring.security.vo.SecurityUser;
 
 @Controller
 public class AuthorizationViewController {
@@ -68,12 +70,14 @@ public class AuthorizationViewController {
     public String listAuthorizations(
             @RequestParam(value = "draftPage", defaultValue = "0") int draftPage,
             @RequestParam(value = "completedPage", defaultValue = "0") int completedPage,
-            Model model
-    ) {
-        Pageable draftPageable = PageRequest.of(draftPage, 5); // 페이지당 10개 문서 표시
+            Model model) {
+
+        // 기안 진행 목록 페이지 처리 (authorRegDate 기준으로 내림차순 정렬)
+        Pageable draftPageable = PageRequest.of(draftPage, 5, Sort.by(Sort.Direction.DESC, "authorRegDate"));
         Page<Authorization> resultList = authorizationService.getDraftAuthorizations(draftPageable);
 
-        Pageable completedPageable = PageRequest.of(completedPage, 5);
+        // 완료 문서 페이지 처리 (authorRegDate 기준으로 내림차순 정렬)
+        Pageable completedPageable = PageRequest.of(completedPage, 5, Sort.by(Sort.Direction.DESC, "authorRegDate"));
         Page<Authorization> completedList = authorizationService.getCompletedAuthorizations(completedPageable);
 
         // 모델에 추가 (getContent()로 리스트만 가져옴)
@@ -84,6 +88,11 @@ public class AuthorizationViewController {
 
         return "authorization/authorizationList";
     }
+
+
+
+
+
 
 
 
@@ -162,7 +171,11 @@ public class AuthorizationViewController {
 
     // 임시 저장함
     @GetMapping("/authorization/authorizationStorage")
-    public String selectTemporaryAuthorizationList(@PageableDefault(size = 5) Pageable pageable, Model model, Principal principal) {
+    public String selectTemporaryAuthorizationList(
+            @PageableDefault(size = 5) Pageable pageable, 
+            Model model, 
+            Principal principal) {
+        
         // 로그인한 사용자의 empNo 가져오기
         String memName = principal.getName();
         Optional<Member> memberOpt = memberRepository.findByMemName(memName);
@@ -174,8 +187,14 @@ public class AuthorizationViewController {
             System.out.println("Member with name " + memName + " not found.");
         }
 
+        // 정렬을 포함한 Pageable 객체 생성 (authorRegDate 기준 내림차순 정렬)
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(), 
+                pageable.getPageSize(), 
+                Sort.by(Sort.Direction.DESC, "authorRegDate"));
+
         // 페이징 처리된 임시 저장 문서 리스트 가져오기
-        Page<AuthorizationDto> tempListPage = authorizationService.selectTemporaryAuthorizationList(pageable);
+        Page<AuthorizationDto> tempListPage = authorizationService.selectTemporaryAuthorizationList(sortedPageable);
 
         // 페이징된 리스트를 모델에 추가
         model.addAttribute("tempListPage", tempListPage);
@@ -184,6 +203,7 @@ public class AuthorizationViewController {
 
         return "authorization/authorizationStorage";
     }
+
 
 
 

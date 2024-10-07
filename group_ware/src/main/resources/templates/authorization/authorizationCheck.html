@@ -47,21 +47,22 @@
 		        
 		        <!-- 페이징 블록 -->
 		        <div class="pagination">
-		            <!-- 이전 페이지 링크: 2 페이지 이상일 때만 표시 -->
-		            <a th:href="@{/authorization/authorizationCheck(page=${authorizationPage.pageable.pageNumber - 1})}" 
-		               th:if="${authorizationPage.pageable.pageNumber > 0}">&lsaquo;</a>
-		
-		            <!-- 페이지 번호 반복 (현재 페이지 기준으로 앞뒤로 최대 3개) -->
-		            <span th:each="i : ${#numbers.sequence(authorizationPage.pageable.pageNumber > 0 ? authorizationPage.pageable.pageNumber : 1, authorizationPage.pageable.pageNumber + 2 < authorizationPage.totalPages ? authorizationPage.pageable.pageNumber + 2 : authorizationPage.totalPages)}">
-		                <a th:text="${i}" 
-		                   th:href="@{/authorization/authorizationCheck(page=${i - 1})}" 
-		                   th:classappend="${i == authorizationPage.pageable.pageNumber + 1} ? 'active'">1</a>
-		            </span>
-		
-		            <!-- 다음 페이지 링크: 마지막 페이지가 아닐 때만 표시 -->
-		            <a th:href="@{/authorization/authorizationCheck(page=${authorizationPage.pageable.pageNumber + 1})}" 
-		               th:if="${authorizationPage.pageable.pageNumber + 1 < authorizationPage.totalPages}">&rsaquo;</a>
-		        </div>
+    <!-- 이전 페이지 링크: 2 페이지 이상일 때만 표시 -->
+    <a th:href="@{/authorization/authorizationCheck(page=${authorizationPage.pageable.pageNumber - 1})}" 
+       th:if="${authorizationPage.pageable.pageNumber > 0}">&lsaquo;</a>
+
+    <!-- 페이지 번호 반복 (현재 페이지 기준으로 앞뒤로 최대 3개) -->
+    <span th:each="i : ${#numbers.sequence(1, authorizationPage.pageable.pageNumber + 2 < authorizationPage.totalPages ? authorizationPage.pageable.pageNumber + 2 : authorizationPage.totalPages)}">
+        <a th:text="${i}" 
+           th:href="@{/authorization/authorizationCheck(page=${i - 1})}" 
+           th:classappend="${i == authorizationPage.pageable.pageNumber + 1} ? 'active'">1</a>
+    </span>
+
+    <!-- 다음 페이지 링크: 마지막 페이지가 아닐 때만 표시 -->
+    <a th:href="@{/authorization/authorizationCheck(page=${authorizationPage.pageable.pageNumber + 1})}" 
+       th:if="${authorizationPage.pageable.pageNumber + 1 < authorizationPage.totalPages}">&rsaquo;</a>
+</div>
+
 		    </div>
 		</section>
 

@@ -10,6 +10,8 @@
 	    <!-- CSRF 토큰 추가 -->
 	    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" id="csrfToken">
 	    <input type="hidden" id="authorNo" name="authorNo" th:value="${authorization != null ? authorization.authorNo : ''}" />
+	    <input type="hidden" id="empNo" name="empNo" th:value="${empNo}">
+	    
 	
 	    <div class="main-content-custom">
 	        <div id="section_wrap">
@@ -59,11 +61,11 @@
 					<!-- 기안 진행 목록 페이징 -->
 					<div class="pagination">
 					    <!-- 이전 페이지 링크: 2 페이지 이상일 때만 표시 -->
-					    <a th:href="@{/authorization/authorizationList(draftPage=${draftPage.pageable.pageNumber - 1}, completedPage=${completedPage.pageable.pageNumber})}" 
-					       th:if="${draftPage.pageable.pageNumber > 0}">&lsaquo;</a>
+					    <a th:href="@{/authorization/authorizationList(draftPage=${draftPage.pageable.pageNumber > 0 ? draftPage.pageable.pageNumber - 1 : 0}, completedPage=${completedPage.pageable.pageNumber})}" 
+   							th:if="${draftPage.pageable.pageNumber > 0}">&lsaquo;</a>
 					
 					    <!-- 페이지 번호 반복 (현재 페이지 기준으로 앞뒤로 최대 3개) -->
-					    <span th:each="i : ${#numbers.sequence(draftPage.pageable.pageNumber > 0 ? draftPage.pageable.pageNumber : 1, draftPage.pageable.pageNumber + 2 < draftPage.totalPages ? draftPage.pageable.pageNumber + 2 : draftPage.totalPages)}">
+					    <span th:each="i : ${#numbers.sequence(1, draftPage.pageable.pageNumber + 2 < draftPage.totalPages ? draftPage.pageable.pageNumber + 2 : draftPage.totalPages)}">
 					        <a th:text="${i}" 
 					           th:href="@{/authorization/authorizationList(draftPage=${i - 1}, completedPage=${completedPage.pageable.pageNumber})}" 
 					           th:classappend="${i == draftPage.pageable.pageNumber + 1} ? 'active'">1</a>
@@ -138,7 +140,7 @@
 	                <div id="section_wrap">
 	                    <form id="authorizationAddFrm" enctype="multipart/form-data">
 	                        <div id="section" class="form-section">
-	                            <input type="button" value="새 결재 진행" style="float:right;" onclick="openModal()">
+	                            <input type="button" class="btn-custom" value="새 결재 진행" style="float:right;" onclick="openModal()">
 	                            <!-- 모달 창 -->
 	                            <div id="documentModal" class="modal-custom" style="display: none;">
 	                                <h3>결재 양식 선택</h3>
@@ -217,7 +219,7 @@
               </tbody>
             </table>
             <button id="closeBtn" class="btn-custom">확인</button> 
-			<button id="recallButton" type="button" onclick="recallDocument(event)">회수</button>
+			<button id="recallButton" class="btn-custom" type="button" onclick="recallDocument(event)">회수</button>
           </div>
         </div>
        <div id="approvalModalBackground" class="modal-background-custom"></div>
@@ -370,10 +372,11 @@
 		
 		        <!-- File Upload -->
 		        <div>
-		            <input type="file" name="content">
+		            <input type="file" name="content" class="file-custom">
 		        </div>
+		        <br>
 				<button id="completedCloseBtn" class="btn-custom">확인</button> <!-- custom 클래스 추가 -->
-				<button id="savePdfButton">PDF로 저장</button>
+				<button id="savePdfButton" class="btn-custom">PDF로 저장</button>
 		    </div>
 		</div>
        <div id="completedModalBackground" class="modal-background-custom"></div>
@@ -822,30 +825,36 @@
 
 		    
 		
-		 	// 모달 닫기 기능 추가
+		 // 모달 닫기 기능 추가
 		    document.querySelector('.close').addEventListener('click', function() {
 		        document.getElementById('approvalModal').style.display = 'none';
+		        document.getElementById('approvalModalBackground').style.display = 'none'; // 배경도 닫기
 		    });
 
 		    // 닫기 버튼이 여러 개 있을 경우
 		    document.querySelectorAll('.close').forEach(closeBtn => {
 		        closeBtn.addEventListener('click', function() {
 		            document.getElementById('approvalModal').style.display = 'none';
+		            document.getElementById('approvalModalBackground').style.display = 'none'; // 배경도 닫기
 		        });
 		    });
 
 		    // 확인 버튼 클릭 시 모달 닫기 기능 추가
 		    document.getElementById('closeBtn').addEventListener('click', function() {
 		        document.getElementById('approvalModal').style.display = 'none';
+		        document.getElementById('approvalModalBackground').style.display = 'none'; // 배경도 닫기
 		    });
 
 		    // 모달 바깥쪽 클릭 시 닫기
 		    window.addEventListener('click', function(event) {
 		        const modal = document.getElementById('approvalModal');
-		        if (event.target == modal) {
+		        const modalBackground = document.getElementById('approvalModalBackground');
+		        if (event.target == modalBackground) {
 		            modal.style.display = 'none';
+		            modalBackground.style.display = 'none'; // 배경도 닫기
 		        }
 		    });
+
 		    
 		 	// CompletedApprovalModal 모달 닫기 기능 추가
 		    document.querySelectorAll('.close').forEach(closeBtn => {

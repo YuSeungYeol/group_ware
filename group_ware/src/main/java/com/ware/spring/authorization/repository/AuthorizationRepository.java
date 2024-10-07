@@ -40,6 +40,8 @@ public interface AuthorizationRepository extends JpaRepository<Authorization, Lo
 	// 알람 삭제
 	Optional<Authorization> findByAuthorNoAndMember_MemNo(Long authorNo, Long memNo);
 
+	
+
 
 
 }

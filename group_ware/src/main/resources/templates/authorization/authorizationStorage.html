@@ -53,17 +53,25 @@
 					</div>
                     <!-- 페이징 버튼 -->
 					<div class="pagination">
+					    <!-- '처음' 링크, 2 페이지 이상일 때만 표시 -->
 					    <a th:href="@{/authorization/authorizationStorage(page=${currentPage - 2})}" th:if="${currentPage > 1}">&laquo; 처음</a>
 					    <a th:href="@{/authorization/authorizationStorage(page=${currentPage - 2})}" th:if="${currentPage > 1}">&lsaquo; 이전</a>
 					    
-					    <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+					    <!-- 페이지 번호 반복 (1부터 totalPages까지), 만약 totalPages가 0이면 1로 표시 -->
+					    <span th:if="${totalPages > 0}" th:each="i : ${#numbers.sequence(1, totalPages)}">
 					        <a th:text="${i}" th:href="@{/authorization/authorizationStorage(page=${i - 1})}"
 					           th:classappend="${i == currentPage} ? 'active'">1</a>
 					    </span>
+					    <!-- totalPages가 0이면 1로 표시 -->
+					    <span th:if="${totalPages == 0}">
+					        <a th:text="1" th:class="'active'"></a>
+					    </span>
 					    
-					    <a th:href="@{/authorization/authorizationStorage(page=${currentPage})}" th:if="${currentPage < totalPages}">다음 &rsaquo;</a>
-					    <a th:href="@{/authorization/authorizationStorage(page=${totalPages - 1})}" th:if="${currentPage < totalPages}">끝 &raquo;</a>
+					    <!-- '다음' 및 '끝' 링크, 마지막 페이지가 아닐 때만 표시 -->
+					    <a th:href="@{/authorization/authorizationStorage(page=${currentPage})}" th:if="${currentPage < totalPages && totalPages > 1}">다음 &rsaquo;</a>
+					    <a th:href="@{/authorization/authorizationStorage(page=${totalPages - 1})}" th:if="${currentPage < totalPages && totalPages > 1}">끝 &raquo;</a>
 					</div>
+
                 </div>
             </div>
         </section>

@@ -138,9 +138,6 @@ public class AuthorizationService {
     }
 
 
-
-
-
     // 결재자 경로 업데이트
     @Transactional
     public void saveAuthorizationData(AuthorizationDto dto, List<Long> approvers, Long referer) {
@@ -284,10 +281,6 @@ public class AuthorizationService {
         System.out.println("로그인된 사용자 정보 없음");
         return Page.empty(); // 인증되지 않은 경우 빈 페이지 반환
     }
-
-
-
-    
 
 
     // 승인 처리 메서드
@@ -573,6 +566,7 @@ public class AuthorizationService {
 	    public Page<Authorization> getCompletedAuthorizations(Pageable pageable) {
 	        return authorizationRepository.findByAuthorStatusIn(Arrays.asList("Y", "N", "C"), pageable); // "Y": 승인, "N": 반려
 	    }
+
 
 	    // 기안자 알람
 	    public boolean hasAuthorNotifications(Long memNo) {
