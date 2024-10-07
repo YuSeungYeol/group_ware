@@ -1,41 +1,168 @@
-/* 전체 섹션 스타일 */
+/* Main container styles */
 .main-content-custom {
-    margin-left: 285px; /* 사이드바 너비에 맞춤 */
-    padding: 20px;
-    background-color: #f4f4f4;
-    min-height: 100vh; /* 전체 페이지를 채우는 높이 */
-    margin-right: 150px;
+    min-height: 500px;
+    max-width: 100%;
+    margin-top: 50px;
+    margin-left: 270px;
+    margin-right: 100px;
+    padding: 80px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
-/* 테이블 스타일 */
-.table-custom {
+/* Table styles */
+table.table-custom {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
     margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
 }
 
-.table-custom th, .table-custom td {
-    padding: 12px;
-    text-align: center;
+table.table-custom thead th {
+    background-color: rgba(209, 201, 240, 0.6);
+    color: black;
+    text-align: left;
+    padding: 10px;
     border-bottom: 1px solid #ddd;
 }
 
-.table-custom th {
-    background-color: #f2f2f2;
-    font-weight: bold;
+table.table-custom tbody td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
 }
 
-.table-custom td a {
-    color: #007bff;
+table.table-custom tbody a {
+    color: inherit; /* 부모 요소(기본 글씨 색상)와 동일하게 */
+    text-decoration: none; /* 밑줄 제거 */
+}
+
+table.table-custom tbody a:hover {
+    color: #333; /* 마우스 올렸을 때 색상 */
+    text-decoration: underline; /* 마우스 올렸을 때 밑줄 표시 */
+}
+
+table.table-custom tbody tr:hover {
+    background-color: rgba(209, 201, 240, 0.1);
+}
+
+td[colspan="4"] {
+    text-align: center;
+    font-style: italic;
+    color: #888;
+    padding: 20px;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* 모든 버튼을 수직 정렬 */
+    gap: 5px; /* 버튼 간의 간격 */
+}
+
+.pagination a {
+    padding: 8px 16px;
     text-decoration: none;
+    color: black;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    line-height: 1.5;
+    display: flex;
+    align-items: center; /* 각 버튼 안의 내용도 수직 정렬 */
+	font-weight : bold;
 }
 
-.table-custom td a:hover {
-    text-decoration: underline;
+div.pagination a.prev, div.pagination a.next {
+    font-size: 16px;
+    padding: 10px 12px;
+    vertical-align: middle;
+    display: inline-block;
 }
 
-/* 테이블 hover 효과 */
-.table-custom tr:hover {
-    background-color: #f9f9f9;
+
+.pagination a:hover {
+    background-color: #ddd;
+}
+
+.pagination .active {
+    font-weight: bold;
+    background-color: #ccc;
+    pointer-events: none;
+    vertical-align: middle;
+}
+
+
+/* Button styles */
+.btn-custom {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    background-color: #F6F4FA;
+    color: #666;
+    transition: background-color 0.3s;
+}
+
+.btn-custom:hover {
+    background-color: #ddd;
+}
+
+.file-custom {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    background-color: #F6F4FA;
+    color: #666;
+    transition: background-color 0.3s;
+}
+
+/* Modal styles */
+.modal-custom {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.modal-background-custom {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 900;
+}
+
+/* Word section styles */
+.word {
+    margin-bottom: 20px;
+}
+
+.word h3 {
+    font-size: 1.5em;
+    color: #333;
+    text-align: left;
+}
+
+/* CSRF token hidden input styles (for visibility) */
+input[type="hidden"]#csrfToken {
+    display: none;
 }

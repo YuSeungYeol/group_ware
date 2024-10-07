@@ -1,0 +1,115 @@
+/* 메인 컨테이너 스타일 */
+.main-content-custom {
+    min-height: 500px;
+    max-width: 100%;
+    margin-top: 50px;
+    margin-left: 270px;
+    margin-right: 100px;
+    padding: 50px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 게시글 정보 테이블 스타일 */
+._detail table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    color: #333;
+    table-layout: fixed; /* 테이블 셀 너비 고정 */
+}
+
+._detail td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: 16px;
+    word-wrap: break-word;
+    vertical-align: top;
+}
+
+/* 제목과 작성자 간 간격 조절 */
+._detail td:first-child {
+    width: 9%; /* 제목 칸 너비 */
+    font-weight: bold;
+    color: #555;
+}
+
+._detail td:nth-child(2) {
+    width: 55%; /* 게시글 제목 칸 넓게 조정 */
+    color: #333;
+}
+
+._detail td:nth-child(3) {
+    width: 10%; /* 작성자 라벨 칸 */
+    text-align: right; /* 라벨을 오른쪽 정렬 */
+    font-weight: bold;
+    color: #555;
+}
+
+._detail td:nth-child(4) {
+    width: 20%; /* 작성자 이름 칸 */
+    text-align: left; /* 이름을 왼쪽 정렬 */
+    color: #333;
+}
+
+
+/* 게시글 내용 박스 */
+.content-box {
+    width: calc(100% - 20px); /* 테두리와 딱 맞추도록 너비 조정 */
+    min-height: 200px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-right: 0; /* 오른쪽 여백을 없앰 */
+}
+
+/* 등록일 텍스트 스타일 */
+._detail td[colspan="3"] {
+    font-size: 12px;
+    color: #999;
+}
+
+/* 버튼 스타일 */
+.buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.update_notice_button, .delete_notice_button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #f6f4fa;
+    border: 1px solid #d1c9f0;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #666;
+    font-size: 16px;
+    margin-left: 10px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.update_notice_button:hover, .delete_notice_button:hover {
+    background-color: #d1c9f0;
+    color: #333;
+    cursor: pointer;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .main-content-custom {
+        margin-left: 20px;
+        margin-right: 20px;
+        padding: 30px;
+    }
+    .buttons {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+    .buttons a {
+        margin-bottom: 10px;
+    }
+}

@@ -1,48 +1,66 @@
-/* 전체 섹션 스타일 */
+/* Main container styles */
 .main-content-custom {
-    margin-left: 285px; /* 사이드바 너비에 맞춤 */
-    padding: 20px;
-    background-color: #f4f4f4;
-    min-height: 100vh; /* 전체 페이지를 채우는 높이 */
-    margin-right: 150px;
+    min-height: 500px;
+    max-width: 100%;
+    margin-top: 50px;
+    margin-left: 270px;
+    margin-right: 100px;
+    padding: 80px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
-/* 테이블 스타일 */
-.table-custom {
+/* Quill 에디터 및 입력 필드 스타일 */
+input[name="board_title"] {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    margin-bottom: 20px;
-}
-
-.table-custom th, .table-custom td {
-    padding: 12px;
-    text-align: center;
-    border-bottom: 1px solid #ddd;
-}
-
-.table-custom th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-}
-
-.table-custom td a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-.table-custom td a:hover {
-    text-decoration: underline;
-}
-
-/* 테이블 hover 효과 */
-.table-custom tr:hover {
-    background-color: #f9f9f9;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    margin-bottom: 10px; /* 아래 여백 추가 */
 }
 
 #board-editor {
-    width: 100%; /* 전체 너비를 페이지에 맞추기 */
-    height: 300px; /* 적절한 높이 설정 */
-    box-sizing: border-box; /* 패딩과 테두리 포함한 크기 */
-    resize: none; /* 사용자가 크기 조정 못하게 */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    height: 200px; /* 에디터 높이 설정 */
+    box-sizing: border-box;
+}
+
+/* 등록 버튼을 오른쪽 끝으로 정렬 */
+input[type="submit"] {
+    display: block;
+    margin-left: auto; /* 자동으로 왼쪽 여백을 채워서 버튼을 오른쪽으로 밀어냄 */
+    margin-top: 10px; /* 상단에 여백 추가 */
+    padding: 10px 20px;
+    background-color: #F6F4FA;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #666;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+input[type="submit"]:hover {
+    background-color: #ddd;
+}
+
+/* Word section styles */
+.word {
+    margin-bottom: 20px;
+}
+
+.word h3 {
+    font-size: 1.5em;
+    color: #333;
+    text-align: left;
+}
+
+/* CSRF token hidden input styles */
+input[type="hidden"]#csrfToken {
+    display: none;
 }
