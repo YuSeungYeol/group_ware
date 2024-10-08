@@ -1,8 +1,16 @@
 /* 전체 레이아웃 */
+
+h1 {
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
+}
 .list-container {
     width: 70%;
 	margin-left:270px;
-	margin-top:100px;
+	margin-top:10px;
 	margin-right:100px;
     padding: 2px 30px 20px 30px;
     background-color: #F6F4FA;
@@ -54,10 +62,10 @@
 
 /* 테이블 헤더 */
 .member_list th {
-    background-color: #808080b3;
-    color: white;
+    background-color: rgba(209,201,240,0.6);
+    color: black;
     font-weight: bold;
-    text-align: left;
+    text-align: center;
     padding: 12px;
     font-size: 16px;
     border-bottom: 2px solid #ddd;
@@ -66,19 +74,17 @@
 /* 테이블 본문 */
 .member_list td {
     padding: 12px;
+    text-align: center;
     border-bottom: 1px solid #ddd;
     font-size: 14px;
     color: #333;
 }
 
-/* 테이블 줄 바꿈 색 */
-.member_list tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
+
 
 /* 테이블 행에 마우스를 올렸을 때 효과 */
 .member_list tr:hover {
-    background-color: #ddd;
+    background-color: rgba(209,201,240,0.1);
 }
 
 /* 상세보기 링크 스타일 */
@@ -134,8 +140,8 @@ th.desc:after {
 	border: 1px solid #ccc;	
 }
 #search_mem_button{
-	background-color: #EFEFEF;
-    border: none;
+	background-color: white;
+    border: 1px solid #ddd;
     border-radius: 5px;
     padding: 5px;
     font-size: 0.9rem;
@@ -143,7 +149,7 @@ th.desc:after {
 }
 
 #search_mem_button:hover{
-	background-color:#ddd;
+	background-color:#f1f1f1;
 }
 #searchType{
 			padding:5px;
