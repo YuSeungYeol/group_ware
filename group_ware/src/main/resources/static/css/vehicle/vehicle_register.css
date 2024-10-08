@@ -2,7 +2,6 @@ section {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-left: 270px;
     background-color: #f0f0f0;
     border:2px solid #ccc
 }
@@ -33,15 +32,11 @@ input, select {
     border-radius: 4px;
 }
 
-button {
+.register-button {
     padding: 10px 20px;
     background-color: #007bff;
-    color: white;
+    color: black;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-}
-
-button:hover {
-    background-color: #0056b3;
 }

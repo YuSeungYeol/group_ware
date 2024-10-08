@@ -5,7 +5,7 @@
     margin-right: 100px; 
     padding : 20px;
     box-sizing: border-box;
-    background-color: #f4f4f4;
+    background-color: white;
     
 }
 
@@ -39,9 +39,9 @@ select, input[type="text"] {
 
 button[type="submit"], .delete-section button {
     padding: 10px 10px;
-    border: none;
-    background-color: #333;
-    color: white;
+    border: 1px solid #ddd;
+    background-color: white;
+    color: black;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -49,7 +49,7 @@ button[type="submit"], .delete-section button {
 }
 
 button[type="submit"]:hover {
-    background-color: #555;
+    background-color: #f1f1f1;
 }
 
 .delete-section {
@@ -58,6 +58,7 @@ button[type="submit"]:hover {
 
 .delete-section button {
     background-color: #d9534f;
+    color:white;
 }
 
 .delete-section button:hover {
@@ -76,8 +77,8 @@ table {
 }
 
 thead {
-    background-color: #333;
-    color: white;
+    background-color: rgba(209,201,240,0.6);
+    color: black;
     text-align: left;
     font-weight: bold;
 }
@@ -87,31 +88,19 @@ th, td {
     text-align: left;
 }
 
-tr:nth-child(even) {
-    background-color: #f4f4f4;
-}
+
 
 tr.selected {
     background-color: rgba(255, 99, 71, 0.3); /* 선택된 행의 배경색 강조 */
 }
 
 tr:hover {
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: rgba(209,201,240,0.1);
     transition: background-color 0.3s;
     cursor: pointer; /* 클릭 가능하게 포인터 커서 추가 */
 }
 
-a.track-link {
-    color: #007bff;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 8px 12px;
-    border-radius: 5px;
-    transition: background-color 0.3s, color 0.3s;
-    background-color: rgba(0, 0, 0, 0.05);
-}
-
-a.track-link:hover {
-    background-color: #007bff;
-    color: white;
+u{
+	color:#808080;
+	font-weight: bold;
 }
