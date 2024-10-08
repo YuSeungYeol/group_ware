@@ -1,40 +1,125 @@
-.home-content {
-    margin-left: 250px; /* 사이드바의 넓이만큼 마진 */
-    margin-right:100px;
-   	padding : 20px;
-    display: flex;
-    justify-content: space-around;
-  	flex-wrap: wrap;
+/* 공통 스타일 설정 */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
- 
-.chart-container {
-    width: 42%;
+/* 페이지의 메인 컨텐츠 설정 */
+.home-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin: 20px;
+    margin-left: 270px; /* nav 바를 위한 왼쪽 마진 */
+    margin-right: 100px; /* 오른쪽 마진 */
 }
-.chart-navigation {
-    display: inline-flex;
+
+/* 차트와 범례를 감싸는 컨테이너 - 가로 배치 */
+.chart-row-one {
+    display: flex;
+    width: 100%;
+    max-width: 1540px; /* 전체 최대 너비를 늘림 */
+    margin: 20px 0;
+    height: 400px;
+}
+.chart-row-two {
+    display: flex;
+    width: 100%;
+    max-width: 1540px; /* 전체 최대 너비 */
+}
+
+/* 차트 비율 설정을 위한 개별 컨테이너 스타일 */
+.chart-container-large {
+	width:60%;
+	border: 2px solid #ddd;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+	height:390px;
+}
+
+/* 작은 차트 컨테이너 스타일 */
+.chart-container-small {
+    width: 40%; /* 너비를 유지 */
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.chart-container-small canvas {
+    width: 100% !important; /* 차트가 부모 요소에 맞춰 넓게 표시되도록 설정 */
+    height: 100% !important; /* 차트 높이를 컨테이너 높이에 맞춤 */
+}
+
+/* 차트와 범례를 감싸는 개별 컨테이너 */
+.chart-container-with-legend {
+    position: relative; /* 자식 요소의 절대 위치 설정을 위해 상대 위치 사용 */
+    width: 60%; /* 개별 차트를 감싸고 있는 div의 너비를 늘림 */
+    height: 400px; /* 고정된 높이 설정 */
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    display: flex;
+    justify-content: center;
     align-items: center;
 }
 
-.chart-navigation button {
-    margin: 0 5px;
-    border:none;
+/* 차트 스타일 */
+.chart-container-with-legend canvas {
+    width: 100%; /* 차트가 부모 요소에 맞춰 넓게 표시되도록 설정 */
+    height: auto; /* 높이 비율 유지 */
 }
 
-.chart-navigation button:hover {
-    background-color: #0056b3;
+/* 범례 컨테이너 스타일 */
+.chart-legend-container {
+   	font-size:10px;
+    position: absolute; /* 절대 위치 설정 */
+    bottom: 10px; /* 컨테이너의 아래쪽에서 20px 위로 */
+    left: 10px; /* 컨테이너의 왼쪽에서 20px 오른쪽으로 */
+    background-color: rgba(255, 255, 255, 0.9); /* 배경색 추가로 구분 */
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow-y: auto; /* 내용이 많아지면 스크롤 추가 */
+}
+.chart-container-cover {
+    position: absolute; /* 절대 위치 설정 */
+    bottom: 20px; /* 컨테이너의 아래쪽에서 20px 위로 */
+    left: 20px; /* 컨테이너의 왼쪽에서 20px 오른쪽으로 */
+    background-color: rgba(255, 255, 255, 0.9); /* 배경색 추가로 구분 */
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow-y: auto; /* 내용이 많아지면 스크롤 추가 */
 }
 
-#currentYearLabel, #currentMonthLabel {
-    font-size: 16px;
-    font-weight: bold;
-    margin: 0 10px;
+/* 커스텀 범례 스타일 */
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.legend-box {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    display: inline-block;
+}
+
+.legend-label {
+    font-size: 14px;
 }

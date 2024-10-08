@@ -84,7 +84,8 @@ public class WebSecurityConfig {
 				"/chatting/**",
 				"/clearNoticeNotification/**",
 				"/notice/**",
-				"/board/**"
+				"/board/**",
+				"/api/vehicle/**"
                 
             )
         )
