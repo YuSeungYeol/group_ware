@@ -176,22 +176,27 @@ document.getElementById("statusButton").addEventListener("click", function() {
 	                <p class="profile-branch">${member.distributor_name}</p> <!-- 지점 -->
 	                <p class="profile-email">${member.mem_email}</p> <!-- 이메일 -->
 	            </div>
-	            <div class="bottom-buttons">
-	                <button class="btn">일정보기</button>
-               		<button class="btn" id="messageBtn">메신저</button>
-
-	            </div>
-	        </div>
-	    `;
-
-	    const modal = document.getElementById("profileModal");
-	    modal.querySelector('.modal-content').innerHTML = modalContent;
-	    modal.style.display = "block";  // 모달 열기
-	}
-
-	$(document).on("click", "#messageBtn", function(){
-		window.location.href = "/chat/room/list";
-	})
+				<div class="bottom-buttons">
+				                <button class="btn" id="ScheduleBtn">일정보기</button>
+				                <input type="hidden" value="${member.mem_no}" id="mem_no" />
+				                <button class="btn" id="messageBtn">메신저</button>
+				            </div>
+				        </div>
+				    `;
+				    const modal = document.getElementById("profileModal");
+				    modal.querySelector('.modal-content').innerHTML = modalContent;
+				    modal.style.display = "block";  // 모달 열기
+				}
+				// 메신저 버튼 클릭 이벤트
+				$(document).on("click", "#messageBtn", function() {
+				    window.location.href = "/chat/room/list"; // Redirecting to the chat room list
+				});
+				// 일정 보기 버튼 클릭 이벤트
+				$(document).on("click", "#ScheduleBtn", function() {
+				    const memberNo = document.getElementById("mem_no").value; // hidden input에서 memberNo 값 가져오기
+				    console.log('클릭한 멤버 번호:', memberNo); // 콘솔에 멤버 번호 출력
+				    window.location.href = `/calendar/${memberNo}`; // 해당 멤버의 일정 페이지로 이동
+				});
 
 
 document.addEventListener('DOMContentLoaded', function () {

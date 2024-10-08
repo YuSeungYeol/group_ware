@@ -47,21 +47,21 @@
 		        
 		        <!-- 페이징 블록 -->
 		        <div class="pagination">
-    <!-- 이전 페이지 링크: 2 페이지 이상일 때만 표시 -->
-    <a th:href="@{/authorization/authorizationCheck(page=${authorizationPage.pageable.pageNumber - 1})}" 
-       th:if="${authorizationPage.pageable.pageNumber > 0}">&lsaquo;</a>
-
-    <!-- 페이지 번호 반복 (현재 페이지 기준으로 앞뒤로 최대 3개) -->
-    <span th:each="i : ${#numbers.sequence(1, authorizationPage.pageable.pageNumber + 2 < authorizationPage.totalPages ? authorizationPage.pageable.pageNumber + 2 : authorizationPage.totalPages)}">
-        <a th:text="${i}" 
-           th:href="@{/authorization/authorizationCheck(page=${i - 1})}" 
-           th:classappend="${i == authorizationPage.pageable.pageNumber + 1} ? 'active'">1</a>
-    </span>
-
-    <!-- 다음 페이지 링크: 마지막 페이지가 아닐 때만 표시 -->
-    <a th:href="@{/authorization/authorizationCheck(page=${authorizationPage.pageable.pageNumber + 1})}" 
-       th:if="${authorizationPage.pageable.pageNumber + 1 < authorizationPage.totalPages}">&rsaquo;</a>
-</div>
+				    <!-- 이전 페이지 링크: 2 페이지 이상일 때만 표시 -->
+				    <a th:href="@{/authorization/authorizationCheck(page=${authorizationPage.pageable.pageNumber - 1})}" 
+				       th:if="${authorizationPage.pageable.pageNumber > 0}">&lsaquo;</a>
+				
+				    <!-- 페이지 번호 반복 (현재 페이지 기준으로 앞뒤로 최대 3개) -->
+				    <span th:each="i : ${#numbers.sequence(1, authorizationPage.pageable.pageNumber + 2 < authorizationPage.totalPages ? authorizationPage.pageable.pageNumber + 2 : authorizationPage.totalPages)}">
+				        <a th:text="${i}" 
+				           th:href="@{/authorization/authorizationCheck(page=${i - 1})}" 
+				           th:classappend="${i == authorizationPage.pageable.pageNumber + 1} ? 'active'">1</a>
+				    </span>
+				
+				    <!-- 다음 페이지 링크: 마지막 페이지가 아닐 때만 표시 -->
+				    <a th:href="@{/authorization/authorizationCheck(page=${authorizationPage.pageable.pageNumber + 1})}" 
+				       th:if="${authorizationPage.pageable.pageNumber + 1 < authorizationPage.totalPages}">&rsaquo;</a>
+				</div>
 
 		    </div>
 		</section>
@@ -220,19 +220,19 @@
 		        </div>
 		
 		        <!-- 서명 입력 캔버스 -->
-		        <h3>서명</h3>
-		        <canvas id="signature-pad" style="border: 1px solid #000; width: 400px; height: 200px;"></canvas>
-		        <br>
+		        <h3 class="left-align">서명</h3>
+				<canvas id="signature-pad" style="border: 1px solid #000; width: 300px; height: 150px;"></canvas> <!-- 사이즈 조절 -->
+		        <br><br>
 		        <button id="clear" type="button">서명 지우기</button>
 		        <br><br>
 		
 		        <!-- 승인/반려 버튼 -->
-		        <form th:action="@{/api/authorization/sign}" method="post" id="approvalForm">
+		        <form th:action="@{/api/authorization/sign}" method="post" id="approvalForm" class="form-right-align">
 		            <input type="hidden" id="authorNo" name="authorNo">
 		            <input type="hidden" id="signature" name="signature">
 		            <button type="button" id="approveBtn" name="action" value="approve" onclick="submitForm('approve')">승인</button>
 		            <button type="button" id="rejectBtn" name="action" value="reject" onclick="submitForm('reject')">반려</button>
-		        </form>
+		        </form><br>
 		        <button id="savePdfButton">PDF로 저장</button>
 		    </div>
 		</div>

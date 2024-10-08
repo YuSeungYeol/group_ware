@@ -219,3 +219,14 @@ ul li span {
     border-right: 1px solid black;
     font-size: 5px;
 }
+
+.left-align {
+    text-align: left; 
+    margin-left: 0; 
+}
+
+.form-right-align {
+    display: flex;
+    justify-content: flex-end; /* 버튼들을 오른쪽으로 정렬 */
+    gap: 10px; /* 버튼들 사이 간격 조정 */
+}
