@@ -4,9 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // CSRF 토큰 추출
     const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-   
-   
-   
+
     // SSE 연결 설정
     const eventSource = new EventSource('/notification/sse');
     eventSource.addEventListener('schedule-notification', function (event) {
@@ -34,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
             schedule_content: item.schedule_content,
             schedule_background_color: item.schedule_background_color,
             notification_minutes: parseInt(item.notification_minutes, 10) || 0,
-            is_notice: item.is_notice // 여기서 _notice를 is_notice로 변경
+            is_notice: item.is_notice
         }
     });
 
@@ -47,8 +45,6 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     const convertColorValue = (value) => colorMapping[value] || value;
-   
-   
 
     // FullCalendar 초기화
     const calendar = new FullCalendar.Calendar(calendarEl, {
@@ -57,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
         initialView: 'dayGridMonth',
         locale: 'ko',
         timeZone: 'Asia/Seoul',
-      
+
         headerToolbar: {
             left: 'today,prev,next addEventButton',
             center: 'title',
@@ -80,17 +76,54 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         editable: true,
         droppable: true,
-        events: [],
+
+        // 하드코딩된 한국 공휴일
+        events: [
+         { title: '임시공휴일', start: '2024-10-01' },
+            { title: '신정', start: '2024-01-01' },
+            { title: '설날 연휴', start: '2024-02-09', end: '2024-02-11' },
+            { title: '삼일절', start: '2024-03-01' },
+            { title: '어린이날', start: '2024-05-05' },
+            { title: '석가탄신일', start: '2024-05-15' },
+            { title: '현충일', start: '2024-06-06' },
+            { title: '광복절', start: '2024-08-15' },
+            { title: '추석 연휴', start: '2024-09-16', end: '2024-09-18' },
+            { title: '개천절', start: '2024-10-03' },
+            { title: '한글날', start: '2024-10-09' },
+            { title: '성탄절', start: '2024-12-25' }
+        ],
+      
+      // 날짜에 대한 스타일 적용
+             eventDidMount: function (info) {
+                 const eventDate = info.event.startStr.split('T')[0];
+                 const holidayDates = [
+                  
+                     '2024-01-01', '2024-02-09', '2024-03-01', '2024-05-05', 
+                     '2024-05-15', '2024-06-06', '2024-08-15', '2024-09-16', 
+                     '2024-10-03', '2024-10-09', '2024-12-25', '2024-10-01'
+                 ];
+
+                 if (holidayDates.includes(eventDate)) {
+                     const dateElement = info.el.closest('.fc-daygrid-day');
+                     if (dateElement) {
+                         // 날짜 텍스트에 빨간색 스타일 적용
+                         const dayNumber = dateElement.querySelector('.fc-daygrid-day-number');
+                         if (dayNumber) {
+                             dayNumber.style.color = 'red';
+                             dayNumber.style.fontWeight = 'bold';
+                         }
+                     }
+                 }
+             },
+        // 이벤트 클릭 시 처리
         eventClick: function (info) {
             const event = info.event;
-            console.log('is_notice:', event.extendedProps.is_notice); // 로그로 확인
 
-            // 공지사항 클릭 시 리다이렉트
             if (event.extendedProps.is_notice === true) {
-                const noticeNo = event.id; // 공지사항 번호 가져오기
-                window.location.href = `/notice/${noticeNo}`; // 변경된 경로로 이동
+                const noticeNo = event.id;
+                window.location.href = `/notice/${noticeNo}`;
             } else {
-                // 개인 일정 클릭 시 처리 로직
+                // 개인 일정 클릭 시 모달 띄우기
                 document.getElementById('detail_title').value = event.title;
                 document.getElementById('detail_start_date').value = event.start.toISOString().split('T')[0];
                 document.getElementById('detail_start_time').value = event.start.toISOString().split('T')[1].substring(0, 5);
@@ -99,94 +132,87 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('detail_content').value = event.extendedProps.schedule_content || '';
                 document.getElementById('detail_notification_minutes').value = event.extendedProps.notification_minutes !== undefined ? event.extendedProps.notification_minutes : '';
 
-            // 배경색 설정
-            const color = event.extendedProps.schedule_background_color;
-            if (color) {
-                const colorInput = document.querySelector(`input[name="detail_background_color"][value="${color}"]`);
-                if (colorInput) {
-                    // 해당 배경색의 input 요소가 있는 경우, 선택된 상태로 설정
-                    colorInput.checked = true;
-
-                    // 모달의 배경 색상 미리보기 업데이트 (예시로 스타일을 바꿔주기 위해 추가)
-                    const detailBackgroundDisplay = document.querySelector('.detail_background_display');
-                    if (detailBackgroundDisplay) {
-                        detailBackgroundDisplay.style.backgroundColor = color; // 배경색 미리보기 업데이트
-                    } else {
-                        console.warn('detail_background_display 요소가 존재하지 않습니다.');
+                const color = event.extendedProps.schedule_background_color;
+                if (color) {
+                    const colorInput = document.querySelector(`input[name="detail_background_color"][value="${color}"]`);
+                    if (colorInput) {
+                        colorInput.checked = true;
+                        const detailBackgroundDisplay = document.querySelector('.detail_background_display');
+                        if (detailBackgroundDisplay) {
+                            detailBackgroundDisplay.style.backgroundColor = color;
+                        }
                     }
-                } else {
-                    console.warn('배경색 input 요소를 찾을 수 없습니다:', color);
                 }
-            }
                 document.getElementById('detailModal').style.display = 'block';
-            // 수정 버튼 클릭 처리 (모달이 열릴 때마다 이벤트 설정)
-            document.querySelector('.update-button').onclick = function () {
-                // 유효성 검사
-                const title = document.getElementById('detail_title').value;
-                const startDate = document.getElementById('detail_start_date').value;
-                const startTime = document.getElementById('detail_start_time').value;
-                const endDate = document.getElementById('detail_end_date').value;
-                const endTime = document.getElementById('detail_end_time').value;
-                const selectedBackgroundColorElement = document.querySelector('input[name="detail_background_color"]:checked');
 
-                if (!title) {
-                    Swal.fire("오류", "제목을 입력해야 합니다.", "warning");
-                    return;
-                }
+                // 수정 버튼 처리
+                document.querySelector('.update-button').onclick = function () {
+                    // 유효성 검사
+                    const title = document.getElementById('detail_title').value;
+                    const startDate = document.getElementById('detail_start_date').value;
+                    const startTime = document.getElementById('detail_start_time').value;
+                    const endDate = document.getElementById('detail_end_date').value;
+                    const endTime = document.getElementById('detail_end_time').value;
+                    const selectedBackgroundColorElement = document.querySelector('input[name="detail_background_color"]:checked');
 
-                if (new Date(`${startDate}T${startTime}`) > new Date(`${endDate}T${endTime}`)) {
-                    Swal.fire("오류", "시작 시간이 종료 시간보다 늦을 수 없습니다.", "warning");
-                    return;
-                }
+                    if (!title) {
+                        Swal.fire("오류", "제목을 입력해야 합니다.", "warning");
+                        return;
+                    }
 
-                if (!selectedBackgroundColorElement) {
-                    Swal.fire("오류", "배경색을 선택해야 합니다.", "warning");
-                    return;
-                }
+                    if (new Date(`${startDate}T${startTime}`) > new Date(`${endDate}T${endTime}`)) {
+                        Swal.fire("오류", "시작 시간이 종료 시간보다 늦을 수 없습니다.", "warning");
+                        return;
+                    }
 
-                const updatedData = {
-                    schedule_no: event.id,
-                    schedule_title: title,
-                    start_date: startDate,
-                    start_time: startTime,
-                    end_date: endDate,
-                    end_time: endTime,
-                    notification_minutes: parseInt(document.getElementById('detail_notification_minutes').value, 10),
-                    schedule_content: document.getElementById('detail_content').value,
-                    schedule_background_color: selectedBackgroundColorElement.value
+                    if (!selectedBackgroundColorElement) {
+                        Swal.fire("오류", "배경색을 선택해야 합니다.", "warning");
+                        return;
+                    }
+
+                    const updatedData = {
+                        schedule_no: event.id,
+                        schedule_title: title,
+                        start_date: startDate,
+                        start_time: startTime,
+                        end_date: endDate,
+                        end_time: endTime,
+                        notification_minutes: parseInt(document.getElementById('detail_notification_minutes').value, 10),
+                        schedule_content: document.getElementById('detail_content').value,
+                        schedule_background_color: selectedBackgroundColorElement.value
+                    };
+
+                    fetch(`/calendar/schedule/update/${event.id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            [csrfHeader]: csrfToken
+                        },
+                        body: JSON.stringify(updatedData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.res_code === "200") {
+                            event.setProp('title', updatedData.schedule_title);
+                            event.setStart(`${updatedData.start_date}T${updatedData.start_time}`);
+                            event.setEnd(`${updatedData.end_date}T${updatedData.end_time}`);
+                            event.setExtendedProp('schedule_content', updatedData.schedule_content);
+                            event.setExtendedProp('notification_minutes', updatedData.notification_minutes);
+                            event.setProp('backgroundColor', convertColorValue(updatedData.schedule_background_color));
+
+                            document.getElementById('detailModal').style.display = 'none';
+                            Swal.fire("수정 완료", "일정이 수정되었습니다.", "success");
+                        } else {
+                            Swal.fire("오류", "수정 중 오류가 발생했습니다.", "error");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire("오류", "수정 중 오류가 발생했습니다.", "error");
+                    });
                 };
 
-                fetch(`/calendar/schedule/update/${event.id}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        [csrfHeader]: csrfToken
-                    },
-                    body: JSON.stringify(updatedData)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.res_code === "200") {
-                        // 이벤트 업데이트
-                        event.setProp('title', updatedData.schedule_title);
-                        event.setStart(`${updatedData.start_date}T${updatedData.start_time}`);
-                        event.setEnd(`${updatedData.end_date}T${updatedData.end_time}`);
-                        event.setExtendedProp('schedule_content', updatedData.schedule_content);
-                        event.setExtendedProp('notification_minutes', updatedData.notification_minutes);
-                        event.setProp('backgroundColor', convertColorValue(updatedData.schedule_background_color)); // 배경색 수정 반영
-
-                        document.getElementById('detailModal').style.display = 'none';
-                    } else {
-                        Swal.fire("오류", "수정 중 오류가 발생했습니다.", "error");
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    Swal.fire("오류", "수정 중 오류가 발생했습니다.", "error");
-                });
-            };
-
-                // 삭제 버튼 클릭 처리 (모달이 열릴 때마다 이벤트 설정)
+                // 삭제 버튼 처리
                 document.querySelector('.delete-button').onclick = function () {
                     Swal.fire({
                         title: '정말 삭제하시겠습니까?',
@@ -304,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const startDateTime = new Date(event.start);
             const alertTime = new Date(startDateTime.getTime() - notificationMinutes * 60000);
             const currentTime = new Date();
-            
+
             const remainingMinutes = Math.floor((alertTime - currentTime) / 60000);
 
             if (remainingMinutes > 0) {
