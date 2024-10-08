@@ -12,4 +12,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     
     List<Schedule> findByMemberMemId(String memId);
     
+    List<Schedule> findByMember_MemNo(Long memberNo); // member_no를 사용하여 조회
+    
 }

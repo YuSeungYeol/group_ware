@@ -4,7 +4,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // CSRF 토큰 추출
     const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-
+   
+   
+   
     // SSE 연결 설정
     const eventSource = new EventSource('/notification/sse');
     eventSource.addEventListener('schedule-notification', function (event) {
@@ -32,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
             schedule_content: item.schedule_content,
             schedule_background_color: item.schedule_background_color,
             notification_minutes: parseInt(item.notification_minutes, 10) || 0,
-            is_notice: item._notice // _notice를 is_notice로 매핑
+            is_notice: item.is_notice // 여기서 _notice를 is_notice로 변경
         }
     });
 
@@ -45,6 +47,8 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     const convertColorValue = (value) => colorMapping[value] || value;
+   
+   
 
     // FullCalendar 초기화
     const calendar = new FullCalendar.Calendar(calendarEl, {
@@ -53,10 +57,10 @@ document.addEventListener('DOMContentLoaded', function () {
         initialView: 'dayGridMonth',
         locale: 'ko',
         timeZone: 'Asia/Seoul',
-
+      
         headerToolbar: {
-            left: 'today addEventButton',
-            center: 'prev,title,next',
+            left: 'today,prev,next addEventButton',
+            center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
         },
         customButtons: {
@@ -79,9 +83,10 @@ document.addEventListener('DOMContentLoaded', function () {
         events: [],
         eventClick: function (info) {
             const event = info.event;
+            console.log('is_notice:', event.extendedProps.is_notice); // 로그로 확인
 
             // 공지사항 클릭 시 리다이렉트
-            if (event.extendedProps.is_notice) {
+            if (event.extendedProps.is_notice === true) {
                 const noticeNo = event.id; // 공지사항 번호 가져오기
                 window.location.href = `/notice/${noticeNo}`; // 변경된 경로로 이동
             } else {
@@ -94,16 +99,127 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('detail_content').value = event.extendedProps.schedule_content || '';
                 document.getElementById('detail_notification_minutes').value = event.extendedProps.notification_minutes !== undefined ? event.extendedProps.notification_minutes : '';
 
-                // 배경색 설정
-                const color = event.extendedProps.schedule_background_color;
-                if (color) {
-                    const colorInput = document.querySelector(`input[name="detail_background_color"][value="${color}"]`);
-                    if (colorInput) {
-                        colorInput.checked = true;
+            // 배경색 설정
+            const color = event.extendedProps.schedule_background_color;
+            if (color) {
+                const colorInput = document.querySelector(`input[name="detail_background_color"][value="${color}"]`);
+                if (colorInput) {
+                    // 해당 배경색의 input 요소가 있는 경우, 선택된 상태로 설정
+                    colorInput.checked = true;
+
+                    // 모달의 배경 색상 미리보기 업데이트 (예시로 스타일을 바꿔주기 위해 추가)
+                    const detailBackgroundDisplay = document.querySelector('.detail_background_display');
+                    if (detailBackgroundDisplay) {
+                        detailBackgroundDisplay.style.backgroundColor = color; // 배경색 미리보기 업데이트
+                    } else {
+                        console.warn('detail_background_display 요소가 존재하지 않습니다.');
                     }
+                } else {
+                    console.warn('배경색 input 요소를 찾을 수 없습니다:', color);
+                }
+            }
+                document.getElementById('detailModal').style.display = 'block';
+            // 수정 버튼 클릭 처리 (모달이 열릴 때마다 이벤트 설정)
+            document.querySelector('.update-button').onclick = function () {
+                // 유효성 검사
+                const title = document.getElementById('detail_title').value;
+                const startDate = document.getElementById('detail_start_date').value;
+                const startTime = document.getElementById('detail_start_time').value;
+                const endDate = document.getElementById('detail_end_date').value;
+                const endTime = document.getElementById('detail_end_time').value;
+                const selectedBackgroundColorElement = document.querySelector('input[name="detail_background_color"]:checked');
+
+                if (!title) {
+                    Swal.fire("오류", "제목을 입력해야 합니다.", "warning");
+                    return;
                 }
 
-                document.getElementById('detailModal').style.display = 'block';
+                if (new Date(`${startDate}T${startTime}`) > new Date(`${endDate}T${endTime}`)) {
+                    Swal.fire("오류", "시작 시간이 종료 시간보다 늦을 수 없습니다.", "warning");
+                    return;
+                }
+
+                if (!selectedBackgroundColorElement) {
+                    Swal.fire("오류", "배경색을 선택해야 합니다.", "warning");
+                    return;
+                }
+
+                const updatedData = {
+                    schedule_no: event.id,
+                    schedule_title: title,
+                    start_date: startDate,
+                    start_time: startTime,
+                    end_date: endDate,
+                    end_time: endTime,
+                    notification_minutes: parseInt(document.getElementById('detail_notification_minutes').value, 10),
+                    schedule_content: document.getElementById('detail_content').value,
+                    schedule_background_color: selectedBackgroundColorElement.value
+                };
+
+                fetch(`/calendar/schedule/update/${event.id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify(updatedData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.res_code === "200") {
+                        // 이벤트 업데이트
+                        event.setProp('title', updatedData.schedule_title);
+                        event.setStart(`${updatedData.start_date}T${updatedData.start_time}`);
+                        event.setEnd(`${updatedData.end_date}T${updatedData.end_time}`);
+                        event.setExtendedProp('schedule_content', updatedData.schedule_content);
+                        event.setExtendedProp('notification_minutes', updatedData.notification_minutes);
+                        event.setProp('backgroundColor', convertColorValue(updatedData.schedule_background_color)); // 배경색 수정 반영
+
+                        document.getElementById('detailModal').style.display = 'none';
+                    } else {
+                        Swal.fire("오류", "수정 중 오류가 발생했습니다.", "error");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire("오류", "수정 중 오류가 발생했습니다.", "error");
+                });
+            };
+
+                // 삭제 버튼 클릭 처리 (모달이 열릴 때마다 이벤트 설정)
+                document.querySelector('.delete-button').onclick = function () {
+                    Swal.fire({
+                        title: '정말 삭제하시겠습니까?',
+                        text: "이 작업은 되돌릴 수 없습니다!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: '네, 삭제합니다.',
+                        cancelButtonText: '아니요, 취소합니다.'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(`/calendar/schedule/delete/${event.id}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    [csrfHeader]: csrfToken
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.res_code === "200") {
+                                    event.remove();
+                                    document.getElementById('detailModal').style.display = 'none';
+                                    Swal.fire("삭제 완료", "일정이 삭제되었습니다.", "success");
+                                } else {
+                                    Swal.fire("오류", "삭제 중 오류가 발생했습니다.", "error");
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                Swal.fire("오류", "삭제 중 오류가 발생했습니다.", "error");
+                            });
+                        }
+                    });
+                };
             }
         }
     });
@@ -112,7 +228,6 @@ document.addEventListener('DOMContentLoaded', function () {
     fetch('/calendar/schedule/getScheduleListForLoggedInUser')
         .then(response => response.json())
         .then(data => {
-            console.log('Fetched data:', data); // 추가된 로그
             const events = data.map(mapScheduleData);
             calendar.addEventSource(events);
             events.forEach(event => {
@@ -124,7 +239,15 @@ document.addEventListener('DOMContentLoaded', function () {
     // 캘린더 렌더링
     calendar.render();
 
-    // 취소 버튼 처리 (이벤트 위임 사용)
+    // 'X' 닫기 버튼 처리
+    document.querySelectorAll('.close').forEach(button => {
+        button.addEventListener('click', function () {
+            document.getElementById('myModal').style.display = 'none';
+            document.getElementById('detailModal').style.display = 'none';
+        });
+    });
+
+    // 취소 버튼 처리
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('cancel-button')) {
             document.getElementById('myModal').style.display = 'none';

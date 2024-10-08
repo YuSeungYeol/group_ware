@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://ultrq.net.nz/thymeleaf/layout" layout:decorate="~{include/layout}">
+    <th:block layout:fragment="content">
+        <!-- 외부 스타일시트 및 스크립트 링크 -->
+        <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+        <link th:href="@{/fullcalendar/main.css}" rel="stylesheet" />
+        <link th:href="@{/css/calendar/calendar.css}" rel="stylesheet" type="text/css">
+
+        <!-- jQuery 및 외부 스크립트 -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+        <script th:src="@{/fullcalendar/main.js}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!-- jQuery Timepicker 추가 -->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
+        <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+
+        <!-- CSRF Token -->
+        <meta name="_csrf" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+        <section>
+    
+
+            <div id="calendar" style="width: 75%; height: 40%; margin-left: 270px; margin-top: 100px; margin-bottom: 100px;"></div>
+        </section>
+
+        <!-- 일정 등록 모달 -->
+        <div id="myModal" class="modal">
+      
+                <form id="scheduleForm">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <div class="form-group">
+                        <label for="schedule_title">제목</label>
+                        <input type="text" id="schedule_title" name="schedule_title" placeholder="제목" required>
+                    </div>
+                    <div class="form-group inline-group">
+                        <label for="start_date">시작 날짜</label>
+                        <div class="input-group">
+                            <input type="text" id="start_date" name="start_date" class="datetimepicker short-input" required>
+                            <span class="calendar-icon" id="start_date_icon">&#128197;</span>
+                        </div>
+                        <div class="input-group">
+                            <input id="start_time" name="start_time" type="text" class="timepicker short-input" placeholder="--:--" required />
+                            <ul id="start_time_list" class="time-select-list"></ul>
+                        </div>
+                    </div>
+
+                    <div class="form-group inline-group">
+                        <label for="end_date">마지막 날짜</label>
+                        <div class="input-group">
+                            <input type="text" id="end_date" name="end_date" class="datetimepicker short-input" required>
+                            <span class="calendar-icon" id="end_date_icon">&#128197;</span>
+                        </div>
+                        <div class="input-group">
+                            <input id="end_time" name="end_time" type="text" class="timepicker short-input" placeholder="--:--" required />
+                            <ul id="end_time_list" class="time-select-list"></ul>
+                        </div>
+                    </div>
+
+                    <!-- 알림 설정 추가 -->
+                    <div class="form-group">
+                        <label for="notification_minutes">알림 시간</label>
+                        <input type="number" id="notification_minutes" name="notification_minutes" placeholder="예: 10 (종료 시간 기준)" min="0">
+                        <span style="margin-left: 5px;">분 전</span>
+                    </div>
+
+                    <!-- 배경색 선택 라디오 버튼 -->
+                    <div class="form-group">
+                        <label for="background_color">배경색</label>
+                        <div class="color-picker">
+                            <label><input type="radio" name="background_color" value="1" required><span class="color-box" style="background-color: #FF5722;"></span></label>
+                            <label><input type="radio" name="background_color" value="2" required><span class="color-box" style="background-color: #FF9800;"></span></label>
+                            <label><input type="radio" name="background_color" value="3" required><span class="color-box" style="background-color: #9C27B0;"></span></label>
+                            <label><input type="radio" name="background_color" value="4" required><span class="color-box" style="background-color: #E91E63;"></span></label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="schedule_content">내용</label>
+                        <textarea id="schedule_content" name="schedule_content" placeholder="내용" required></textarea>
+                    </div>
+                    <div class="form-group buttons">
+                        <button type="submit" class="save-button">저장</button>
+                        <button type="button" class="cancel-button">취소</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 일정 수정 모달 -->
+        <div id="detailModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>일정 수정</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <form id="detailForm">
+                    <div class="form-group">
+                        <label for="detail_title">제목</label>
+                        <input type="text" id="detail_title" name="detail_title" required>
+                    </div>
+                    <div class="form-group inline-group">
+                        <label for="detail_start_date">시작 날짜</label>
+                        <div class="input-group">
+                            <input type="text" id="detail_start_date" name="detail_start_date" class="datetimepicker short-input" required>
+                            <span class="calendar-icon" id="detail_start_date_icon">&#128197;</span>
+                        </div>
+                        <div class="input-group">
+                            <input id="detail_start_time" name="detail_start_time" type="text" class="timepicker short-input" placeholder="--:--" required />
+                            <ul id="detail_start_time_list" class="time-select-list"></ul>
+                        </div>
+                    </div>
+
+                    <div class="form-group inline-group">
+                        <label for="detail_end_date">마지막 날짜</label>
+                        <div class="input-group">
+                            <input type="text" id="detail_end_date" name="detail_end_date" class="datetimepicker short-input" required>
+                            <span class="calendar-icon" id="detail_end_date_icon">&#128197;</span>
+                        </div>
+                        <div class="input-group">
+                            <input id="detail_end_time" name="detail_end_time" type="text" class="timepicker short-input" placeholder="--:--" required />
+                            <ul id="detail_end_time_list" class="time-select-list"></ul>
+                        </div>
+                    </div>
+
+                    <!-- 알림 설정 추가 -->
+                    <div class="form-group">
+                        <label for="detail_notification_minutes">알림 시간</label>
+                        <input type="number" id="detail_notification_minutes" name="detail_notification_minutes" placeholder="예: 10 (종료 시간 기준)" min="0">
+                        <span style="margin-left: 5px;">분 전</span>
+                    </div>
+
+                    <!-- 배경색 선택 라디오 버튼 -->
+                    <div class="form-group">
+                        <label for="background_color">배경색</label>
+                        <div class="color-picker">
+                            <label><input type="radio" name="detail_background_color" value="1" required><span class="color-box" style="background-color: #FF5722;"></span></label>
+                            <label><input type="radio" name="detail_background_color" value="2" required><span class="color-box" style="background-color: #FF9800;"></span></label>
+                            <label><input type="radio" name="detail_background_color" value="3" required><span class="color-box" style="background-color: #9C27B0;"></span></label>
+                            <label><input type="radio" name="detail_background_color" value="4" required><span class="color-box" style="background-color: #E91E63;"></span></label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="detail_content">내용</label>
+                        <textarea id="detail_content" name="detail_content" required></textarea>
+                    </div>
+                    <div class="form-group buttons">
+                        <button type="button" class="update-button">수정</button>
+                        <button type="button" class="delete-button">삭제</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- JavaScript 코드 -->
+        <script src="/js/member_calendar.js"></script> <!-- JS 파일을 별도로 불러오기 -->
+    </th:block>
+</html>

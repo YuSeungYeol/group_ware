@@ -33,7 +33,6 @@ public class ScheduleService {
 
     @Autowired
     private ScheduleRepository scheduleRepository;
-
     @Transactional(readOnly = true)
     public List<ScheduleDto> getAllSchedulesAndNotices(String username) {
         // 개인 일정 가져오기
@@ -42,8 +41,13 @@ public class ScheduleService {
         // 공지사항 가져오기 (Pageable 없이 전체 공지사항 조회)
         List<Notice> notices = noticeRepository.findAll();
 
+        // 공지사항에서 notice_schedule이 'Y'인 항목만 필터링
+        List<Notice> filteredNotices = notices.stream()
+                .filter(notice -> "Y".equalsIgnoreCase(notice.getNoticeSchedule()))
+                .collect(Collectors.toList());
+
         // 공지사항을 ScheduleDto로 변환하기
-        List<ScheduleDto> noticeDtos = notices.stream()
+        List<ScheduleDto> noticeDtos = filteredNotices.stream()
                 .map(this::fromNotice)
                 .collect(Collectors.toList());
 
@@ -54,6 +58,14 @@ public class ScheduleService {
 
         return combinedList;
     }
+    
+    public List<ScheduleDto> getSchedulesByMemberNo(Long memberNo) {
+        return scheduleRepository.findByMember_MemNo(memberNo)
+            .stream()
+            .map(ScheduleDto::toDto)
+            .collect(Collectors.toList());
+    }
+
 
     @Transactional(readOnly = true)
     public List<ScheduleDto> getSchedulesForUser(String username) {

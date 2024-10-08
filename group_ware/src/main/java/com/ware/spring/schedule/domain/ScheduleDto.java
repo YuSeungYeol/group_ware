@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ware.spring.member.domain.Member;
 import com.ware.spring.notice.domain.Notice;
 
@@ -32,6 +33,7 @@ public class ScheduleDto {
     private Integer notification_minutes; // 알림 시간 필드 추가
     private Member member;
     private Notice notice; // 공지사항 추가
+    @JsonProperty("is_notice")
     private boolean is_notice; // 공지사항 여부 필드 추가
 
     // DTO를 엔티티로 변환하는 메서드

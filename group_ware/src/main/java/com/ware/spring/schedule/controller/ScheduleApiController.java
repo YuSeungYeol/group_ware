@@ -34,7 +34,9 @@ public class ScheduleApiController {
     
     @Autowired
     private NoticeService noticeService;
+   
 
+    
     // 경로 변경: noticeNo를 가진 공지사항 상세보기
     @GetMapping("/schedule/notice/{noticeNo}")
     public String viewNoticeDetail(@PathVariable("noticeNo") Long noticeNo, Model model) {
@@ -54,7 +56,7 @@ public class ScheduleApiController {
             return principal.toString();
         }
     }
-
+    
     @PostMapping("/calendar/schedule/createScheduleWithJson")
     @ResponseBody
     public Map<String, String> createScheduleWithJson(@RequestBody ScheduleDto scheduleDto) {
@@ -128,4 +130,10 @@ public class ScheduleApiController {
         }
         return resultMap;
     }
+    @GetMapping("/api/calendar/member/{memberNo}")
+    @ResponseBody
+    public List<ScheduleDto> getMemberEvents(@PathVariable Long memberNo) {
+        return scheduleService.getSchedulesByMemberNo(memberNo);
+    }
+
 }
