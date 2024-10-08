@@ -16,7 +16,7 @@ public class VehicleSize {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "size_no")
-    private int sizeNo;
+    private Long sizeNo;
 
     @Column(name = "vehicle_size", nullable = false)
     private String vehicleSize;

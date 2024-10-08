@@ -6,7 +6,7 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
         <section id="vehicle-container">
             <h1>차량 목록</h1>
-            <form id="searching" th:action="@{/vehicle}" method="get">
+            <!--<form id="searching" th:action="@{/vehicle}" method="get">
                 <div class="search-container">
                     <div class="search-elements">
                         <select name="searchType">
@@ -21,17 +21,16 @@
                         <button type="button" id="deleteButton" disabled onclick="confirmDelete()">등록 해제</button>
                     </div>
                 </div>
-            </form>
-
+            </form>-->
             <table>
                 <colgroup>
                     <col width="20%">
-                    <col width="15%">
-                    <col width="10%">
-                    <col width="10%">
-                    <col width="15%">
                     <col width="20%">
-                    <col width="10%">
+                    <col width="15%">
+                    <col width="15%">
+                    <col width="15%">
+                    <col width="15%">
+
                 </colgroup>
                 <thead>
                 <tr>
@@ -40,8 +39,7 @@
                     <th>연료 종류</th>
                     <th>배기량</th>
                     <th>최고 출력</th>
-                    <th>출고 가능 여부</th>
-                    <th></th>
+                    <th>상세보기</th>
                 </tr>
                 </thead>
                 <tbody id="vehicleTableBody">
@@ -51,30 +49,24 @@
                     <td th:text="${vehicle.vehicleFuel}">연료 종류</td>
                     <td th:text="${vehicle.vehicleDisplacement}">배기량</td>
                     <td th:text="${vehicle.vehicleRpm}">최고 출력</td>
-                    <td th:text="${vehicle.vehicleStatus}">출고 가능 여부</td>
                     <td>
-						 	<a th:href="@{'/vehicle/' + ${vehicle.vehicleNo} + '/detail'}" class="detail-link">상세보기</a>
+						 	<a th:href="@{'/vehicle/' + ${vehicle.vehicleNo} + '/detail'}" class="detail-link"><u>상세보기</u></a>
                     </td>
                 </tr>
                 </tbody>
             </table>
         </section>
-
         <script>
             let selectedRow = null;
             let selectedVehicleId = null;
-
             document.addEventListener('DOMContentLoaded', function () {
                 const tableBody = document.getElementById('vehicleTableBody');
                 const deleteButton = document.getElementById('deleteButton');
-
                 tableBody.addEventListener('click', function (event) {
                     const targetRow = event.target.closest('tr');
-
                     if (selectedRow) {
                         selectedRow.classList.remove('selected');
                     }
-
                     if (targetRow && targetRow !== selectedRow) {
                         selectedRow = targetRow;
                         selectedVehicleId = targetRow.getAttribute('data-id');
@@ -87,7 +79,6 @@
                     }
                 });
             });
-
             function confirmDelete() {
                 if (!selectedVehicleId) {
                     Swal.fire({
@@ -97,7 +88,6 @@
                     });
                     return;
                 }
-
                 Swal.fire({
                     title: '차량 삭제',
                     text: '선택한 차량을 삭제하려면 차량 모델명을 입력해주세요.',
@@ -116,7 +106,6 @@
                     if (result.isConfirmed) {
                         const inputModel = result.value;
                         const vehicleModel = selectedRow.querySelector('td:nth-child(1)').textContent.trim();
-
                         if (inputModel !== vehicleModel) {
                             Swal.fire({
                                 icon: 'error',
@@ -129,7 +118,6 @@
                     }
                 });
             }
-
             function deleteVehicle(vehicleId) {
                 fetch(`/api/vehicle/delete/${vehicleId}`, {
                     method: 'DELETE',

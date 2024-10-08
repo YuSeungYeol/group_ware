@@ -20,4 +20,25 @@ public interface VehicleSalesRepository extends JpaRepository<VehicleSales, Long
 
     @Query("SELECT SUM(vs.saleCount) FROM VehicleSales vs WHERE YEAR(vs.saleDate) = :year AND MONTH(vs.saleDate) = :month")
     Integer sumSaleCountByMonth(@Param("year") int year, @Param("month") int month);
+
+
+    @Query(value = "SELECT v.vehicle.vehicleNo, SUM(v.saleCount), SUM(v.salePrices) " +
+            "FROM VehicleSales v " +
+            "WHERE v.saleDate BETWEEN :startDate AND :endDate " +
+            "GROUP BY v.vehicle.vehicleNo " +
+            "ORDER BY SUM(v.saleCount) DESC")
+	List<Object[]> findTop5VehiclesBySales(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+	@Query("SELECT v.member.memNo, SUM(v.saleCount), SUM(v.salePrices) " +
+		       "FROM VehicleSales v " +
+		       "GROUP BY v.member.memNo " +
+		       "ORDER BY SUM(v.saleCount) DESC")
+		List<Object[]> findIndividualSalesRanking();
+	@Query("SELECT v.member, SUM(v.saleCount), SUM(v.salePrices) " +
+		       "FROM VehicleSales v " +
+		       "GROUP BY v.member " +
+		       "ORDER BY SUM(v.salePrices) DESC")
+		List<Object[]> findTop5MembersByRevenue();
+
+
 }
+

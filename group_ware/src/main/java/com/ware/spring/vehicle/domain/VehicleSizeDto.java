@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 public class VehicleSizeDto {
 
-    private int sizeNo;
+    private Long sizeNo;
     private String vehicleSize;
 
     public VehicleSize toEntity() {
