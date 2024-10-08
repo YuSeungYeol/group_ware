@@ -66,28 +66,74 @@ public class AuthorizationViewController {
     }
 
     // 결재 리스트 조회
+//    @GetMapping("/authorization/authorizationList")
+//    public String listAuthorizations(
+//            @RequestParam(value = "draftPage", defaultValue = "0") int draftPage,
+//            @RequestParam(value = "completedPage", defaultValue = "0") int completedPage,
+//            Model model) {
+//
+//        // 기안 진행 목록 페이지 처리 (authorRegDate 기준으로 내림차순 정렬)
+//        Pageable draftPageable = PageRequest.of(draftPage, 5, Sort.by(Sort.Direction.DESC, "authorRegDate"));
+//        Page<Authorization> resultList = authorizationService.getDraftAuthorizations(draftPageable);
+//
+//        // 완료 문서 페이지 처리 (authorRegDate 기준으로 내림차순 정렬)
+//        Pageable completedPageable = PageRequest.of(completedPage, 5, Sort.by(Sort.Direction.DESC, "authorRegDate"));
+//        Page<Authorization> completedList = authorizationService.getCompletedAuthorizations(completedPageable);
+//
+//        // 모델에 추가 (getContent()로 리스트만 가져옴)
+//        model.addAttribute("resultList", resultList.getContent());
+//        model.addAttribute("draftPage", resultList); // Page 객체 전달
+//        model.addAttribute("completedList", completedList.getContent());
+//        model.addAttribute("completedPage", completedList); // Page 객체 전달
+//
+//        return "authorization/authorizationList";
+//    }
+    
+    
     @GetMapping("/authorization/authorizationList")
     public String listAuthorizations(
             @RequestParam(value = "draftPage", defaultValue = "0") int draftPage,
             @RequestParam(value = "completedPage", defaultValue = "0") int completedPage,
-            Model model) {
+            Model model, Principal principal) {
 
-        // 기안 진행 목록 페이지 처리 (authorRegDate 기준으로 내림차순 정렬)
-        Pageable draftPageable = PageRequest.of(draftPage, 5, Sort.by(Sort.Direction.DESC, "authorRegDate"));
-        Page<Authorization> resultList = authorizationService.getDraftAuthorizations(draftPageable);
+        try {
+            // 로그인한 사용자의 memNo 가져오기
+            String memName = principal.getName();
+            Optional<Member> memberOpt = memberRepository.findByMemId(memName);  // memName이 실제로는 memId를 의미
 
-        // 완료 문서 페이지 처리 (authorRegDate 기준으로 내림차순 정렬)
-        Pageable completedPageable = PageRequest.of(completedPage, 5, Sort.by(Sort.Direction.DESC, "authorRegDate"));
-        Page<Authorization> completedList = authorizationService.getCompletedAuthorizations(completedPageable);
+            if (memberOpt.isPresent()) {
+                Member member = memberOpt.get();
+                Long memNo = member.getMemNo();  // memNo 가져오기
 
-        // 모델에 추가 (getContent()로 리스트만 가져옴)
-        model.addAttribute("resultList", resultList.getContent());
-        model.addAttribute("draftPage", resultList); // Page 객체 전달
-        model.addAttribute("completedList", completedList.getContent());
-        model.addAttribute("completedPage", completedList); // Page 객체 전달
+                // 기안 진행 중 문서 페이지 처리
+                Pageable draftPageable = PageRequest.of(draftPage, 5, Sort.by(Sort.Direction.DESC, "authorRegDate"));
+                Page<AuthorizationDto> resultList = authorizationService.getDraftAuthorizations(memNo, draftPageable);
 
-        return "authorization/authorizationList";
+                // 완료된 문서 페이지 처리
+                Pageable completedPageable = PageRequest.of(completedPage, 5, Sort.by(Sort.Direction.DESC, "authorRegDate"));
+                Page<AuthorizationDto> completedList = authorizationService.getCompletedAuthorizations(memNo, completedPageable);
+
+                // 모델에 추가 (getContent()로 리스트만 가져옴)
+                model.addAttribute("resultList", resultList.getContent());
+                model.addAttribute("draftPage", resultList);
+                model.addAttribute("completedList", completedList.getContent());
+                model.addAttribute("completedPage", completedList);
+            } else {
+                System.out.println("Member with name " + memName + " not found.");
+                return "error";  // 오류 페이지로 이동
+            }
+
+            return "authorization/authorizationList";
+
+        } catch (Exception e) {
+            e.printStackTrace();  // 예외 발생 시 스택 트레이스 출력
+            return "error";  // 오류 페이지로 이동
+        }
     }
+
+
+
+
 
     @GetMapping("/authorization/authorizationCreate")
     public String createAuthorizationPage(Model model, Principal principal) {

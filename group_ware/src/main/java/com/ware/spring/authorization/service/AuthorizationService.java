@@ -600,6 +600,22 @@ public class AuthorizationService {
 	    }
 
 
+	 // 기안 진행 중인 본인의 문서만 가져오기
+	    @Transactional
+	    public Page<AuthorizationDto> getDraftAuthorizations(Long memNo, Pageable pageable) {
+	        Page<Authorization> authorizationPage = authorizationRepository.findByAuthorStatusAndMember_MemNo("P", memNo, pageable);
+	        return authorizationPage.map(AuthorizationDto::toDto);
+	    }
+
+	    // 완료된 본인의 문서만 가져오기
+	    @Transactional
+	    public Page<AuthorizationDto> getCompletedAuthorizations(Long memNo, Pageable pageable) {
+	        List<String> completedStatuses = Arrays.asList("Y", "N", "C");
+	        Page<Authorization> authorizationPage = authorizationRepository.findByAuthorStatusInAndMember_MemNo(completedStatuses, memNo, pageable);
+	        return authorizationPage.map(AuthorizationDto::toDto);
+	    }
+
+
 
 
 
