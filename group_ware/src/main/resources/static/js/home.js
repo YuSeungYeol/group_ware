@@ -417,7 +417,7 @@
 			        labels: labels,
 			        datasets: [
 			            {
-			                label: '부서별 판매 대수',
+			                label: '판매 대수',
 			                data: salesCounts,
 			                backgroundColor: [
 			                    'rgba(75, 192, 192, 0.6)',
