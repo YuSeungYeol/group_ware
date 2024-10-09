@@ -44,12 +44,14 @@ public class VehicleViewController {
     @GetMapping("/vehicle/{vehicleNo}/detail")
     public String getVehicleDetail(@PathVariable("vehicleNo") Long vehicleNo, Model model) {
         VehicleDto vehicleDetail = vehicleService.getVehicleDetail(vehicleNo);
-        int vehicleSalesCount = vehicleSalesRepository.sumSaleCountByVehicleNo(vehicleNo); // 판매량 합계 계산
-
+        // 판매량 합계 계산, null이면 기본값 0으로 처리
+        Integer vehicleSalesCount = vehicleSalesRepository.sumSaleCountByVehicleNo(vehicleNo);
+        if (vehicleSalesCount == null) {
+            vehicleSalesCount = 0; // null인 경우 0으로 설정
+        }
         model.addAttribute("vehicle", vehicleDetail);
         model.addAttribute("vehicleSalesCount", vehicleSalesCount); // 판매량 추가
-
-        return "vehicle/vehicle_detail"; 
+        return "vehicle/vehicle_detail";
     }
 
 }

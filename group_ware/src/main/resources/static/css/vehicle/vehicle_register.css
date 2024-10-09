@@ -1,4 +1,4 @@
-section {
+body {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -34,7 +34,7 @@ input, select {
 
 .register-button {
     padding: 10px 20px;
-    background-color: #007bff;
+    background-color: #EFEFEF;
     color: black;
     border: none;
     border-radius: 4px;

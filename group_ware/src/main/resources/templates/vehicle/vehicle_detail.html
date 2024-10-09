@@ -12,7 +12,7 @@
 				</h1>
             <!-- 차량 사진 -->
             <div class="vehicle-image">
-                <img th:src="@{${vehicle.vehicleProfile}}" alt="차량 이미지" class="vehicle-img"/>
+<img th:src="@{'/image/vehicles/' + ${vehicle.vehicleNo} + '/' + ${vehicle.vehicleProfile}}" alt="차량 이미지" class="vehicle-img"/>
             </div>
 
             <!-- 차량 정보 -->
