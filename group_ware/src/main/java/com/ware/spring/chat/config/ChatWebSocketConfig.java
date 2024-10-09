@@ -19,12 +19,14 @@ public class ChatWebSocketConfig implements WebSocketConfigurer{
 	}
 	 
 	@Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry
-            .addHandler(chatWebSocketHandler, "/chatting/{roomNo}")
-            .setAllowedOrigins("*"); // 모든 도메인에서의 요청 허용
-        
-        // 공통 채널 연결 경로 추가
-        registry.addHandler(chatWebSocketHandler, "/chatting/all").setAllowedOrigins("*");
-    }
+	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+	    registry
+	        .addHandler(chatWebSocketHandler, "/chatting/{roomNo}")
+	        .addInterceptors(new HttpSessionHandshakeInterceptor()) // 인터셉터 추가
+	        .setAllowedOrigins("*");
+	    registry
+	        .addHandler(chatWebSocketHandler, "/chatting/all")
+	        .addInterceptors(new HttpSessionHandshakeInterceptor()) // 공통 채널에도 추가
+	        .setAllowedOrigins("*");
+	}
 }
