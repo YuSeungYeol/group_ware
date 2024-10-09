@@ -1,10 +1,5 @@
 /* 상단 필터 부분 위치 조정 */
-#filter-section {
-    margin-left: 230px; /* 좌측 네비게이션 바와의 간격 조정 */
-    margin-bottom: 20px;
-    width: calc(100% - 360px); /* 좌측 네비게이션 바와 출근/퇴근 버튼을 제외한 너비 설정 */
-	
-}
+
 
 /* 입력란의 테두리 제거 */
 input {
@@ -19,9 +14,8 @@ input {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    padding-right: 130px; /* 출근/퇴근 버튼과의 간격을 조정 */
-    width: calc(100% - 360px); /* 좌측 네비게이션 바와 출근/퇴근 버튼을 제외한 폼 필드의 너비 설정 */
     margin-top: 50px;
+	width:1580px;    
 }
 
 
@@ -34,17 +28,6 @@ input {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-}
-
-.form-section input[type="submit"], .form-section input[type="button"] {
-    padding: 10px 20px;
-    border: none;
-    background-color: #333;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-size: 16px;
 }
 
 .form-section input[type="submit"]:hover, .form-section input[type="button"]:hover {

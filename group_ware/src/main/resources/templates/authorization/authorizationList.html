@@ -59,22 +59,22 @@
 	                </table>
 
 					<!-- 기안 진행 목록 페이징 -->
-					<div class="pagination">
-					    <!-- 이전 페이지 링크: 2 페이지 이상일 때만 표시 -->
-					    <a th:href="@{/authorization/authorizationList(draftPage=${draftPage.pageable.pageNumber > 0 ? draftPage.pageable.pageNumber - 1 : 0}, completedPage=${completedPage.pageable.pageNumber})}" 
-   							th:if="${draftPage.pageable.pageNumber > 0}">&lsaquo;</a>
-					
-					    <!-- 페이지 번호 반복 (현재 페이지 기준으로 앞뒤로 최대 3개) -->
-					    <span th:each="i : ${#numbers.sequence(1, draftPage.pageable.pageNumber + 2 < draftPage.totalPages ? draftPage.pageable.pageNumber + 2 : draftPage.totalPages)}">
-					        <a th:text="${i}" 
-					           th:href="@{/authorization/authorizationList(draftPage=${i - 1}, completedPage=${completedPage.pageable.pageNumber})}" 
-					           th:classappend="${i == draftPage.pageable.pageNumber + 1} ? 'active'">1</a>
-					    </span>
-					
-					    <!-- 다음 페이지 링크: 마지막 페이지가 아닐 때만 표시 -->
-					    <a th:href="@{/authorization/authorizationList(draftPage=${draftPage.pageable.pageNumber + 1}, completedPage=${completedPage.pageable.pageNumber})}" 
-					       th:if="${draftPage.pageable.pageNumber + 1 < draftPage.totalPages}">&rsaquo;</a>
-					</div>
+<div class="pagination" th:if="${draftPage.totalPages > 0}">
+    <!-- 이전 페이지 링크: 2 페이지 이상일 때만 표시 -->
+    <a th:href="@{/authorization/authorizationList(draftPage=${draftPage.pageable.pageNumber > 0 ? draftPage.pageable.pageNumber - 1 : 0}, completedPage=${completedPage.pageable.pageNumber})}" 
+       th:if="${draftPage.pageable.pageNumber > 0}">&lsaquo;</a>
+
+    <!-- 페이지 번호 반복 (1부터 totalPages까지) -->
+    <span th:each="i : ${#numbers.sequence(1, draftPage.totalPages)}">
+        <a th:text="${i}" 
+           th:href="@{/authorization/authorizationList(draftPage=${i - 1}, completedPage=${completedPage.pageable.pageNumber})}" 
+           th:classappend="${i == draftPage.pageable.pageNumber + 1} ? 'active'">1</a>
+    </span>
+
+    <!-- 다음 페이지 링크: 마지막 페이지가 아닐 때만 표시 -->
+    <a th:href="@{/authorization/authorizationList(draftPage=${draftPage.pageable.pageNumber + 1}, completedPage=${completedPage.pageable.pageNumber})}" 
+       th:if="${draftPage.pageable.pageNumber + 1 < draftPage.totalPages}">&rsaquo;</a>
+</div>
 	                <br>
 	
 	                <!-- 완료된 문서 리스트 -->

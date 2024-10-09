@@ -41,9 +41,6 @@ public interface AuthorizationRepository extends JpaRepository<Authorization, Lo
 	Optional<Authorization> findByAuthorNoAndMember_MemNo(Long authorNo, Long memNo);
 
 
-	// 진행 중인 문서만 가져오기 (본인의 문서)
-
-
 	// 완료된 문서만 가져오기 (본인의 문서)
 	Page<Authorization> findByAuthorStatusInAndMember_MemNo(List<String> statuses, Long memNo, Pageable pageable);
 

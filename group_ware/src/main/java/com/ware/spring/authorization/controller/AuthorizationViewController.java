@@ -298,6 +298,10 @@ public class AuthorizationViewController {
         if (authentication != null && authentication.isAuthenticated()) {
             String memId = authentication.getName();  // 현재 로그인한 사용자의 ID를 가져옴
             System.out.println("로그인된 사용자 ID: " + memId);
+            
+            // 최신순으로 정렬된 Pageable 객체 생성
+            Pageable sortedPageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, "authorRegDate"));
+
 
             // 서비스 메서드 호출 시 memId 전달, 페이징 처리된 결과를 받음
             Page<AuthorizationDto> authorizationPage = authorizationService.selectAuthorizationListForApproversAndReferers(memId, pageable);
@@ -337,9 +341,7 @@ public class AuthorizationViewController {
             return "redirect:/login";  // 로그인 페이지로 리다이렉트
         }
     }
-
-
-
+    
 
     // 기안 진행 목록 가져오기
     @GetMapping("/authorization/drafts")

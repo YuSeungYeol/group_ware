@@ -15,7 +15,9 @@ import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -281,6 +283,8 @@ public class AuthorizationService {
         System.out.println("로그인된 사용자 정보 없음");
         return Page.empty(); // 인증되지 않은 경우 빈 페이지 반환
     }
+    
+   
 
 
     // 승인 처리 메서드
