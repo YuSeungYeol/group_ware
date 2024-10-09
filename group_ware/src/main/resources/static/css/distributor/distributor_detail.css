@@ -51,7 +51,7 @@ form select {
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 16px;
-    width: 100%; /* 입력 필드의 너비를 100%로 설정하여 폼의 너비와 일치 */
+    width: 95%; /* 입력 필드의 너비를 100%로 설정하여 폼의 너비와 일치 */
 }
 
 /* 읽기 전용 필드 스타일 */
@@ -67,14 +67,17 @@ form button {
     border-radius: 4px;
     font-size: 16px;
     cursor: pointer;
-    background-color: #007bff;
-    color: #fff;
+    background-color: #EFEFEF;
+    color: black;
+    margin-left: 20px;
     margin-top: 5px;
     align-self: flex-end; /* 버튼을 왼쪽 정렬 */
+    
 }
 
 form button:hover {
-    background-color: #0056b3;
+background-color: #ddd;
+
 }
 
 /* 등록 버튼 스타일 */

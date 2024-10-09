@@ -2,14 +2,20 @@
 .list-container {
     width: 70%;
     margin-left: 270px;
-    margin-top: 100px;
+    margin-top: 10px;
     margin-right: 100px;
     padding: 2px 30px 20px 30px;
     background-color: #F6F4FA;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
+h1 {
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
+}
 /* 검색 폼과 필터 폼을 한 줄에 배치 */
 .form-container {
     display: flex;
@@ -38,13 +44,7 @@ u{
     align-items: center;
 }
 
-/* 제목 스타일 */
-.word h3 {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 10px;
-}
+
 
 /* 테이블 스타일 */
 .distributor_list table {
@@ -58,8 +58,8 @@ u{
 
 /* 테이블 헤더 */
 .distributor_list th {
-    background-color: #808080b3;
-    color: white;
+    background-color: rgba(209,201,240,0.6);
+    color: black;
     font-weight: bold;
     text-align: left;
     padding: 12px;
@@ -84,14 +84,11 @@ u{
 }
 
 /* 테이블 줄 바꿈 색 */
-.distributor_list tr:nth-child(even) {
-    background-color: #f2f2f2;
+.distributor_list tr:hover {
+    background-color: rgba(209,201,240,0.1);
 }
 
-/* 테이블 행에 마우스를 올렸을 때 효과 */
-.distributor_list tr:hover {
-    background-color: #ddd;
-}
+
 
 /* 페이지네이션 */
 .pagination {
@@ -102,13 +99,12 @@ u{
 .pagination a {
     margin: 0 5px;
     padding: 8px 16px;
+    text-decoration: none;
     background-color: #EFEFEF;
-    color: black;
-    border: none;
+    color: white;
     border-radius: 5px;
     font-weight: bold;
-    cursor: pointer;
-    text-decoration: none;
+    
 }
 
 .pagination a:hover {
@@ -117,7 +113,6 @@ u{
 
 .pagination a.active {
     background-color: #808080b3;
-    color: white;
 }
 
 /* 정렬 방향 표시 */
@@ -138,16 +133,16 @@ th.desc:after {
 
 /* 검색 버튼 스타일 */
 #search_distributor_button {
-    background-color: #EFEFEF;
-    border: none;
+	background-color: white;
+    border: 1px solid #ddd;
     border-radius: 5px;
-    padding: 6px 12px;
+    padding: 5px;
     font-size: 0.9rem;
     cursor: pointer;
 }
 
 #search_distributor_button:hover {
-    background-color: #ddd;
+	background-color:#f1f1f1;
 }
 
 /* 검색 타입 선택 스타일 */
