@@ -1,41 +1,28 @@
-/* src/main/resources/static/css/folder.css */
-
-h1 {
-    color: #333;
-    text-align: center;
-    margin-bottom: 20px;
+html {
+	background-color:#F6F4FA;
 }
-
-/* 테이블 스타일 */
 table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
 }
-
 table thead th {
     background-color: #808080;
     color: white;
     text-align: left;
     padding: 10px;
 }
-
 table tbody td {
     padding: 10px;
     border-bottom: 1px solid #ddd;
 }
-/* 링크와 버튼 스타일 */
 a {
     text-decoration: none;
     color: #333; /* 색상을 더 어둡게 설정 */
 }
-
-
-
 a.folderLink{
 	color: #333;
 }
-
 .btn {
     display: inline-block;
     padding: 10px 20px;
@@ -44,7 +31,6 @@ a.folderLink{
     text-align: center;
     cursor: pointer;
 }
-
 .btn-primary {
     background-color: #EFEFEF;
     color: #666;
@@ -52,39 +38,36 @@ a.folderLink{
     transition: background-color 0.3s;
     margin-bottom: 10px;
 }
-
 .btn-primary:hover {
     background-color: #ddd;
 }
 #folderForm.visible {
     display: block; /* 폼을 표시할 때 사용하는 클래스 */
 }
-
 #content {
-	min-height:500px;
-    max-width: 100%;
-    margin-top: 50px; margin-left: 270px; margin-right: 100px;
-    padding: 80px;
+    width: 70%;
+    min-height:650px;
+    margin-left: 270px;
+    margin-top: 10px;
+    margin-right: 100px;
+    padding: 2px 30px 20px 30px;
     background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
 h1 {
+    font-size: 28px;
     color: #333;
-    text-align: center;
     margin-bottom: 20px;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
 }
-
-/* 테이블 스타일 */
 table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
-}
-table {
     border: 1px solid #ddd;
-	border-radius:20px;
+    border-radius: 20px;
 }
 table thead th {
     background-color:rgba(209,201,240,0.6);
@@ -104,7 +87,6 @@ table thead th {
 	float: right;
 	margin-bottom:10px;
 }
-
 #uploadFileBtn{
 	margin-left:5px;
 	margin-right:5px;
@@ -113,12 +95,10 @@ table thead th {
     border: none;
     color: #666;
     transition: background-color 0.3s;
-}  
-
+}
 #uploadFileBtn:hover {
     background-color: #ddd;
 }
-
 #createFolderBtn{
 	float: right;
     background-color: #F6F4FA;
@@ -126,28 +106,22 @@ table thead th {
     color: #666;
     transition: background-color 0.3s;
 }
-
 #createFolderBtn:hover {
     background-color: #ddd;
 }
-
 table tbody td {
     padding: 10px;
     border-bottom: 1px solid #ddd;
 }
-
 table tbody tr:nth-child {
     background-color: rgba(209,201,240,0.3);
 }
-
 table tbody tr:hover {
     background-color: rgba(209,201,240,0.1);
 }
-
 a.folderLink{
 	color: #333;
 }
-
 .btn {
     display: inline-block;
     padding: 10px 20px;
@@ -157,76 +131,58 @@ a.folderLink{
     cursor: pointer;
     border: none;
 }
-
 .btn-primary {
     background-color: #F6F4FA;
     border: none;
     color: #666;
     transition: background-color 0.3s;
 }
-
 .btn-primary:hover {
     background-color: #ddd;
 }
-
-
-/* 공지사항 같은 빈 폴더 목록 알림 스타일 */
 td[colspan="3"] {
     text-align: center;
     font-style: italic;
     color: #888;
     padding: 20px;
 }
-
-
 #folderForm.visible {
     display: block; /* 폼을 표시할 때 사용하는 클래스 */
 }
-
 .folder-show {
     display: table-row !important; /* 또는 적절한 display 값 */
 }
-
 .folderIcon {
     width: 24px;   /* 원하는 너비로 설정 */
     height: 24px;  /* 원하는 높이로 설정 */
     object-fit: contain;  /* 이미지 비율을 유지하면서 크기를 조정 */
 }
-
 .fileIcon {
     width: 24px;   /* 원하는 너비로 설정 */
     height: 24px;  /* 원하는 높이로 설정 */
     object-fit: contain;  /* 이미지 비율을 유지하면서 크기를 조정 */
 }
-
 th:first-child {
     text-align: center;
 }
-
 th:nth-child(2) {
     text-align: right;
 }
-
-
 th:nth-child(3) {
     padding-left: 100px;
 }
-
 td:first-child {
     text-align: center;
 }
 td:nth-child(2) {
     text-align: right;
 }
-
 td:nth-child(4) {
     padding-left: 20px;
 }
-
 th:last-child {
     text-align: center;
 }
-
 td:last-child {
     text-align: center;
 }
