@@ -10,6 +10,7 @@
     	
         <div class="mypage-container">
             <form id="profileForm" action="/api/member/update" method="post" enctype="multipart/form-data">
+        <h1>마이페이지</h1>
                 <!-- CSRF 토큰을 폼에 추가 -->
                 <input type="hidden" name="_csrf" th:value="${_csrf.token}">
                 <input type="hidden" name="mem_no" th:value="${member.mem_no}">

@@ -8,12 +8,12 @@ body {
     justify-content: center;
     align-items: center;
     padding: 20px;
-    background-color: rgba(248, 248, 255, 1);
+    background-color: #F6F4FA;
     border-radius: 20px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     margin-left: 270px;  /* 좌측 마진 유지 */
     margin-right: 110px; /* 우측 마진 */
-    margin-top: 110px;  /* 상단 마진 유지 */
+    margin-top: 10px;  /* 상단 마진 유지 */
     min-height: calc(100vh - 110px); /* 화면 높이를 기준으로 상단 마진을 뺀 높이 */
 }
 
