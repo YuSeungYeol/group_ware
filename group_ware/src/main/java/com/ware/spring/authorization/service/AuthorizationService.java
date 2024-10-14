@@ -217,7 +217,7 @@ public class AuthorizationService {
 
         // 엔티티를 저장 (임시 저장)
         Authorization savedAuthorization = authorizationRepository.save(authorization);  // 저장 후 반환된 엔티티 객체를 저장
-
+ 
         return savedAuthorization;  // 저장된 Authorization 객체 반환
     }
 
