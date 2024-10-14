@@ -1,5 +1,5 @@
 package com.ware.spring.authorization.service;
-
+ 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
@@ -25,7 +25,7 @@ import com.ware.spring.authorization.repository.AuthorizationRepository;
 
 @Service
 public class AuthorizationFileService {
-
+ 
     private String fileDir = "C:\\document\\upload\\";
     
     private final AuthorizationRepository authorizationRepository;

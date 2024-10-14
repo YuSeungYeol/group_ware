@@ -144,7 +144,7 @@ public class ApprovalRouteController {
         if (memberOpt.isPresent()) {
             Long memNo = memberOpt.get().getMemNo();
             boolean approvalNotification = approvalRouteService.hasApprovalNotifications(memNo);
-            boolean authorNotification = authorizationService.hasAuthorNotifications(memNo);
+            boolean authorNotification = authorizationService.hasAuthorNotifications(memNo); 
 
             notifications.put("approvalNotification", approvalNotification);
             notifications.put("authorNotification", authorNotification);

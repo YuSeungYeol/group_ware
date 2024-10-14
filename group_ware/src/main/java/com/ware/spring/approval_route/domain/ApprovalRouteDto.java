@@ -83,7 +83,7 @@ public class ApprovalRouteDto {
             .refererSignature(null)   // 기본값 null 설정
             .build();
     }
-
+ 
     @JsonCreator
     public ApprovalRouteDto(
             @JsonProperty("memNo") Long memNo, 
