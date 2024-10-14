@@ -193,7 +193,7 @@ public class AuthorizationApiController {
                 .collect(Collectors.toList());
  
             dto.setApprovers(approvers);
-
+ 
             // `createAuthorizationFromDto` 메서드 호출
             List<Long> referersList = new ArrayList<>();
             referersList.add(referer); // 참조자를 리스트로 변환
