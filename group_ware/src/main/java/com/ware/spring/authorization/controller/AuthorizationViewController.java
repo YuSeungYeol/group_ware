@@ -321,7 +321,7 @@ public class AuthorizationViewController {
             
                 // `memNo`를 사용하여 Member를 조회하도록 변경
                 Optional<Member> memberOptional = memberRepository.findByMemNo(authorization.getMemNo());
- 
+  
                 if (memberOptional.isPresent()) {
                     Member member = memberOptional.get();
                     authorization.setMemName(member.getMemName()); // memName을 직접 설정
