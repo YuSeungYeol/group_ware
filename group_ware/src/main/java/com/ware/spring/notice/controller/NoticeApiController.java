@@ -128,7 +128,7 @@ public class NoticeApiController {
         String username = principal.getName();
         Member loggedInMember = memberRepository.findByMemId(username)
                 .orElseThrow(() -> new RuntimeException("로그인된 사용자를 찾을 수 없습니다."));
-
+ 
         // 삭제할 게시글의 작성자 확인
         NoticeDto originalDto = noticeService.selectNoticeOne(notice_no);
         if (!originalDto.getMember().getMemNo().equals(loggedInMember.getMemNo())) {

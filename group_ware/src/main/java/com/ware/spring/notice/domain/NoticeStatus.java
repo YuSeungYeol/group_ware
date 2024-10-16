@@ -25,7 +25,7 @@ import lombok.Setter;
 @AllArgsConstructor(access=AccessLevel.PROTECTED)
 @Builder
 public class NoticeStatus {
-
+ 
 	 @Id
 	 @GeneratedValue(strategy = GenerationType.IDENTITY)
 	 @Column(name="notice_status_no")

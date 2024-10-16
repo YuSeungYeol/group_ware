@@ -18,7 +18,7 @@ import lombok.ToString;
 @ToString
 @Builder
 public class NoticeStatusDto {
-
+ 
 	private Long noticeStatusNo;
     private Notice notice;
     private Member member;

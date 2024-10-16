@@ -66,7 +66,7 @@ public class NoticeViewController {
         model.addAttribute("userRankNo", loggedInMember.getRank().getRankNo()); // Rank 정보를 모델에 추가
         return "notice/noticeCreate";
     }   
-
+ 
     // 공지사항 상세화면
     @GetMapping("/notice/{notice_no}")
     public String selectNoticeOne(Model model, 
