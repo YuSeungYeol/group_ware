@@ -409,7 +409,7 @@
 		    if (window.topDistributorSalesChart instanceof Chart) {
 		        window.topDistributorSalesChart.destroy();
 		    }
-
+ 
 			const topDistributorSalesChartCtx = document.getElementById('topDistributorSalesChart').getContext('2d');
 			window.topDistributorSalesChart = new Chart(topDistributorSalesChartCtx, {
 			    type: 'pie',

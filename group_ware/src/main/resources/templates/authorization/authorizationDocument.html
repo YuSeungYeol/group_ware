@@ -14,7 +14,7 @@
                         <form th:action="@{/authorizationList}" th:object="${searchDto}" method="get">
                             <select name="search_type" th:value="${searchDto.search_type}">
                                 <option th:value="1" th:selected="${searchDto.search_type} == '1'">제목</option>
-                            </select> 
+                            </select>  
                             <input type="text" name="search_text" 
                             th:field="*{search_text}" placeholder="검색어를 입력하세요">
                             <input type="submit" value="검색">

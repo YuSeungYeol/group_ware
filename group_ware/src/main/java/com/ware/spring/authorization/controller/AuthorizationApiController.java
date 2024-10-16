@@ -191,7 +191,7 @@ public class AuthorizationApiController {
                     return approverDto;
                 })
                 .collect(Collectors.toList());
-  
+   
             dto.setApprovers(approvers);
  
             // `createAuthorizationFromDto` 메서드 호출

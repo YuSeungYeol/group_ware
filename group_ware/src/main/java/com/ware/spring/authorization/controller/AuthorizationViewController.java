@@ -329,7 +329,7 @@ public class AuthorizationViewController {
                     System.out.println("해당 memNo에 대한 Member가 없습니다: " + authorization.getMemNo());
                 }
             }
-
+ 
             // 모델에 페이징된 결재 내역 리스트 추가
             model.addAttribute("authorizationPage", authorizationPage);
             model.addAttribute("currentPage", authorizationPage.getNumber() + 1);  // 현재 페이지 번호
