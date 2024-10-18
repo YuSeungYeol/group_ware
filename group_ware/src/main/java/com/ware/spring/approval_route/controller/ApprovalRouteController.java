@@ -44,7 +44,7 @@ public class ApprovalRouteController {
         this.authorizationRepository = authorizationRepository;
         this.approvalRouteRepository = approvalRouteRepository;
     }
-
+ 
     // 기안 진행중인 문서 조회
     @GetMapping("/{authorNo}")
     public ResponseEntity<List<ApprovalRouteDto>> getApprovalRoutes(@PathVariable("authorNo") Long authorNo) {
