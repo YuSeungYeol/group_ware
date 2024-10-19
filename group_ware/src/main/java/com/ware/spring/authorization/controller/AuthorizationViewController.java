@@ -212,7 +212,7 @@ public class AuthorizationViewController {
             @PageableDefault(size = 5) Pageable pageable, 
             Model model, 
             Principal principal) {
-     
+  
         // 로그인한 사용자의 empNo 가져오기
         String memName = principal.getName();
         Optional<Member> memberOpt = memberRepository.findByMemName(memName);
