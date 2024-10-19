@@ -34,7 +34,7 @@ public class AuthorizationFileService {
     public AuthorizationFileService(AuthorizationRepository authorizationRepository) {
         this.authorizationRepository = authorizationRepository;
     }
-
+ 
     // 파일 업로드 메서드
     public String upload(MultipartFile file) {
         String newFileName = null;
