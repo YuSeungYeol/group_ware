@@ -107,7 +107,7 @@ public class AuthorizationService {
         // Authorization 엔티티 생성 (authorNo는 null이어야 함)
         Authorization authorization = dto.toEntity(member, new ArrayList<>());
         System.out.println("Authorization Entity before save: " + authorization); // 저장 전 Entity 확인
-
+ 
         // Authorization에 authContent 값을 설정
         if (dto.getAuthContent() != null && !dto.getAuthContent().isEmpty()) {
             authorization.setAuthContent(dto.getAuthContent());  // authContent 값 설정
