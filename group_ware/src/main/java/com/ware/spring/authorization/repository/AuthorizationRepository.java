@@ -30,7 +30,7 @@ public interface AuthorizationRepository extends JpaRepository<Authorization, Lo
 
 	// 기안 진행 중인 문서 조회 
     Page<Authorization> findByAuthorStatus(String status, Pageable pageable);
-
+ 
     // 완료된 문서(승인/반려) 조회
     Page<Authorization> findByAuthorStatusIn(List<String> statuses, Pageable pageable);
 
