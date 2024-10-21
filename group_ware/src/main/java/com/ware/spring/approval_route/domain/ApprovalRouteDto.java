@@ -64,7 +64,7 @@ public class ApprovalRouteDto {
             .refererSignature(refererSignature)    // Authorization에서 사인 정보 가져오기
             .build();
     }
-  
+ 
     // DTO를 Entity로 변환하는 메서드
     public static ApprovalRouteDto toDto(ApprovalRoute approvalRoute) {
         Authorization authorization = approvalRoute.getAuthorization();  // Authorization 엔티티 가져오기
