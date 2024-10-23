@@ -141,7 +141,7 @@ public class ApprovalRouteService {
             routeBuilder.approverSignature(signature);
             System.out.println("결재자 서명 저장: " + signature);  // 디버깅 로그 추가
         }
-
+ 
         // 참조자인 경우 서명 저장
         if (isReferer) {
             routeBuilder.refererSignature(signature);
