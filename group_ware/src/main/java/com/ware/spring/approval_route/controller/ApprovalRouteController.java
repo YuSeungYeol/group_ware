@@ -84,7 +84,7 @@ public class ApprovalRouteController {
         approvalRouteDtos.forEach(dto -> {
             Authorization authorization = authorizationRepository.findById(dto.getAuthorNo())
                     .orElseThrow(() -> new RuntimeException("Authorization not found"));
-
+ 
             // 결재자 정보 설정
             if ("Y".equals(dto.getIsApprover())) {
                 Member approver = memberRepository.findById(dto.getMemNo()).orElse(null);
