@@ -24,7 +24,7 @@
                     <option th:value="${member.rank.rankNo}" th:text="${member.rank.rankName}" selected="selected"></option>
                     <option th:each="rank : ${rankList}" th:value="${rank.rankNo}"
                             th:text="${rank.rankName}" th:if="${rank.rankNo != member.rank.rankNo}"></option>
-                </select>a
+                </select><!--  -->
             </div>
             <div class="member-detail">
                 <label>지점 </label>
