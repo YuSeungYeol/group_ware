@@ -47,7 +47,11 @@ public class MemberService {
 
     }
 
-    // 사원번호 생성 로직
+    /**
+     * 사원번호 생성 로직
+     * 기술: 문자열 조작, Random
+     * 설명: 사용자의 소속된 지점 번호, 등록일, 무작위 2자리 숫자를 조합하여 사원번호를 생성합니다.
+     */
     public String generateEmpNo(MemberDto memberDto) {
         String distributorNo = String.format("%02d", memberDto.getDistributor_no()); // 두 자리로 맞춤
         String memRegDate = memberDto.getMem_reg_date().format(DateTimeFormatter.ofPattern("yyMM")); // YYMM 추출
@@ -57,20 +61,30 @@ public class MemberService {
         return empNo;
     }
 
-    // 부서 이름 조회
+    /**
+     * 부서 이름 조회
+     * 기술: Spring Data JPA
+     * 설명: 지점 번호를 통해 해당 지점의 이름을 조회합니다.
+     */
     public String getDistributorNameByNo(Long distributorNo) {
         return distributorRepository.findDistributorNameByDistributorNo(distributorNo);
     }
-
-    // 아이디 중복 확인 메서드
+    /**
+     * 아이디 중복 확인 메서드
+     * 기술: Spring Data JPA
+     * 설명: 특정 아이디가 이미 존재하는지 확인합니다.
+     */
     public boolean isIdDuplicated(String memId) {
         return memberRepository.existsByMemId(memId);
     }
 
-    // 회원 등록 메서드
+    /**
+     * 회원 등록 메서드
+     * 기술: Spring Data JPA, PasswordEncoder, DTO 패턴
+     * 설명: 사원번호 생성, 비밀번호 인코딩 후, DTO를 엔티티로 변환하여 데이터베이스에 저장합니다.
+     */
     public Member saveMember(MemberDto memberDto) {
-        // 사원번호 생성
-        String empNo = generateEmpNo(memberDto);
+        String empNo = generateEmpNo(memberDto); // 사원번호 생성
         System.out.println("Generated empNo in Service: " + empNo);
 
         // 직급과 소속 찾기
@@ -90,45 +104,50 @@ public class MemberService {
         // 회원 정보 저장
         return memberRepository.save(member);
     }
-
-    // 회원 수정 메서드
+    /**
+     * 회원 정보 수정 (updateMember)
+     * 기술: Spring Data JPA, 파일 입출력, MultipartFile, DTO 패턴
+     * 설명: 기존 회원 정보를 가져와 필요한 필드를 수정하고, 프로필 사진이 업로드된 경우 파일을 저장하며 변경 사항을 데이터베이스에 반영합니다.
+     */
     public void updateMember(MemberDto memberDto, MultipartFile profilePicture) throws IOException {
-        // 기존 회원 정보 가져오기
         Member existingMember = memberRepository.findById(memberDto.getMem_no())
             .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다: " + memberDto.getMem_no()));
 
         // 필수 필드 유지
-        memberDto.setMem_id(existingMember.getMemId());  // 아이디 유지
-        memberDto.setEmp_no(existingMember.getEmpNo());  // 사원번호 유지
+        memberDto.setMem_id(existingMember.getMemId());
+        memberDto.setEmp_no(existingMember.getEmpNo());
         if (memberDto.getMem_leave() == null || memberDto.getMem_leave().isEmpty()) {
             memberDto.setMem_leave(existingMember.getMemLeave() != null ? existingMember.getMemLeave() : "N");
         }
-        // 비밀번호가 비어있지 않으면 암호화하고, 비어있으면 기존 비밀번호 유지
+
+        // 비밀번호 변경 시 암호화, 비어있을 경우 기존 비밀번호 유지
         if (memberDto.getMem_pw() != null && !memberDto.getMem_pw().isEmpty()) {
             String encodedPassword = passwordEncoder.encode(memberDto.getMem_pw());
             memberDto.setMem_pw(encodedPassword);
         } else {
-            memberDto.setMem_pw(existingMember.getMemPw());  // 기존 비밀번호 유지
+            memberDto.setMem_pw(existingMember.getMemPw());
         }
 
-        // 프로필 사진 처리: 새로운 파일이 있는 경우에만 저장
+        // 프로필 사진 처리
         if (profilePicture != null && !profilePicture.isEmpty()) {
             String savedFileName = saveProfilePicture(profilePicture, existingMember.getDistributor().getDistributorName(), existingMember.getMemName());
             memberDto.setProfile_saved(savedFileName);
         } else {
-            memberDto.setProfile_saved(existingMember.getProfileSaved());  // 기존 사진 유지
+            memberDto.setProfile_saved(existingMember.getProfileSaved());
         }
 
-        // 등록일 유지, 수정일 갱신
-        memberDto.setMem_reg_date(existingMember.getMemRegDate());
-        memberDto.setMem_mod_date(LocalDate.now());
+        memberDto.setMem_reg_date(existingMember.getMemRegDate()); // 등록일 유지
+        memberDto.setMem_mod_date(LocalDate.now()); // 수정일 갱신
 
         // DTO를 엔티티로 변환하여 저장
         Member member = memberDto.toEntity(existingMember.getRank(), existingMember.getDistributor());
-        memberRepository.save(member);  // 업데이트 처리
+        memberRepository.save(member);
     }
-
-    // 프로필 이미지 저장 메서드
+    /**
+     * 프로필 이미지 저장 (saveProfilePicture)
+     * 기술: 파일 입출력, java.nio.file.Files, StandardCopyOption
+     * 설명: 프로필 이미지를 지정된 디렉토리에 저장하며, 기존 파일이 있는 경우 덮어씁니다.
+     */
     private String saveProfilePicture(MultipartFile profilePicture, String distributorName, String memberName) throws IOException {
         String uploadDir = "src/main/resources/static/profile/" + distributorName;
         Files.createDirectories(Paths.get(uploadDir));
@@ -140,50 +159,74 @@ public class MemberService {
         return fileName;
     }
 
-    // 파일 확장자 추출
+    /**
+     * 파일 확장자 추출 (getExtension)
+     * 기술: 문자열 조작
+     * 설명: 파일명에서 확장자를 추출하여 반환합니다.
+     */
     private String getExtension(String fileName) {
         return fileName.substring(fileName.lastIndexOf(".") + 1);
     }
-
-    // 직급 정보를 불러오는 메서드
+    /**
+     * 직급 정보를 불러오는 메서드 (getRank)
+     * 기술: Spring Data JPA
+     * 설명: 데이터베이스에서 모든 직급 정보를 조회해 반환합니다.
+     */
     public List<Rank> getRank() {
         return rankRepository.findAll();
     }
-
-    // 소속 정보를 불러오는 메서드
+    /**
+     * 소속 정보를 불러오는 메서드 (getDistributors)
+     * 기술: Spring Data JPA
+     * 설명: 데이터베이스에서 모든 소속 정보를 조회해 반환합니다.
+     */
     public List<Distributor> getDistributors() {
         return distributorRepository.findAll();
     }
 
-    public Member findMemberById(String memId) {
-        Optional<Member> member = memberRepository.findByMemId(memId);
-        return member.orElseThrow(() -> new IllegalArgumentException("해당 아이디의 회원을 찾을 수 없습니다: " + memId));
-    }
-
+    /**
+     * 특정 회원 조회 (getMemberById)
+     * 기술: Spring Data JPA, DTO 패턴
+     * 설명: 특정 ID 또는 회원 번호로 회원을 조회한 뒤, DTO로 변환하여 반환합니다.
+     */
     public MemberDto getMemberById(Long memNo) {
-        // 멤버 조회
         Member member = memberRepository.findById(memNo)
             .orElseThrow(() -> new IllegalArgumentException("해당 멤버를 찾을 수 없습니다: " + memNo));
 
-        // DTO로 변환하면서 rank_name과 distributor_name을 추가 설정
         MemberDto memberDto = MemberDto.toDto(member);
-        memberDto.setRank_name(member.getRank().getRankName());  // Rank의 rank_name 설정
-        memberDto.setDistributor_name(member.getDistributor().getDistributorName());  // Distributor의 distributor_name 설정
+        memberDto.setRank_name(member.getRank().getRankName());
+        memberDto.setDistributor_name(member.getDistributor().getDistributorName());
 
         return memberDto;
     }
 
+    /**
+     * 비밀번호 업데이트 (updatePassword)
+     * 기술: PasswordEncoder, Spring Data JPA
+     * 설명: 비밀번호를 암호화한 후 데이터베이스에 업데이트합니다.
+     */
     public void updatePassword(int memNo, String rawPassword) {
         String encodedPassword = passwordEncoder.encode(rawPassword);
         memberRepository.updatePassword(memNo, encodedPassword);
     }
-
+    /**
+     * 회원 정보 업데이트 (updateMemberInfo)
+     * 기술: Spring Data JPA
+     * 설명: 특정 회원의 이름, 전화번호, 이메일을 업데이트합니다.
+     */
     public void updateMemberInfo(int memNo, String memName, String memPhone, String memEmail) {
         memberRepository.updateMemberInfo(memNo, memName, memPhone, memEmail);
     }
+
+    /**
+     * 회원 리스트 조회 (findAllByMemLeaveOrderByEmpNoAsc, findAllOrderByEmpNoAsc)
+     * 기술: Spring Data JPA, 페이징 (Pageable)
+     * 설명: 퇴사 여부에 따라 정렬된 회원 리스트를 반환하거나, 모든 회원을 정렬된 형태로 반환합니다.
+     */
     public Page<Member> findAllByMemLeaveOrderByEmpNoAsc(String memLeave, Pageable pageable) {
         return memberRepository.findAllByMemLeaveOrderByEmpNoAsc(memLeave, pageable);
     }
+
     public Page<Member> findAllOrderByEmpNoAsc(Pageable pageable) {
         return memberRepository.findAllByOrderByEmpNoAsc(pageable);
     }
