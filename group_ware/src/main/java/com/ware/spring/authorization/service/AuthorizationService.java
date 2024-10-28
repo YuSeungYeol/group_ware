@@ -56,6 +56,13 @@ public class AuthorizationService {
     }
 
     // Authorization 목록 조회
+    /**
+     * 결재 목록 조회
+     * 기술: Spring Data JPA, Spring Security
+     * 설명: 로그인한 사용자의 회원 번호를 기반으로 본인 결재 리스트를 조회합니다. 
+     *        임시 저장(T) 상태가 아닌 문서만 필터링하여 DTO 형식으로 반환합니다. 
+     *        인증되지 않은 경우 빈 리스트를 반환합니다.
+     */
     public List<AuthorizationDto> selectAuthorizationList() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof SecurityUser) {
@@ -76,13 +83,26 @@ public class AuthorizationService {
         return Collections.emptyList(); // 인증되지 않은 경우 빈 리스트 반환
     }
 
-    // Authorization 엔티티 직접 생성
+    /**
+     * Authorization 엔티티 생성
+     * 기술: Spring Data JPA
+     * 설명: 주어진 Authoriza
+     * tion 엔티티를 데이터베이스에 저장합니다. 
+     *        이 메서드는 트랜잭션으로 실행되어, 저장 중에 발생하는 모든 예외가 롤백됩니다.
+     */
     @Transactional
     public Authorization createAuthorization(Authorization authorization) {
         return authorizationRepository.save(authorization);
     }
 
     // 결재
+    /**
+     * Authorization 엔티티를 DTO에서 생성하고 저장
+     * 기술: Spring Data JPA, Spring Security
+     * 설명: 주어진 AuthorizationDto를 기반으로 Authorization 엔티티를 생성하고,
+     *        현재 로그인한 사용자의 정보를 설정합니다. 또한, 결재자 및 참조자 목록의 중복을 제거하고 
+     *        결재 경로를 생성합니다. 트랜잭션으로 실행되며, 오류 발생 시 롤백됩니다.
+     */
     @Transactional
     public Authorization createAuthorizationFromDto(AuthorizationDto dto, List<ApprovalRouteDto> approvers, List<Long> referers) {
         // 시작 로그
@@ -141,6 +161,13 @@ public class AuthorizationService {
 
 
     // 결재자 경로 업데이트
+    /**
+     * 기술: Spring Data JPA, Spring Framework (트랜잭션 관리), Service 패턴
+     * 설명: 주어진 AuthorizationDto와 결재자 목록을 기반으로 결재 경로를 저장합니다. 
+     *        결재자 목록을 순회하면서 각 결재자의 현재 결재 경로가 존재하지 않을 경우 
+     *        새로운 결재 경로를 생성합니다. 참조자(referer)가 주어지면 마지막으로 참조자에 대한 결재 경로도 생성합니다.
+     *        이 메서드는 트랜잭션으로 실행되어 데이터 무결성을 보장합니다.
+     */
     @Transactional
     public void saveAuthorizationData(AuthorizationDto dto, List<Long> approvers, Long referer) {
         int order = 1;
@@ -156,14 +183,31 @@ public class AuthorizationService {
         }
     }
 
-    // 파일 삭제 메서드
+    /**
+     * 업로드된 파일 삭제
+     * 기술: Java File I/O
+     * 설명: 주어진 경로에서 파일 이름을 기반으로 업로드된 파일을 삭제합니다. 
+     *        파일 이름은 쉼표(,)로 구분되어 있으며, 각 파일 이름을 이용해 
+     *        해당 파일이 존재하는 경우 삭제를 시도합니다. 
+     *        rename 매개변수가 잘못된 경우 삭제되지 않습니다.
+     */
     public void cleanUploadFile(String rename, String path) {
         for (String s : rename.split(rename)) {
             File f = new File(path, s);
             f.delete();
         }
     }
+    
     // 임시 저장함
+    /**
+     * 기술: Spring Data JPA, Spring Security, 페이징 처리
+     * 설명: 현재 로그인한 사용자의 임시 저장 문서를 조회하여 페이지 형태로 반환합니다. 
+     *        사용자 정보를 SecurityContext에서 가져와서 해당 사용자의 memNo를 기반으로 
+     *        임시 저장 상태("T")인 결재 목록을 조회합니다. 
+     *        결과는 Page<Authorization> 형태로 가져온 후, 
+     *        Page<AuthorizationDto>로 변환하여 반환합니다. 
+     *        인증되지 않은 경우 빈 페이지를 반환합니다.
+     */
     public Page<AuthorizationDto> selectTemporaryAuthorizationList(Pageable pageable) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof SecurityUser) {
@@ -178,13 +222,19 @@ public class AuthorizationService {
         }
         return Page.empty(); // 인증되지 않은 경우 빈 페이지 반환
     }
-
-
-
-
-    
     
     // 임시 저장
+    /**
+     * 임시 저장된 결재 데이터 저장
+     * 기술: Spring Data JPA, Spring Security, 트랜잭션 관리
+     * 설명: 주어진 AuthorizationDto를 기반으로 임시 저장된 결재 데이터를 저장합니다. 
+     *        현재 로그인한 사용자 정보를 SecurityContext에서 가져와서 DTO에 
+     *        사용자의 memNo를 설정합니다. 사용자의 Member 정보를 조회하고,
+     *        Authorization 엔티티를 생성하여 authContent 값을 설정한 후,
+     *        임시 저장 상태로 설정합니다. 
+     *        마지막으로 Authorization 엔티티를 데이터베이스에 저장하고,
+     *        저장된 객체를 반환합니다. 인증되지 않은 경우 예외를 발생시킵니다.
+     */
     @Transactional
     public Authorization saveTemporaryAuthorization(AuthorizationDto dto) {
         // SecurityContext에서 현재 로그인한 사용자 정보 가져오기
@@ -225,6 +275,14 @@ public class AuthorizationService {
 
 
     // 임시 저장한 파일 다시 작성
+    /**
+     * 기술: Spring Data JPA
+     * 설명: 주어진 authorNo를 기반으로 Authorization 객체를 조회합니다. 
+     *        authorizationRepository를 사용하여 데이터베이스에서 해당 결재 데이터를 검색합니다. 
+     *        결재 데이터가 존재하지 않을 경우 예외를 발생시킵니다. 
+     *        또한, 조회된 Authorization 객체에 연관된 Member와 Distributor 정보를 
+     *        로그로 출력하여 확인할 수 있도록 합니다.
+     */
     public Authorization getAuthorizationById(Long authorNo) {
         System.out.println("Looking for Authorization with authorNo: " + authorNo); // 디버깅용 로그
         
@@ -238,7 +296,17 @@ public class AuthorizationService {
         return authorization;
     }
 
-    // 결재 확인 관련 결재자, 참조자 승인 확인란
+    /**
+     * 결재자 및 참조자를 위한 결재 확인 목록 조회
+     * 기술: Spring Data JPA, 페이징 처리
+     * 설명: 주어진 memId를 기반으로 현재 로그인한 사용자의 결재자 및 참조자 상태를 확인하여 
+     *        결재 목록을 조회합니다. 현재 사용자의 memNo를 조회한 후, 해당 사용자가 
+     *        참여한 결재 경로를 페이징 처리하여 가져옵니다. 
+     *        결재 경로에서 Authorization 정보를 DTO로 변환하고, 
+     *        결재자 및 참조자의 서명을 추가하여 최종적으로 
+     *        AuthorizationDto 목록을 반환합니다. 
+     *        로그인된 사용자가 없을 경우 빈 페이지를 반환합니다.
+     */
     public Page<AuthorizationDto> selectAuthorizationListForApproversAndReferers(String memId, Pageable pageable) {
         System.out.println("로그인한 사용자 ID: " + memId);
         Optional<Member> currentMember = memberRepository.findByMemId(memId);
@@ -290,6 +358,15 @@ public class AuthorizationService {
 
 
     // 승인 처리 메서드
+    /**
+     * 기술: Spring Data JPA, 트랜잭션 관리
+     * 설명: 주어진 authorNo에 해당하는 결재 문서를 승인 처리하는 메서드입니다.
+     *        해당 문서의 결재 경로에서 주어진 memNo(사용자 ID)에 해당하는 결재자 또는 참조자를 찾습니다.
+     *        결재자 또는 참조자인 경우, 서명을 저장하고 승인 상태를 변경합니다.
+     *        문서의 종류가 "off Report"인 경우, 모든 결재자가 승인했는지 확인한 후,
+     *        연차 사용 가능 여부를 체크하여 남아 있는 연차 일수를 차감합니다.
+     *        결재자 또는 참조자의 상태가 'Y'로 변경되면 문서 상태도 승인 상태로 변경합니다.
+     */
     @Transactional
     public void approveDocument(Long authorNo, String signature, Long memNo) {
         Authorization authorization = authorizationRepository.findById(authorNo)
@@ -349,8 +426,16 @@ public class AuthorizationService {
     }
 
 
-    
-    // 모든 결재자가 승인했는지 확인하는 메서드
+     /**
+     * 모든 결재자가 승인했는지 확인하는 메서드
+     * 기술: Spring Data JPA
+     * 설명: 주어진 authorNo에 해당하는 결재 문서의 결재자 목록을 조회하여,
+     *        결재자 중 승인 상태가 'Y'인 결재자의 수를 확인합니다.
+     *        모든 결재자가 승인되었는지 여부를 판단하여 true 또는 false를 반환합니다.
+     * 
+     * @param authorNo 결재 문서의 고유 번호
+     * @return 모든 결재자가 승인했으면 true, 그렇지 않으면 false
+     */
     public boolean checkAllApproversApproved(Long authorNo) {
         List<ApprovalRoute> approvalRoutes = approvalRouteRepository.findByAuthorization_AuthorNo(authorNo);
 
@@ -369,10 +454,15 @@ public class AuthorizationService {
         return totalApprovers == approvedCount;
     }
 
-
-
-	
-	    // 반려 처리 메서드
+	    /**
+	     * 반려 처리 메서드
+	     * 기술: Spring Data JPA
+	     * 설명: 주어진 authorNo에 해당하는 결재 문서를 조회하여,
+	     *        결재자의 서명을 설정한 후 문서의 상태를 'N'으로 변경하여 반려 처리합니다.
+	     * 
+	     * @param authorNo 반려할 결재 문서의 고유 번호
+	     * @param signature 결재자의 서명
+	     */
 	    public void rejectDocument(Long authorNo, String signature) {
 	        Authorization authorization = authorizationRepository.findById(authorNo)
 	            .orElseThrow(() -> new IllegalArgumentException("해당 문서를 찾을 수 없습니다."));
@@ -382,7 +472,18 @@ public class AuthorizationService {
 	        authorizationRepository.save(authorization);
 	    }
 	
-	    // 모든 결재자와 참조자의 상태를 확인 후 문서 상태를 업데이트
+	    /**
+	     * 모든 결재자와 참조자의 상태를 확인 후 문서 상태를 업데이트하는 메서드
+	     * 기술: Spring Data JPA
+	     * 설명: 주어진 authorNo에 해당하는 결재 경로를 조회하여,
+	     *        모든 결재자와 참조자가 승인했는지 확인하고,
+	     *        반려된 경우 문서 상태를 업데이트합니다.
+	     *        모든 결재자가 승인한 경우에는 문서 상태를 'Y'로,
+	     *        반려된 경우에는 문서 상태를 'N'으로 변경합니다.
+	     *        승인/반려가 결정되지 않은 경우는 상태를 변경하지 않습니다.
+	     * 
+	     * @param authorNo 결재 문서의 고유 번호
+	     */
 	    @Transactional
 	    public void checkAndUpdateDocumentStatus(Long authorNo) {
 	        List<ApprovalRoute> routes = approvalRouteRepository.findByAuthorization_AuthorNo(authorNo);
@@ -417,9 +518,17 @@ public class AuthorizationService {
 	        authorizationRepository.save(authorization);
 	    }
 
-
-
-	    // 결재 경로의 상태 업데이트 (승인/반려)
+	    /**
+	     * 결재 경로의 상태를 업데이트하는 메서드 (승인/반려)
+	     * 기술: Spring Data JPA
+	     * 설명: 주어진 authorNo에 해당하는 결재 경로를 조회하고,
+	     *        현재 결재자의 승인 또는 반려에 따라 각 결재 경로의 상태를 업데이트합니다.
+	     *        이전 결재자가 승인된 경우에만 현재 결재자가 승인 상태로 업데이트되고,
+	     *        이전 결재자가 반려된 경우 남은 결재자들은 반려 상태로 설정됩니다.
+	     * 
+	     * @param authorNo 결재 문서의 고유 번호
+	     * @param action    'approve' 또는 'reject'로 승인 또는 반려를 나타냄
+	     */
 	    @Transactional
 	    public void updateApprovalRouteStatus(Long authorNo, String action) {
 	        List<ApprovalRoute> routes = approvalRouteRepository.findByAuthorization_AuthorNo(authorNo);
@@ -444,12 +553,27 @@ public class AuthorizationService {
 	        }
 	    }
 
-	    // 완료된 문서 가져오기
+	    /**
+	     * 완료된 문서를 가져오는 메서드
+	     * 기술: Spring Data JPA
+	     * 설명: 주어진 상태 목록에 해당하는 모든 결재 문서를 조회합니다.
+	     *        상태는 여러 개를 입력받아 해당 상태의 문서를 필터링하여 반환합니다.
+	     * 
+	     * @param statuses 결재 문서의 상태 목록
+	     * @return 주어진 상태에 해당하는 모든 결재 문서 목록
+	     */
 	    public List<Authorization> findAllByAuthorStatus(List<String> statuses) {
 	        return authorizationRepository.findAllByAuthorStatusIn(statuses);
 	    }
 
-	    // 기안 진행 중 목록 조회
+	    /**
+	     * 기안 진행 중 목록 조회
+	     * 기술: Spring Data JPA
+	     * 설명: 현재 로그인한 사용자의 결재 리스트에서 대기(P) 상태인 문서를 조회합니다.
+	     *        사용자의 memNo를 이용하여 본인의 결재 문서 중 대기 중인 문서만 필터링하여 반환합니다.
+	     * 
+	     * @return 대기 상태인 결재 문서의 DTO 목록
+	     */
 	    public List<AuthorizationDto> selectDraftAuthorizationList() {
 	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	        if (authentication != null && authentication.getPrincipal() instanceof SecurityUser) {
@@ -470,7 +594,14 @@ public class AuthorizationService {
 	        return Collections.emptyList(); // 인증되지 않은 경우 빈 리스트 반환
 	    }
 	    
-	    // 완료된 문서 목록 조회
+	    /**
+	     * 완료된 문서 목록 조회
+	     * 기술: Spring Data JPA
+	     * 설명: 현재 로그인한 사용자의 결재 리스트에서 승인(Y), 반려(N), 또는 완료(C) 상태인 문서를 조회합니다.
+	     *        사용자의 memNo를 이용하여 해당 상태의 결재 문서를 반환합니다.
+	     * 
+	     * @return 완료 상태인 결재 문서의 DTO 목록
+	     */
 	    public List<AuthorizationDto> selectCompletedAuthorizationList() {
 	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	        if (authentication != null && authentication.getPrincipal() instanceof SecurityUser) {
@@ -504,7 +635,13 @@ public class AuthorizationService {
 	        
 	    }
 
-	    // 결재 경로를 회수된 상태로 업데이트하는 메서드
+	    /**
+	     * 결재 경로를 회수된 상태로 업데이트하는 메서드
+	     * 기술: Spring Data JPA
+	     * 설명: 주어진 문서 번호에 해당하는 모든 결재 경로의 상태를 '회수됨(R)'으로 변경합니다.
+	     * 
+	     * @param authorNo 결재 경로를 업데이트할 문서의 고유 번호
+	     */
 	    @Transactional
 	    public void updateApprovalRouteStatusToRecalled(Long authorNo) {
 	        List<ApprovalRoute> routes = approvalRouteRepository.findByAuthorization_AuthorNo(authorNo);
@@ -515,7 +652,14 @@ public class AuthorizationService {
 	        }
 	    }
 	    
-	    // 문서 회수 로직
+	    /**
+	     * 문서를 회수하는 로직
+	     * 기술: Spring Data JPA
+	     * 설명: 주어진 문서 번호에 해당하는 문서를 회수합니다. 
+	     * 문서 상태가 '대기중(P)'인 경우에만 회수가 가능합니다.
+	     *
+	     * @param authorNo 회수할 문서의 고유 번호
+	     */
 	    public void recallDocument(Long authorNo) {
 	        Authorization authorization = authorizationRepository.findById(authorNo)
 	            .orElseThrow(() -> new IllegalArgumentException("해당 문서를 찾을 수 없습니다."));
@@ -535,6 +679,15 @@ public class AuthorizationService {
 	        
 	    }
 
+	    /**
+	     * 결재자의 서명을 업데이트하는 메서드
+	     * 기술: Spring Data JPA, Java Optional
+	     * 설명: 주어진 문서 번호와 회원 번호에 해당하는 결재자의 서명을 업데이트합니다.
+	     *
+	     * @param authorNo 결재할 문서의 고유 번호
+	     * @param memNo 결재자의 회원 번호
+	     * @param signature 결재자의 서명
+	     */
 	    @Transactional
 	    public void updateApproverSignature(Long authorNo, Long memNo, String signature) {
 	        Optional<ApprovalRoute> optionalRoute = approvalRouteRepository.findByAuthorization_AuthorNoAndMember_MemNo(authorNo, memNo);
@@ -549,6 +702,16 @@ public class AuthorizationService {
 	        }
 	    }
 	    
+	    /**
+	     * 참조자의 서명을 업데이트하는 메서드
+	     * 기술: Spring Data JPA, Java Optional
+	     * 설명: 주어진 문서 번호와 회원 번호에 해당하는 참조자의 서명을 업데이트합니다.
+	     *
+	     * @param authorNo 결재할 문서의 고유 번호
+	     * @param memNo 참조자의 회원 번호
+	     * @param signature 참조자의 서명
+	     * @throws IllegalArgumentException 참조자 경로를 찾을 수 없는 경우
+	     */
 	    @Transactional
 	    public void updateRefererSignature(Long authorNo, Long memNo, String signature) {
 	        Optional<ApprovalRoute> optionalRoute = approvalRouteRepository.findByAuthorization_AuthorNoAndMember_MemNo(authorNo, memNo);
@@ -574,12 +737,28 @@ public class AuthorizationService {
 	    }
 
 
-	    // 기안자 알람
+	    /**
+	     * 기안자 알림 확인 메서드
+	     * 기술: Spring Data JPA (쿼리 메서드)
+	     * 설명: 특정 회원(memNo)에게 알람이 필요한 문서가 있는지 확인하여 반환합니다.
+	     *      - 'C' 또는 'T' 상태가 아닌 문서가 있는 경우 true를 반환합니다.
+	     *
+	     * @param memNo 확인할 기안자의 회원 번호
+	     * @return 알람이 필요한 문서가 있는 경우 true, 그렇지 않으면 false
+	     */
 	    public boolean hasAuthorNotifications(Long memNo) {
 	        return authorizationRepository.existsByMember_MemNoAndAuthorStatusNotAndAuthorStatusNot(memNo, "C", "T");
 	    }
 	    
-	    // 알림 해제 로직
+	    /**
+	     * 기안자 알림 해제 메서드
+	     * 기술: Spring Data JPA, @Transactional
+	     * 설명: 특정 문서(authorNo)가 memNo 사용자의 문서일 때, 'Y'(승인), 'N'(반려), 'R'(회수됨) 상태라면 'C'(알림 해제)로 상태를 변경하여 알림을 제거합니다.
+	     *      - 알림 해제 상태로 업데이트되지 않으면 관련 메시지를 출력합니다.
+	     *
+	     * @param authorNo 알림을 해제할 문서 번호
+	     * @param memNo 문서 소유자의 회원 번호
+	     */
 	    @Transactional
 	    public void clearAuthorNotification(Long authorNo, Long memNo) {
 	        System.out.println("clearAuthorNotification 메서드 호출됨, authorNo: " + authorNo + ", memNo: " + memNo);
@@ -606,23 +785,36 @@ public class AuthorizationService {
 	    }
 
 
-	 // 기안 진행 중인 본인의 문서만 가져오기
+	    /**
+	     * 본인의 진행 중인 기안 문서 페이징 조회 메서드
+	     * 기술: Spring Data JPA, @Transactional, 페이징(Pageable)
+	     * 설명: 특정 회원(memNo)의 'P'(진행 중) 상태인 기안 문서 목록을 페이징 처리하여 반환합니다.
+	     *      - 조회된 `Authorization` 엔티티를 `AuthorizationDto`로 변환하여 반환합니다.
+	     *
+	     * @param memNo 조회할 회원의 회원 번호
+	     * @param pageable 페이징 정보(PageRequest 객체 등)
+	     * @return 진행 중인 기안 문서 목록을 페이징하여 반환
+	     */
 	    @Transactional
 	    public Page<AuthorizationDto> getDraftAuthorizations(Long memNo, Pageable pageable) {
 	        Page<Authorization> authorizationPage = authorizationRepository.findByAuthorStatusAndMember_MemNo("P", memNo, pageable);
 	        return authorizationPage.map(AuthorizationDto::toDto);
 	    }
 
-	    // 완료된 본인의 문서만 가져오기
+	    /**
+	     * 본인의 완료된 기안 문서 페이징 조회 메서드
+	     * 기술: Spring Data JPA, @Transactional, 페이징(Pageable)
+	     * 설명: 특정 회원(memNo)의 완료된 기안 문서 목록을 상태 필터링(`Y`, `N`, `C`)하여 페이징 처리하고 반환합니다.
+	     *      - 조회된 `Authorization` 엔티티를 `AuthorizationDto`로 변환하여 반환합니다.
+	     *
+	     * @param memNo 조회할 회원의 회원 번호
+	     * @param pageable 페이징 정보(PageRequest 객체 등)
+	     * @return 완료된 기안 문서 목록을 페이징하여 반환
+	     */
 	    @Transactional
 	    public Page<AuthorizationDto> getCompletedAuthorizations(Long memNo, Pageable pageable) {
 	        List<String> completedStatuses = Arrays.asList("Y", "N", "C");
 	        Page<Authorization> authorizationPage = authorizationRepository.findByAuthorStatusInAndMember_MemNo(completedStatuses, memNo, pageable);
 	        return authorizationPage.map(AuthorizationDto::toDto);
 	    }
-
-
-
-
-
 }
