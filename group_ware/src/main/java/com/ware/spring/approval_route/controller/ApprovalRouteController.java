@@ -179,7 +179,7 @@ public class ApprovalRouteController {
      * @return ResponseEntity<Map<String, Boolean>> 알림 상태 정보를 포함하는 HTTP 응답.
      *         성공적으로 조회 시 HTTP 200 OK 상태 코드와 함께
      *         결재 알림과 기안 알림의 상태가 포함된 맵이 반환됩니다.
-     */
+     */ 
     @GetMapping("/nav")
     public ResponseEntity<Map<String, Boolean>> getNavNotifications() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
