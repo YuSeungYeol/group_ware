@@ -64,32 +64,23 @@ public class AuthorizationViewController {
         this.approvalRouteRepository = approvalRouteRepository;
         this.approvalRouteService = approvalRouteService;
     }
-
-    // 결재 리스트 조회
-//    @GetMapping("/authorization/authorizationList")
-//    public String listAuthorizations(
-//            @RequestParam(value = "draftPage", defaultValue = "0") int draftPage,
-//            @RequestParam(value = "completedPage", defaultValue = "0") int completedPage,
-//            Model model) {
-//
-//        // 기안 진행 목록 페이지 처리 (authorRegDate 기준으로 내림차순 정렬)
-//        Pageable draftPageable = PageRequest.of(draftPage, 5, Sort.by(Sort.Direction.DESC, "authorRegDate"));
-//        Page<Authorization> resultList = authorizationService.getDraftAuthorizations(draftPageable);
-//
-//        // 완료 문서 페이지 처리 (authorRegDate 기준으로 내림차순 정렬)
-//        Pageable completedPageable = PageRequest.of(completedPage, 5, Sort.by(Sort.Direction.DESC, "authorRegDate"));
-//        Page<Authorization> completedList = authorizationService.getCompletedAuthorizations(completedPageable);
-//
-//        // 모델에 추가 (getContent()로 리스트만 가져옴)
-//        model.addAttribute("resultList", resultList.getContent());
-//        model.addAttribute("draftPage", resultList); // Page 객체 전달
-//        model.addAttribute("completedList", completedList.getContent());
-//        model.addAttribute("completedPage", completedList); // Page 객체 전달
-//
-//        return "authorization/authorizationList";
-//    }
     
-    
+    /**
+     * 기안 진행 중 및 완료된 문서 목록을 조회하여 화면에 표시하는 메서드.
+     * 
+     * ## 기능
+     * - 로그인한 사용자의 기안 진행 중 문서와 완료된 문서 리스트를 페이지 단위로 조회하여 모델에 추가
+     * 
+     * ## 기술
+     * - Spring Data JPA를 사용하여 기안 상태에 따른 문서 리스트를 `Pageable`로 조회
+     * - GET 요청에 따라 뷰에 필요한 데이터(페이지 번호, 문서 리스트)를 Model에 담아 반환
+     * 
+     * @param draftPage - 진행 중인 문서의 페이지 번호, 기본값은 0
+     * @param completedPage - 완료된 문서의 페이지 번호, 기본값은 0
+     * @param model - 뷰로 전달할 데이터를 담는 Model 객체
+     * @param principal - 현재 로그인한 사용자의 정보를 포함하는 Principal 객체
+     * @return String - 문서 목록 화면을 나타내는 뷰 이름, 예외 시 오류 페이지 반환
+     */
     @GetMapping("/authorization/authorizationList")
     public String listAuthorizations(
             @RequestParam(value = "draftPage", defaultValue = "0") int draftPage,
@@ -131,10 +122,21 @@ public class AuthorizationViewController {
         }
     }
 
-
-
-
-
+    /**
+     * 문서 생성 페이지를 로드하여 사용자 정보를 모델에 추가하는 메서드.
+     * 
+     * ## 기능
+     * - 로그인한 사용자의 empNo(사번)와 memNo(멤버 번호)를 조회하여 모델에 추가
+     * - Thymeleaf 템플릿에서 사용자 정보를 활용할 수 있도록 설정
+     * 
+     * ## 기술
+     * - Spring Security를 사용해 로그인한 사용자 정보를 Principal로 받아옴
+     * - Spring Data JPA를 통해 Member 정보를 조회하여 모델에 담음
+     * 
+     * @param model - 뷰로 전달할 데이터를 담는 Model 객체
+     * @param principal - 현재 로그인한 사용자의 정보를 포함하는 Principal 객체
+     * @return String - 문서 생성 화면을 나타내는 뷰 이름
+     */
     @GetMapping("/authorization/authorizationCreate")
     public String createAuthorizationPage(Model model, Principal principal) {
         // 로그인한 사용자의 사용자명(ID)을 가져옴
@@ -162,51 +164,150 @@ public class AuthorizationViewController {
         return "authorization/authorizationCreate";
     }
 
-    
-    
-    // 모달 전달
+    /**
+     * 결재 모달 창을 로드하는 메서드.
+     * 
+     * ## 기능
+     * - 사용자에게 결재 관련 모달 창을 표시하기 위해 뷰를 반환
+     * - 추가적인 데이터나 로직 없이 단순하게 모달 뷰로 이동
+     * 
+     * ## 기술
+     * - Spring MVC의 @GetMapping을 사용하여 GET 요청을 처리
+     * - 모달 창은 Thymeleaf 템플릿을 통해 프론트엔드에 렌더링됨
+     * 
+     * @return String - 결재 모달 화면을 나타내는 뷰 이름
+     */
     @GetMapping("/authorization/authorizationModal")
     public String showAuthorizationModal() {
         return "authorization/authorizationModal";
     }
 
-    // 결재 문서함
+    /**
+     * 결재 문서함 페이지를 로드하는 메서드.
+     * 
+     * ## 기능
+     * - 사용자에게 결재 문서함 화면을 표시
+     * - 결재 문서 목록 및 관련 데이터가 포함된 페이지를 로드하기 위한 엔드포인트
+     * 
+     * ## 기술
+     * - Spring MVC의 @GetMapping을 사용하여 GET 요청을 처리
+     * - Thymeleaf 템플릿을 통해 프론트엔드에 결재 문서함 뷰를 렌더링
+     * 
+     * @return String - 결재 문서함 페이지를 나타내는 뷰 이름
+     */
     @GetMapping("/authorization/authorizationDocument")
     public String showAuthorizationDocument() {
         return "authorization/authorizationDocument";
     }
 
-    // 문서함 연차 결재 서류 정보
+    /**
+     * 연차 결재 서류 정보를 보여주는 페이지를 로드하는 메서드.
+     * 
+     * ## 기능
+     * - 사용자에게 연차 결재 서류 정보 화면을 제공
+     * - 연차 신청, 확인 및 승인/반려와 관련된 정보가 포함된 페이지를 로드하기 위한 엔드포인트
+     * 
+     * ## 기술
+     * - Spring MVC의 @GetMapping을 통해 연차 결재 서류 화면을 로드
+     * - Thymeleaf 템플릿 엔진을 통해 프론트엔드에 뷰를 렌더링
+     * 
+     * @return String - 연차 결재 서류 정보 페이지를 나타내는 뷰 이름
+     */
     @GetMapping("/authorization/authorizationOff")
     public String showAuthorizationOffPage() {
         return "authorization/authorizationOff";
     }
 
-    // 문서함 조퇴 결재 서류 정보
+    /**
+     * 조퇴 결재 서류 정보를 보여주는 페이지를 로드하는 메서드.
+     * 
+     * ## 기능
+     * - 사용자에게 조퇴 결재 서류 정보 화면을 제공
+     * - 조퇴 신청, 확인 및 승인/반려와 관련된 정보가 포함된 페이지를 로드하기 위한 엔드포인트
+     * 
+     * ## 기술
+     * - Spring MVC의 @GetMapping을 통해 조퇴 결재 서류 화면을 로드
+     * - Thymeleaf 템플릿 엔진을 통해 프론트엔드에 뷰를 렌더링
+     * 
+     * @return String - 조퇴 결재 서류 정보 페이지를 나타내는 뷰 이름
+     */
     @GetMapping("/authorization/authorizationLate")
     public String showAuthorizationLatePage() {
         return "authorization/authorizationLate";
     }
 
-    // 문서함 해외 결재 서류 정보
+    /**
+     * 해외 결재 서류 정보를 보여주는 페이지를 로드하는 메서드.
+     * 
+     * ## 기능
+     * - 사용자에게 해외 결재 서류 정보 화면을 제공
+     * - 해외 출장 및 외부 근무와 관련된 결재 서류의 신청, 확인, 승인/반려와 관련된 정보가 포함된 페이지를 로드
+     * 
+     * ## 기술
+     * - Spring MVC의 @GetMapping을 통해 해외 결재 서류 화면을 로드
+     * - Thymeleaf 템플릿 엔진을 통해 프론트엔드에 뷰를 렌더링하여 사용자에게 제공
+     * 
+     * @return String - 해외 결재 서류 정보 페이지를 나타내는 뷰 이름
+     */
     @GetMapping("/authorization/authorizationTrip")
     public String showAuthorizationTripPage() {
         return "authorization/authorizationTrip";
     }
     
-    // 문서함 외근 신청서
+    /**
+     * 외근 신청서 페이지를 로드하는 메서드.
+     * 
+     * ## 기능
+     * - 사용자에게 외근 신청서 문서를 조회 및 관리할 수 있는 화면을 제공
+     * - 외근 신청, 수정, 승인/반려와 같은 외근 관련 결재 정보를 표시하는 페이지를 로드
+     * 
+     * ## 기술
+     * - Spring MVC의 @GetMapping을 사용하여 외근 신청서 페이지를 호출
+     * - Thymeleaf 템플릿 엔진을 이용해 외근 결재 서류의 사용자 인터페이스를 렌더링
+     * 
+     * @return String - 외근 신청서 페이지를 표시하는 뷰 이름
+     */
     @GetMapping("/authorization/authorizationOutside")
     public String showAuthorizationOutsidePage() {
         return "authorization/authorizationOutside";
     }
         
-    // 문서함 야근 신청서
+    /**
+     * 야근 신청서 페이지를 로드하는 메서드.
+     * 
+     * ## 기능
+     * - 사용자에게 야근 신청서를 조회하고 관리할 수 있는 화면을 제공
+     * - 야근 신청, 수정, 승인/반려 등 야근 관련 결재 정보를 표시하는 페이지를 로드
+     * 
+     * ## 기술
+     * - Spring MVC의 @GetMapping을 사용하여 야근 신청서 페이지를 호출
+     * - Thymeleaf 템플릿 엔진을 이용해 야근 신청서의 사용자 인터페이스를 렌더링
+     * 
+     * @return String - 야근 신청서 페이지를 표시하는 뷰 이름
+     */
     @GetMapping("/authorization/authorizationOvertime")
     public String showAuthorizationOvertimePage() {
         return "authorization/authorizationOvertime";
     }
 
-    // 임시 저장함
+    /**
+     * 임시 저장 문서 리스트를 조회하여 임시 저장함 페이지를 로드하는 메서드.
+     *
+     * ## 기능
+     * - 로그인한 사용자의 임시 저장 문서 리스트를 페이징하여 가져옴
+     * - empNo를 기반으로 사용자 정보를 확인하고, 페이징된 임시 저장 문서를 모델에 추가
+     * - 임시 저장함 페이지에서 임시 저장된 결재 문서 리스트를 관리할 수 있도록 함
+     *
+     * ## 기술
+     * - Spring MVC의 @GetMapping 및 @PageableDefault 애너테이션을 사용하여 페이징 처리
+     * - Pageable 객체를 이용해 authorRegDate 기준 내림차순으로 정렬된 문서 목록을 페이징하여 조회
+     * - Thymeleaf 템플릿에서 사용될 모델에 현재 페이지 및 전체 페이지 수를 포함하여 데이터 전달
+     *
+     * @param pageable 페이징 및 정렬 설정 객체
+     * @param model Thymeleaf 모델 객체
+     * @param principal 현재 로그인된 사용자의 인증 객체
+     * @return String - 임시 저장함 페이지 뷰 이름
+     */
     @GetMapping("/authorization/authorizationStorage")
     public String selectTemporaryAuthorizationList(
             @PageableDefault(size = 5) Pageable pageable, 
@@ -240,11 +341,23 @@ public class AuthorizationViewController {
         return "authorization/authorizationStorage";
     }
 
-
-
-
     
-    // authorNo를 이용하여 문서 상세 페이지로 이동
+    /**
+     * authorNo를 이용하여 문서 상세 페이지로 이동하는 메서드.
+     *
+     * ## 기능
+     * - 주어진 authorNo를 기반으로 문서의 상세 정보를 조회하고 모델에 추가
+     * - 문서 타입에 따라 적절한 상세 페이지로 리다이렉트
+     *
+     * ## 기술
+     * - 유효하지 않은 authorNo 처리: null 또는 0 이하일 경우 오류 메시지를 모델에 추가
+     * - Authorization 엔티티를 조회하고 모델에 필드 값을 설정
+     * - 각 문서 타입에 따라 반환되는 뷰를 다르게 설정
+     *
+     * @param authorNo 문서 번호
+     * @param model Thymeleaf 모델 객체
+     * @return String - 해당 문서의 상세 페이지 뷰 이름
+     */
     @GetMapping("/authorization/storage/url")
     public String getAuthorizationStorageDetail(@RequestParam("authorNo") Long authorNo, Model model) {
         System.out.println("Received authorNo: " + authorNo);
@@ -283,9 +396,22 @@ public class AuthorizationViewController {
         }
     }
 
-
-
-	// 결재 확인 관련 결재자, 참조자 승인 확인란
+    /**
+     * 결재 확인 관련 결재자 및 참조자의 승인 확인 리스트를 조회하는 메서드.
+     *
+     * ## 기능
+     * - 현재 로그인한 사용자의 ID를 기반으로 결재 내역을 조회하고 모델에 추가
+     * - 승인 내역을 페이지 처리하여 반환
+     *
+     * ## 기술
+     * - SecurityContextHolder에서 로그인 정보를 가져와 사용자의 ID 확인
+     * - 결재 내역을 페이지 단위로 조회하고, 각 결재 내역에 결재 경로 정보를 추가
+     *
+     * @param page 요청 페이지 번호
+     * @param pageable 페이지 당 항목 수
+     * @param model Thymeleaf 모델 객체
+     * @return String - 결재 확인 페이지 뷰 이름
+     */
     @GetMapping("/authorization/authorizationCheck")
     public String selectApprovalList(
             @RequestParam(value = "page", defaultValue = "0") int page,  // 페이지 번호를 받음
@@ -341,22 +467,36 @@ public class AuthorizationViewController {
         }
     }
     
-
-    // 기안 진행 목록 가져오기
+    /**
+     * 기안 진행 목록 가져오기 API
+     *
+     * ## 기능
+     * - 현재 로그인한 사용자의 기안 문서 목록을 조회
+     *
+     * ## 기술
+     * - SecurityContextHolder를 사용하여 로그인 정보를 가져와 현재 사용자의 ID를 확인
+     * - AuthorizationService를 통해 기안 문서 목록을 조회
+     *
+     * @return List<AuthorizationDto> - 기안 문서 목록
+     */
     @GetMapping("/authorization/drafts")
     @ResponseBody
     public List<AuthorizationDto> getDraftDocuments() {
         return authorizationService.selectDraftAuthorizationList();
     }
     
-    // 기안 진행 완료 목록 가져오기
-//    @GetMapping("/authorization/completed")
-//    @ResponseBody
-//    public List<AuthorizationDto> getcompletedDocuments() {
-//        return authorizationService.selectCompletedAuthorizationList();
-//    }
-    
-    // 완료된 문서 목록 조회 API
+    /**
+     * 완료된 문서 목록 조회 API
+     *
+     * ## 기능
+     * - 현재 로그인한 사용자의 완료된 문서 목록을 조회하여 반환
+     *
+     * ## 기술
+     * - AuthorizationService를 통해 완료된 문서 목록을 조회
+     * - 결과는 AuthorizationDto 리스트 형태로 반환됨
+     *
+     * @return List<AuthorizationDto> - 완료된 문서 목록
+     */
     @GetMapping("/api/authorization/completed")
     @ResponseBody
     public List<AuthorizationDto> getCompletedDocuments() {
@@ -364,7 +504,21 @@ public class AuthorizationViewController {
         
     }
 
-    // 개별 문서 조회 API
+    /**
+     * 개별 문서 조회 API
+     *
+     * ## 기능
+     * - 주어진 authorNo를 기반으로 완료된 문서를 조회하고 해당 문서의 결재 경로 정보를 포함하여 반환
+     *
+     * ## 기술
+     * - AuthorizationRepository를 사용하여 authorNo에 해당하는 Authorization 객체를 검색
+     * - 검색된 Authorization 객체가 존재하지 않을 경우 예외를 발생시킴
+     * - 결재 경로 정보를 ApprovalRouteRepository를 통해 조회하고 DTO에 추가
+     *
+     * @param authorNo 문서의 고유 번호
+     * @return AuthorizationDto - 완료된 문서의 DTO
+     * @throws IllegalArgumentException 문서를 찾을 수 없는 경우
+     */
     @GetMapping("/api/authorization/completed/{authorNo}")
     @ResponseBody
     public AuthorizationDto getCompletedAuthorizationById(@PathVariable("authorNo") Long authorNo) {
@@ -401,7 +555,20 @@ public class AuthorizationViewController {
     }
 
     
-    // 알림 정보 추가하는 메서드
+    /**
+     * 알림 정보 추가하는 메서드.
+     *
+     * ## 기능
+     * - 현재 로그인한 사용자의 ID를 기반으로 알림 정보를 조회하고 모델에 추가
+     * - 결재 알림 및 작성자 알림 여부를 확인하여 모델에 설정
+     *
+     * ## 기술
+     * - SecurityContextHolder를 사용하여 현재 로그인한 사용자의 정보를 가져옴
+     * - MemberRepository를 통해 사용자 정보를 조회하고, 해당 사용자의 번호(memNo)를 얻음
+     * - ApprovalRouteService 및 AuthorizationService를 사용하여 알림 여부를 확인
+     *
+     * @param model Thymeleaf 모델 객체
+     */
     private void addNavDataToModel(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String memId = authentication.getName();
