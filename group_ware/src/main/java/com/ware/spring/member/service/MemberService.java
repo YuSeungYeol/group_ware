@@ -60,12 +60,19 @@ public class MemberService {
         return empNo;
     }
 
-    // 부서 이름 조회
+    /**
+     * 부서 이름 조회
+     * 기술: Spring Data JPA
+     * 설명: 지점 번호를 통해 해당 지점의 이름을 조회합니다.
+     */
     public String getDistributorNameByNo(Long distributorNo) {
         return distributorRepository.findDistributorNameByDistributorNo(distributorNo);
     }
-
-    // 아이디 중복 확인 메서드
+    /**
+     * 아이디 중복 확인 메서드
+     * 기술: Spring Data JPA
+     * 설명: 특정 아이디가 이미 존재하는지 확인합니다.
+     */
     public boolean isIdDuplicated(String memId) {
         return memberRepository.existsByMemId(memId);
     }
