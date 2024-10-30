@@ -89,7 +89,7 @@ public class MemberService {
         Distributor distributor = distributorRepository.findById(memberDto.getDistributor_no())
                 .orElseThrow(() -> new IllegalArgumentException("소속 정보를 찾을 수 없습니다."));
 
-        // 비밀번호 인코딩
+        // 비밀번호 인코딩이다
         String encodedPassword = passwordEncoder.encode(memberDto.getMem_pw());
         memberDto.setMem_pw(encodedPassword);  // DTO에 저장
 
