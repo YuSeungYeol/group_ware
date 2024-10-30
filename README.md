@@ -1,4 +1,4 @@
-# group_ware_project
+# group_ware
 
 ### 프로젝트 소개
 
