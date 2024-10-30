@@ -76,8 +76,13 @@ public class MemberService {
     public boolean isIdDuplicated(String memId) {
         return memberRepository.existsByMemId(memId);
     }
-
     // 회원 등록 메서드
+    /**
+     * 회원 등록 메서드
+     * 기술: Spring Data JPA, PasswordEncoder, DTO 패턴
+     * 설명: 사원번호 생성, 비밀번호 인코딩 후, DTO를 엔티티로 변환하여 데이터베이스에 저장합니다.
+     */
+
     public Member saveMember(MemberDto memberDto) {
         // 사원번호 생성
         String empNo = generateEmpNo(memberDto);
@@ -89,7 +94,7 @@ public class MemberService {
         Distributor distributor = distributorRepository.findById(memberDto.getDistributor_no())
                 .orElseThrow(() -> new IllegalArgumentException("소속 정보를 찾을 수 없습니다."));
 
-        // 비밀번호 인코딩이다
+        // 비밀번호 인코딩
         String encodedPassword = passwordEncoder.encode(memberDto.getMem_pw());
         memberDto.setMem_pw(encodedPassword);  // DTO에 저장
 
