@@ -284,7 +284,7 @@ public class AuthorizationApiController {
      * @param outsideType 외출 유형 (선택적)
      * @param overtimeType 초과 근무 유형 (선택적)
      * @param memNo 기안자의 멤버 번호 (필수)
-     * @return 문서 임시 저장 결과를 포함하는 맵
+     * @return 문서 임시 저장 결과를 포함하는 맵 확인
      */
     @ResponseBody
     @PostMapping("/authorization/saveTemp")
