@@ -80,7 +80,7 @@ public class MemberService {
     /**
      * 회원 등록 메서드
      * 기술: Spring Data JPA, PasswordEncoder, DTO 패턴
-     * 설명: 사원번호 생성, 비밀번호 인코딩 후, DTO를 엔티티로 변환하여 데이터베이스에 저장합니다.
+     * 설명: 사원번호 생성, 비밀번호 인코딩한 후, DTO를 엔티티로 변환하여 데이터베이스에 저장합니다.
      */
 
     public Member saveMember(MemberDto memberDto) {
