@@ -147,7 +147,11 @@ public class MemberService {
         memberRepository.save(member);  // 업데이트 처리
     }
 
-    // 프로필 이미지 저장 메서드
+    /**
+     * 프로필 이미지 저장 (saveProfilePicture)
+     * 기술: 파일 입출력, java.nio.file.Files, StandardCopyOption
+     * 설명: 프로필 이미지를 지정된 디렉토리에 저장하며, 기존 파일이 있는 경우 덮어씁니다.
+     */
     private String saveProfilePicture(MultipartFile profilePicture, String distributorName, String memberName) throws IOException {
         String uploadDir = "src/main/resources/static/profile/" + distributorName;
         Files.createDirectories(Paths.get(uploadDir));
