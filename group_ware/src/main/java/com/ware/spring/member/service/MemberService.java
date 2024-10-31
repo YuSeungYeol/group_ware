@@ -106,7 +106,11 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
-    // 회원 수정 메서드
+    /**
+     * 회원 정보 수정 (updateMember)
+     * 기술: Spring Data JPA, 파일 입출력, MultipartFile, DTO 패턴
+     * 설명: 기존 회원 정보를 가져와 필요한 필드를 수정하고, 프로필 사진이 업로드된 경우 파일을 저장하며 변경 사항을 데이터베이스에 반영합니다.
+     */
     public void updateMember(MemberDto memberDto, MultipartFile profilePicture) throws IOException {
         // 기존 회원 정보 가져오기
         Member existingMember = memberRepository.findById(memberDto.getMem_no())
