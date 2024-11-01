@@ -161,8 +161,11 @@ public class MemberService {
 
         return fileName;
     }
-
-    // 파일 확장자 추출
+    /**
+     * 파일 확장자 추출 (getExtension)
+     * 기술: 문자열 조작
+     * 설명: 파일명에서 확장자를 추출하여 반환합니다.
+     */
     private String getExtension(String fileName) {
         return fileName.substring(fileName.lastIndexOf(".") + 1);
     }
