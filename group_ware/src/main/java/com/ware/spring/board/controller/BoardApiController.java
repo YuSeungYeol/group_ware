@@ -33,7 +33,24 @@ public class BoardApiController {
         this.memberRepository = memberRepository;
     }
 
-    // 게시글 등록
+    /**
+     * 게시글 등록 메서드.
+     *
+     * ## 기능
+     * - 게시글 작성 요청을 받아 게시글을 등록
+     * - 로그인한 사용자의 정보를 기반으로 게시글 작성자를 설정
+     * - 게시글 등록 성공 여부에 따라 결과 코드와 메시지를 반환
+     *
+     * ## 기술
+     * - Principal 또는 HttpSession을 통해 로그인된 사용자 정보 확인
+     * - 로그인된 사용자의 Member 객체를 조회하여 게시글 작성자 정보로 설정
+     * - BoardService를 통해 게시글을 저장하고, 결과를 Map 형태로 반환
+     *
+     * @param dto 게시글 데이터 전달 객체 (BoardDto)
+     * @param principal 로그인된 사용자의 인증 정보 (Principal)
+     * @param session 로그인된 사용자 정보를 담고 있는 HttpSession
+     * @return Map<String, String> - 결과 코드와 메시지를 담은 Map
+     */
     @ResponseBody
     @PostMapping("/board")
     public Map<String, String> createBoard(BoardDto dto, Principal principal, HttpSession session) {
@@ -70,7 +87,23 @@ public class BoardApiController {
         return resultMap;
     }
 
-    // 게시글 수정
+    /**
+     * 게시글 수정 메서드.
+     *
+     * ## 기능
+     * - 요청된 게시글 번호에 해당하는 게시글의 제목과 내용을 수정
+     * - 수정 권한 확인을 위해 로그인한 사용자와 게시글 작성자의 일치 여부를 검증
+     * - 게시글 수정 성공 여부에 따라 결과 코드와 메시지를 반환
+     *
+     * ## 기술
+     * - Principal 객체를 사용하여 로그인한 사용자의 정보를 확인
+     * - 게시글 작성자와 현재 로그인한 사용자의 일치 여부를 비교하여 권한 검증
+     * - BoardService를 통해 게시글을 업데이트하고, 결과를 Map 형태로 반환
+     *
+     * @param dto 수정할 게시글 데이터 전달 객체 (BoardDto)
+     * @param principal 로그인된 사용자의 인증 정보 (Principal)
+     * @return Map<String, String> - 결과 코드와 메시지를 담은 Map
+     */
     @ResponseBody
     @PostMapping("/board/{board_no}")
     public Map<String, String> updateBoard(BoardDto dto, Principal principal) {
@@ -99,7 +132,23 @@ public class BoardApiController {
         return resultMap;
     }
 
-    // 게시글 삭제
+    /**
+     * 게시글 삭제 메서드.
+     *
+     * ## 기능
+     * - 요청된 게시글 번호에 해당하는 게시글을 삭제
+     * - 로그인한 사용자가 게시글 작성자와 동일한지 확인하여 삭제 권한을 검증
+     * - 삭제 성공 여부에 따라 결과 코드와 메시지를 반환
+     *
+     * ## 기술
+     * - Principal 객체를 사용하여 로그인한 사용자 정보 확인
+     * - 게시글 작성자와 현재 로그인한 사용자를 비교하여 삭제 권한 검증
+     * - BoardService를 통해 게시글 삭제 처리 후 결과를 Map 형태로 반환
+     *
+     * @param board_no 삭제할 게시글 번호 (Long)
+     * @param principal 로그인된 사용자의 인증 정보 (Principal)
+     * @return Map<String, String> - 결과 코드와 메시지를 담은 Map
+     */
     @ResponseBody
     @DeleteMapping("/board/{board_no}")
     public Map<String, String> deleteBoard(@PathVariable("board_no") Long board_no, Principal principal) {
