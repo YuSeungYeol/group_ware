@@ -206,6 +206,12 @@ public class MemberService {
     public void updateMemberInfo(int memNo, String memName, String memPhone, String memEmail) {
         memberRepository.updateMemberInfo(memNo, memName, memPhone, memEmail);
     }
+
+    /**
+     * 회원 리스트 조회 (findAllByMemLeaveOrderByEmpNoAsc, findAllOrderByEmpNoAsc)
+     * 기술: Spring Data JPA, 페이징 (Pageable)
+     * 설명: 퇴사 여부에 따라 정렬된 회원 리스트를 반환하거나, 모든 회원을 정렬된 형태로 반환합니다.
+     */
     public Page<Member> findAllByMemLeaveOrderByEmpNoAsc(String memLeave, Pageable pageable) {
         return memberRepository.findAllByMemLeaveOrderByEmpNoAsc(memLeave, pageable);
     }
