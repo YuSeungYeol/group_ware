@@ -197,7 +197,11 @@ public class MemberService {
 
         return memberDto;
     }
-
+    /**
+     * 비밀번호 업데이트 (updatePassword)
+     * 기술: PasswordEncoder, Spring Data JPA
+     * 설명: 비밀번호를 암호화한 후 데이터베이스에 업데이트합니다.
+     */
     public void updatePassword(int memNo, String rawPassword) {
         String encodedPassword = passwordEncoder.encode(rawPassword);
         memberRepository.updatePassword(memNo, encodedPassword);
