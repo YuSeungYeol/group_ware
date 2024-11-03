@@ -170,16 +170,19 @@ public class MemberService {
         return fileName.substring(fileName.lastIndexOf(".") + 1);
     }
 
-    // 직급 정보를 불러오는 메서드
-    public List<Rank> getRank() {
+    /**
+     * 직급 정보를 불러오는 메서드 (getRank)
+     * 기술: Spring Data JPA
+     * 설명: 데이터베이스에서 모든 직급 정보를 조회해 반환합니다.
+     */    public List<Rank> getRank() {
         return rankRepository.findAll();
     }
     /**
-     * 소속 정보를 불러오는 메서드 (getDistributors)
+     * 소속 지점을 불러오는 메서드 (getDistributors)
      * 기술: Spring Data JPA
      * 설명: 데이터베이스에서 모든 소속 정보를 조회해 반환합니다.
      */
-    // 소속 정보를 불러오는 메서드
+    // 소속 지점을 불러오는 메서드
     public List<Distributor> getDistributors() {
         return distributorRepository.findAll();
     }
