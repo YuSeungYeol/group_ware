@@ -174,7 +174,11 @@ public class MemberService {
     public List<Rank> getRank() {
         return rankRepository.findAll();
     }
-
+    /**
+     * 소속 정보를 불러오는 메서드 (getDistributors)
+     * 기술: Spring Data JPA
+     * 설명: 데이터베이스에서 모든 소속 정보를 조회해 반환합니다.
+     */
     // 소속 정보를 불러오는 메서드
     public List<Distributor> getDistributors() {
         return distributorRepository.findAll();
