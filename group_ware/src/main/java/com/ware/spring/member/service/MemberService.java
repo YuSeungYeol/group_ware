@@ -184,7 +184,11 @@ public class MemberService {
         Optional<Member> member = memberRepository.findByMemId(memId);
         return member.orElseThrow(() -> new IllegalArgumentException("해당 아이디의 회원을 찾을 수 없습니다: " + memId));
     }
-
+    /**
+     * 특정 회원 조회 (getMemberById)
+     * 기술: Spring Data JPA, DTO 패턴
+     * 설명: 특정 ID 또는 회원 번호로 회원을 조회한 뒤, DTO로 변환하여 반환합니다.
+     */
     public MemberDto getMemberById(Long memNo) {
         // 멤버 조회
         Member member = memberRepository.findById(memNo)
