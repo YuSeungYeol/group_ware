@@ -39,7 +39,25 @@ public class NoticeApiController {
         this.memberRepository = memberRepository;
     }
 
-    // 공지사항 등록
+    /**
+     * 공지사항을 등록하는 메서드.
+     *
+     * ## 기능
+     * - 로그인한 사용자의 정보를 기반으로 공지사항을 등록
+     * - 등록 권한 확인 (회원의 직급이 6 이상인 경우에만 등록 가능)
+     * - 공지사항 일정이 설정된 경우 시작일과 종료일 검증
+     * - 공지사항 등록 성공 시 모든 사용자에게 공지사항 알림 추가
+     *
+     * ## 기술
+     * - Spring Security `Principal`과 `HttpSession`을 이용해 로그인된 사용자 정보 확인
+     * - 공지사항 등록 권한은 회원의 `RankNo` 값으로 결정
+     * - JPA를 통해 공지사항을 저장하고, 모든 사용자에게 알림 정보를 추가하는 서비스 호출
+     *
+     * @param dto 등록할 공지사항의 DTO
+     * @param principal 현재 로그인한 사용자의 인증 객체 (Spring Security 사용)
+     * @param session 사용자 세션 객체 (로그인 정보가 없는 경우 사용)
+     * @return Map<String, String> - 응답 코드와 메시지를 담은 결과 맵
+     */
     @ResponseBody
     @PostMapping("/notice")
     public Map<String, String> createNotice(NoticeDto dto, Principal principal, HttpSession session) {
@@ -87,7 +105,23 @@ public class NoticeApiController {
         return resultMap;
     }
 
-    // 공지사항 수정
+    /**
+     * 공지사항을 수정하는 메서드.
+     *
+     * ## 기능
+     * - 로그인한 사용자의 정보를 바탕으로 공지사항 수정 권한을 확인
+     * - 공지사항의 작성자가 아닌 경우 수정이 불가능하며, 권한이 없음을 알림
+     * - 입력된 내용으로 제목과 내용을 업데이트하여 수정
+     *
+     * ## 기술
+     * - Spring Security `Principal`을 통해 로그인된 사용자 정보를 가져옴
+     * - JPA를 이용하여 작성자 정보를 확인하고, 작성자가 일치할 경우에만 수정 가능
+     * - 성공적으로 수정된 경우 HTTP 응답 코드 200을 반환
+     *
+     * @param dto 수정할 공지사항의 DTO
+     * @param principal 현재 로그인한 사용자의 인증 객체 (Spring Security 사용)
+     * @return Map<String, String> - 응답 코드와 메시지를 담은 결과 맵
+     */
     @ResponseBody
     @PostMapping("/notice/{notice_no}")
     public Map<String, String> updateNotice(NoticeDto dto, Principal principal) {
@@ -116,7 +150,23 @@ public class NoticeApiController {
         return resultMap;
     }
 
-    // 공지사항 삭제
+    /**
+     * 공지사항을 삭제하는 메서드.
+     *
+     * ## 기능
+     * - 로그인한 사용자의 정보를 바탕으로 공지사항 삭제 권한을 확인
+     * - 공지사항의 작성자가 아닌 경우 삭제가 불가능하며, 권한이 없음을 알림
+     * - 삭제가 성공적으로 이루어진 경우 HTTP 응답 코드 200을 반환
+     *
+     * ## 기술
+     * - Spring Security `Principal`을 통해 로그인된 사용자 정보를 가져옴
+     * - JPA를 이용하여 작성자 정보를 확인하고, 작성자가 일치할 경우에만 삭제 가능
+     * - 삭제 과정에서 JPA 예외 발생 시 404 오류 메시지를 반환하여 처리 실패 알림
+     *
+     * @param notice_no 삭제할 공지사항의 고유 번호
+     * @param principal 현재 로그인한 사용자의 인증 객체 (Spring Security 사용)
+     * @return Map<String, String> - 응답 코드와 메시지를 담은 결과 맵
+     */
     @ResponseBody
     @DeleteMapping("/notice/{notice_no}")
     public Map<String, String> deleteNotice(@PathVariable("notice_no") Long notice_no, Principal principal) {
@@ -145,6 +195,22 @@ public class NoticeApiController {
         return map;
     }
     
+    /**
+     * 공지사항 알림을 읽음 처리하는 메서드.
+     *
+     * ## 기능
+     * - 현재 로그인한 사용자의 ID와 공지사항 번호를 기반으로 해당 공지사항 알림을 읽음 처리
+     * - 사용자가 로그인되어 있지 않거나 존재하지 않는 경우, 401 Unauthorized 상태 반환
+     *
+     * ## 기술
+     * - Spring Security `Principal`을 통해 로그인된 사용자 정보 가져오기
+     * - JPA를 통해 사용자가 존재하는지 확인한 후, 공지사항 알림을 읽음 처리
+     * - 성공 시 200 OK 상태를 반환하고, 실패 시 401 Unauthorized 상태 반환
+     *
+     * @param noticeNo 읽음 처리할 공지사항의 고유 번호
+     * @param principal 현재 로그인한 사용자의 인증 객체 (Spring Security 사용)
+     * @return ResponseEntity<Void> - HTTP 상태 코드만 반환
+     */
     @PostMapping("/clearNoticeNotification/{noticeNo}")
     public ResponseEntity<Void> clearNoticeNotification(@PathVariable("noticeNo") Long noticeNo, Principal principal) {
         String username = principal.getName();
