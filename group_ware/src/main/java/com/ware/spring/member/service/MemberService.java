@@ -223,22 +223,66 @@ public class MemberService {
     }
 
     /**
-     * 회원 리스트 조회 (findAllByMemLeaveOrderByEmpNoAsc, findAllOrderByEmpNoAsc)
+     * 퇴사 여부에 따라 사번 오름차순으로 정렬된 회원 리스트를 반환합니다.
      * 기술: Spring Data JPA, 페이징 (Pageable)
-     * 설명: 퇴사 여부에 따라 정렬된 회원 리스트를 반환하거나, 모든 회원을 정렬된 형태로 반환합니다.
+     * 설명: 특정 퇴사 여부(memLeave)에 따라 회원 리스트를 정렬된 형태로 반환합니다.
+     * 
+     * @param memLeave 퇴사 여부 ('Y' 또는 'N')
+     * @param pageable 페이징 정보
+     * @return 페이징된 회원 리스트
      */
     public Page<Member> findAllByMemLeaveOrderByEmpNoAsc(String memLeave, Pageable pageable) {
         return memberRepository.findAllByMemLeaveOrderByEmpNoAsc(memLeave, pageable);
     }
+
+    /**
+     * 모든 회원을 사번 오름차순으로 정렬된 형태로 반환합니다.
+     * 기술: Spring Data JPA, 페이징 (Pageable)
+     * 설명: 퇴사 여부와 상관없이 모든 회원을 정렬된 형태로 반환합니다.
+     * 
+     * @param pageable 페이징 정보
+     * @return 페이징된 회원 리스트
+     */
     public Page<Member> findAllOrderByEmpNoAsc(Pageable pageable) {
         return memberRepository.findAllByOrderByEmpNoAsc(pageable);
     }
+
+    /**
+     * 특정 배급사에 속한 회원을 반환합니다.
+     * 기술: Spring Data JPA, 페이징 (Pageable)
+     * 설명: 주어진 distributorNo에 해당하는 배급사에 속한 회원들을 반환합니다.
+     * 
+     * @param distributorNo 배급사 번호
+     * @param pageable 페이징 정보
+     * @return 페이징된 회원 리스트
+     */
     public Page<Member> findMembersByDistributor(Long distributorNo, Pageable pageable) {
         return memberRepository.findByDistributor_DistributorNo(distributorNo, pageable);
     }
+
+    /**
+     * 현재 배급사에 속한 회원을 반환합니다.
+     * 기술: Spring Data JPA, 페이징 (Pageable)
+     * 설명: 주어진 distributorNo에 해당하는 현재 배급사에 속한 회원들을 반환합니다.
+     * 
+     * @param distributorNo 배급사 번호
+     * @param pageable 페이징 정보
+     * @return 페이징된 회원 리스트
+     */
     public Page<Member> findMembersByCurrentDistributor(Long distributorNo, Pageable pageable) {
         return memberRepository.findByDistributor_DistributorNo(distributorNo, pageable);
     }
+
+    /**
+     * 검색 조건에 맞는 회원 리스트를 반환합니다.
+     * 기술: Spring Data JPA, 페이징 (Pageable)
+     * 설명: 이름이나 이메일을 기준으로 검색어에 맞는 회원 리스트를 페이징된 형태로 반환합니다.
+     * 
+     * @param searchText 검색어
+     * @param searchType 검색 유형 ('name' 또는 'email')
+     * @param pageable 페이징 정보
+     * @return 페이징된 회원 리스트
+     */
     public Page<Member> findMembersBySearchCriteria(String searchText, String searchType, Pageable pageable) {
         if (searchType != null && searchText != null) {
             switch (searchType) {
@@ -252,6 +296,7 @@ public class MemberService {
         }
         return memberRepository.findAll(pageable);
     }
+
     public Page<Member> searchMembersByCriteria(String searchType, String searchText, String statusFilter, Long distributorNo, Pageable pageable) {
         String memLeave = "N";  // 기본값은 재직 중인 직원
         if ("resigned".equals(statusFilter)) {
