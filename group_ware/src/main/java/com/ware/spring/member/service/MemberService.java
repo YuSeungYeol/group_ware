@@ -297,6 +297,19 @@ public class MemberService {
         return memberRepository.findAll(pageable);
     }
 
+    /**
+     * 검색 조건 및 필터에 따라 회원 리스트를 반환합니다.
+     * 기술: Spring Data JPA, 페이징 (Pageable)
+     * 설명: 회원의 이름, 직급, 입사일, 지점 등을 기준으로 검색어에 맞는 회원 리스트를 반환하거나,
+     * 퇴사 여부와 지점 필터에 따라 회원 리스트를 필터링합니다.
+     * 
+     * @param searchType 검색 유형 ('name', 'rank', 'hireDate', 'branch', 'empNo')
+     * @param searchText 검색어
+     * @param statusFilter 상태 필터 ('resigned', 'all', 'mybranch' 등)
+     * @param distributorNo 배급사 번호 (필터에 'mybranch'가 있을 경우 사용)
+     * @param pageable 페이징 정보
+     * @return 페이징된 회원 리스트
+     */
     public Page<Member> searchMembersByCriteria(String searchType, String searchText, String statusFilter, Long distributorNo, Pageable pageable) {
         String memLeave = "N";  // 기본값은 재직 중인 직원
         if ("resigned".equals(statusFilter)) {
@@ -351,12 +364,28 @@ public class MemberService {
         }
     }
 
-
-
+    /**
+     * 회원 번호로 회원을 조회합니다.
+     * 기술: Spring Data JPA
+     * 설명: 주어진 회원 번호(memNo)에 해당하는 회원을 조회합니다.
+     * 회원이 존재하지 않을 경우 예외를 발생시킵니다.
+     * 
+     * @param memNo 회원 번호
+     * @return 조회된 회원 객체
+     */
     public Member findMemberByNo(Long memNo) {
         return memberRepository.findById(memNo)
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원 번호의 회원을 찾을 수 없습니다: " + memNo));
     }
+
+    /**
+     * 회원 정보를 수정합니다.
+     * 기술: Spring Data JPA
+     * 설명: 주어진 회원 객체의 정보로 기존 회원 데이터를 수정합니다.
+     * 직급 및 지점 정보를 포함해 필드 값을 갱신하고 저장합니다.
+     * 
+     * @param member 수정할 회원 객체
+     */
     public void editMember(Member member) {
         Member existingMember = memberRepository.findById(member.getMemNo())
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
@@ -383,26 +412,44 @@ public class MemberService {
         memberRepository.save(existingMember);  // 수정된 회원 정보 저장
     }
 
-    public List<MemberDto> findAllForChat(String memId){
-    	List<Member> memberList = memberRepository.findAllForChat(memId);
-    	List<MemberDto> memberDtoList = new ArrayList<MemberDto>();
-    	for(Member m : memberList) {
-    		new MemberDto();
-			MemberDto dto = MemberDto.toDto(m);
-    		memberDtoList.add(dto);
-    	}
-    	return memberDtoList;
+    /**
+     * 채팅용 회원 리스트를 조회합니다.
+     * 기술: Spring Data JPA
+     * 설명: 특정 회원(memId)을 제외한 회원 리스트를 조회하고, 해당 리스트를 DTO로 변환하여 반환합니다.
+     * 
+     * @param memId 제외할 회원 ID
+     * @return 회원 DTO 리스트
+     */
+    public List<MemberDto> findAllForChat(String memId) {
+        List<Member> memberList = memberRepository.findAllForChat(memId);
+        List<MemberDto> memberDtoList = new ArrayList<>();
+        for (Member m : memberList) {
+            MemberDto dto = MemberDto.toDto(m);
+            memberDtoList.add(dto);
+        }
+        return memberDtoList;
     }
-    
+
+    /**
+     * 회원 정보를 수정하고 프로필 사진을 처리합니다.
+     * 기술: Spring Data JPA, 파일 업로드 (MultipartFile)
+     * 설명: 회원 정보를 수정하고, 새로운 프로필 사진이 업로드된 경우 이를 저장합니다.
+     * 프로필 사진이 없으면 기존 사진을 유지합니다.
+     * 
+     * @param memberDto 수정할 회원 정보를 담은 DTO
+     * @param profilePicture 수정할 프로필 사진 (선택사항)
+     * @throws IOException 프로필 사진 저장 실패 시 발생
+     */
     public void editMember(MemberDto memberDto, MultipartFile profilePicture) throws IOException {
-        // 사원번호가 아니라 회원 번호(mem_no)로 회원 찾기
+        // 회원 번호로 회원 찾기
         Member existingMember = memberRepository.findByMemNo(memberDto.getMem_no())
             .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다: " + memberDto.getMem_no()));
-        System.out.println("Received member data: " + memberDto);
+
         // 공통 로직: 필수 필드 유지, 회원 정보 수정
         existingMember.setMemName(memberDto.getMem_name());
         existingMember.setMemPhone(memberDto.getMem_phone());
         existingMember.setMemEmail(memberDto.getMem_email());
+
         // 직급과 지점 수정
         Rank rank = rankRepository.findById(memberDto.getRank_no())
             .orElseThrow(() -> new IllegalArgumentException("해당 직급을 찾을 수 없습니다."));
@@ -410,6 +457,7 @@ public class MemberService {
         Distributor distributor = distributorRepository.findById(memberDto.getDistributor_no())
             .orElseThrow(() -> new IllegalArgumentException("해당 지점을 찾을 수 없습니다."));
         existingMember.setDistributor(distributor);
+
         // 프로필 사진 처리
         if (profilePicture != null && !profilePicture.isEmpty()) {
             String savedFileName = saveProfilePicture(profilePicture, existingMember.getDistributor().getDistributorName(), existingMember.getMemName());
@@ -417,10 +465,9 @@ public class MemberService {
         } else {
             existingMember.setProfileSaved(existingMember.getProfileSaved());  // 기존 사진 유지
         }
+
         // 기타 정보 수정 및 저장
         existingMember.setMemOff(memberDto.getMem_off());
         memberRepository.save(existingMember);
     }
-    
-
 }
