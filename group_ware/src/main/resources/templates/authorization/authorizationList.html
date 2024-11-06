@@ -382,6 +382,18 @@
         <script>
 		    const csrfToken = document.querySelector('#csrfToken').value;
 		    
+		    /**
+		     * ## 기능 및 기술 요약
+		     * 
+		     * ### 기능
+		     * - `#CompletedApprovalModal` 모달 내부 특정 콘텐츠를 PDF로 변환하여 사용자가 로컬에 저장할 수 있도록 함
+		     * - PDF 생성 및 저장 과정이 완료되면 콘솔에 성공 메시지를 출력하고, 오류가 발생할 경우 콘솔에 오류 메시지를 표시함
+		     * 
+		     * ### 기술
+		     * - `html2pdf` 라이브러리를 사용하여 HTML 요소를 PDF 형식으로 변환
+		     * - `html2canvas`는 HTML을 캡처하여 캔버스로 렌더링하고 이를 PDF로 변환
+		     * - PDF 저장 옵션을 `jsPDF` 설정으로 용지 단위, 크기 및 방향 등을 지정하여 출력 품질을 높임
+		     */
 		    // PDF 저장
 		    document.getElementById('savePdfButton').addEventListener('click', function () {
 			    const element = document.querySelector('#CompletedApprovalModal .modal-content-custom'); // 모달 내부의 특정 컨텐츠만 선택
@@ -402,6 +414,19 @@
 			    });
 			});
 		    
+		    /**
+		     * ## 기능 및 기술 요약
+		     *
+		     * ### 기능
+		     * - 문서 유형에 따라 관련된 필드 그룹만 화면에 표시하고, 나머지 필드 그룹은 숨김
+		     * - 선택된 문서 유형이 올바르지 않거나 해당 ID의 필드 그룹이 없는 경우 오류 메시지를 출력
+		     * 
+		     * ### 기술
+		     * - `document.querySelectorAll`로 모든 필드 그룹을 선택 후 `forEach` 루프로 숨김 처리
+		     * - `switch` 문을 사용하여 문서 유형(`docType`)에 따른 필드 그룹 ID를 결정
+		     * - `document.getElementById`를 통해 필드 그룹 요소를 찾아 스타일을 조정
+		     * - 오류 처리를 위해 `console.error` 사용하여 잘못된 문서 유형 또는 요소가 없을 경우 메시지 출력
+		     */
 		 	// 문서 유형에 따른 필드 표시/숨기기 함수
 	        function toggleFieldsByDocType(docType) {
 	            // 모든 필드 그룹 숨기기
@@ -444,7 +469,22 @@
 	            }
 	        }
 		    
-		    
+
+	        /**
+	         * ## 기능 및 기술 요약
+	         *
+	         * ### 기능
+	         * - `authorNo`를 기반으로 결재 데이터 로드
+	         * - 데이터가 존재할 경우 결재자와 참조자 목록을 HTML에 렌더링하고 모달을 표시
+	         * - 데이터가 없거나 로드 중 오류 발생 시 콘솔에 오류 메시지 출력
+	         *
+	         * ### 기술
+	         * - **Promise 기반 비동기 처리**: `fetchApprovalData(authorNo)`를 통해 데이터 비동기 로드 후 `.then()`과 `.catch()`로 후속 처리
+	         * - **조건부 렌더링**: 데이터 존재 여부에 따라 모달 표시 여부 결정
+	         * - **템플릿 문자열 활용**: `approversHtml`과 `referersHtml`을 템플릿 문자열로 동적 생성하여 HTML 구조에 삽입
+	         * - **DOM 조작**: `document.getElementById`로 특정 요소를 선택하고 `innerHTML`을 통해 내용을 업데이트
+	         * - **오류 처리**: `console.error`를 통해 오류 메시지를 콘솔에 출력
+	         */
 	        function openApprovalModal(authorNo) {
 	            console.log("Opening approval modal for authorNo:", authorNo);
 	            
@@ -507,7 +547,19 @@
 	                });
 	        }
 
-
+	        /**
+	         * ## 기능 및 기술 요약
+	         *
+	         * ### 기능
+	         * - `authorNo`를 기반으로 서버에 승인 중인 문서 데이터를 요청
+	         * - 서버에서 응답받은 데이터를 JSON 형식으로 파싱하여 반환
+	         *
+	         * ### 기술
+	         * - **Fetch API**: HTTP 요청을 서버에 비동기로 전송. `fetch`는 Promise 기반으로, 후속 처리를 `.then()`과 `.catch()`에서 수행
+	         * - **CSRF 보안**: CSRF 보호를 위해 `X-CSRF-TOKEN` 헤더에 토큰 값을 추가하여 요청 전송
+	         * - **응답 상태 확인**: `response.ok`로 서버 응답의 상태 코드가 성공적인지 확인. 오류 발생 시 `Error` 객체를 생성하여 `.catch()`로 전달
+	         * - **JSON 응답 파싱**: 응답을 JSON 형식으로 변환 (`response.json()`), 이후 비동기적으로 데이터가 제공됨
+	         */
 	        // 승인중인 문서 데이터 로드 함수
 	        function fetchApprovalData(authorNo) {
 	            return fetch(`/approval/${authorNo}`, {
@@ -523,6 +575,22 @@
 	            });
 	        }
 
+	         /**
+	          * ## 기능 및 기술 요약
+	          *
+	          * ### 기능
+	          * - `authorNo`를 이용해 특정 완료된 문서의 데이터를 서버로부터 비동기적으로 가져온 후 모달에 표시
+	          * - 문서 내용과 사용자 정보를 동적으로 할당하여 화면에 표시
+	          * - 문서 유형에 따라 필요한 필드를 선택적으로 표시 및 숨김 처리
+
+	          * ### 기술
+	          * - **Fetch API**: HTTP 요청을 통해 서버에 데이터를 요청하고, 비동기적으로 데이터를 받아옴. Promise 기반으로 처리하여 `.then()`으로 성공 시 데이터를 처리하고, `.catch()`로 오류를 관리
+	          * - **CSRF 보안**: `X-CSRF-TOKEN` 헤더에 CSRF 토큰을 추가하여 서버 요청의 보안을 강화
+	          * - **데이터 바인딩**: JSON 형식으로 응답받은 데이터를 DOM 요소에 할당하여 필요한 필드에 값 표시
+	          * - **조건부 필드 표시/숨기기**: 문서 유형에 따라 DOM 요소의 표시를 동적으로 변경 (`toggleFieldsByDocType` 함수 활용)
+	          * - **결재자 및 참조자 정보 업데이트**: 문서의 결재자와 참조자 정보를 테이블에 반영 (`updateApproverTable` 함수 호출)
+	          * - **모달창 표시**: 조건에 따라 특정 모달 요소를 선택적으로 표시하거나 숨김 처리하여 사용자 인터페이스를 구성
+	          */
 	        // 완료 문서용 모달 창 열기 함수 (데이터 로드 후 모달 열기)
 	        function openCompletedApprovalModal(authorNo) {
 	            console.log("Opening completed approval modal for authorNo:", authorNo);
@@ -650,6 +718,19 @@
 	                });
 	        }
 
+	          /**
+	           * ## 기능 및 기술 요약
+	           *
+	           * ### 기능
+	           * - 서버로부터 `authorNo`를 기반으로 특정 완료 문서의 데이터를 비동기적으로 로드
+	           * - 응답된 데이터를 JSON 형식으로 변환하여 이후 함수에서 활용할 수 있도록 반환
+
+	           * ### 기술
+	           * - **Fetch API**: 서버와 비동기적으로 통신하여 데이터를 가져옴. `fetch` 메서드를 사용하여 HTTP 요청을 전송하고 `.then()` 체이닝을 통해 성공 시 JSON 응답을 반환
+	           * - **CSRF 보안**: 요청 헤더에 `X-CSRF-TOKEN`을 추가하여 CSRF 공격 방지
+	           * - **오류 처리**: 응답 상태가 성공적이지 않은 경우 `Error` 객체를 생성하고 `throw`하여 오류 처리, 이후 `.catch()`에서 이를 핸들링 가능
+	           * - **JSON 변환**: `response.json()`을 호출해 JSON 형식으로 데이터를 변환하여 Promise로 반환, 이후 데이터를 사용할 수 있도록 보장
+	           */  
 	        // 완료 문서용 데이터 로드 함수
 	        function fetchCompletedApprovalData(authorNo) {
 	            return fetch(`/api/authorization/${authorNo}`, {
@@ -665,7 +746,22 @@
 	            });
 	        }
 			
-	     // 결재자와 참조자 정보를 업데이트하는 함수
+	           /**
+	            * ## 기능 및 기술 요약
+	            *
+	            * ### 기능
+	            * - 결재자와 참조자 정보를 화면에 업데이트
+	            * - 각 결재자 및 참조자 정보를 받아 리스트에 해당 정보를 표시
+	            * - 결재자/참조자 서명이 있을 경우 이미지로 표시하고, 없을 경우 기본 텍스트(`서명 없음`)로 대체
+
+	            * ### 기술
+	            * - **DOM 조작**: `document.getElementById()`와 `innerHTML`을 사용하여 각 결재자 및 참조자 정보를 동적으로 업데이트
+	            * - **조건부 데이터 바인딩**: 결재자, 참조자 정보가 존재할 때만 정보를 표시하며, 없을 경우 `결재자 없음` 또는 `참조자 없음`을 기본값으로 사용
+	            * - **에러 핸들링**: `try-catch` 구문을 통해 데이터 처리 과정에서 발생할 수 있는 잠재적 오류를 포착하고 로그로 표시
+	            * - **서명 표시 로직**: `Base64` 서명 데이터를 이미지 태그(`<img>`)로 변환하여 서명을 표시하거나, 데이터가 없을 경우 `서명 없음` 텍스트로 대체
+	            * - **로그 출력**: `console.log`와 `console.warn`을 사용하여 결재자/참조자 정보와 서명 데이터를 콘솔에 출력, 문제 발생 시 디버깅에 도움
+	            */
+	     	// 결재자와 참조자 정보를 업데이트하는 함수
 	        function updateApproverTable(approvers, referers) {
 	            try {
 	                // 첫 번째 결재자 리스트 초기화
@@ -765,10 +861,6 @@
 	            }
 	        }
 
-
-
-
-		 	
 			// ApprovalModal과 배경을 동시에 열기
 			function openApprovalModalWithBackground() {
 			    console.log("Open ApprovalModal Function Called");
@@ -824,7 +916,7 @@
 
 		    
 		
-		 // 모달 닫기 기능 추가
+		 	// 모달 닫기 기능 추가
 		    document.querySelector('.close').addEventListener('click', function() {
 		        document.getElementById('approvalModal').style.display = 'none';
 		        document.getElementById('approvalModalBackground').style.display = 'none'; // 배경도 닫기
@@ -906,7 +998,17 @@
 		        }
 		    });
 
-		
+		    /**
+		     * ## 기능 및 기술 요약
+		     *
+		     * ### 기능
+		     * - 사용자가 문서 유형을 선택할 때 해당 문서 작성 페이지로 이동
+		     * - 사용자가 이동을 확인하도록 확인창을 표시
+
+		     * ### 기술
+		     * - **사용자 확인**: `confirm()` 함수를 통해 사용자가 선택한 문서를 작성할지 확인 메시지를 표시하고, 확인 시에만 URL로 이동
+		     * - **URL 이동**: 사용자가 확인창에서 '확인'을 누르면 `window.location.href`를 통해 지정된 URL로 페이지를 이동
+		     */
 		    // 문서 선택 시 URL로 이동
 		    function selectDocument(documentType, url) {
 		        if (confirm(documentType + ' 문서를 작성하시겠습니까?')) {
@@ -914,6 +1016,19 @@
 		        }
 		    }
 		
+		    /**
+		     * ## 기능 및 기술 요약
+		     *
+		     * ### 기능
+		     * - 서버로부터 완료된 문서 목록을 가져오고 화면에 업데이트
+		     * - 네트워크 오류나 데이터 수신 실패 시 콘솔에 오류 메시지 표시
+
+		     * ### 기술
+		     * - **API 요청**: `fetch()` 함수를 사용하여 서버의 `/authorization/completed` 엔드포인트에서 완료된 문서 데이터를 요청
+		     * - **데이터 형식**: 응답 데이터를 JSON 형식으로 파싱하여 JavaScript 객체로 변환
+		     * - **오류 처리**: 응답 상태가 실패(`!response.ok`)일 경우 오류를 발생시키고, `catch`에서 오류를 로그
+		     * - **화면 업데이트**: 성공적으로 데이터를 가져오면 `updateCompletedDocumentList()` 함수를 호출하여 가져온 데이터로 화면 업데이트
+		     */
 		    // 완료된 문서 가져오는 함수
 		    function fetchCompletedDocuments() {
 		        console.log('Fetching completed documents...'); // 함수 호출 확인
@@ -934,6 +1049,21 @@
 		            });
 		    }
 		
+		    /**
+		     * ## 기능 및 기술 요약
+		     *
+		     * ### 기능
+		     * - 서버에서 전달된 완료된 문서 목록 데이터를 받아 테이블에 표시
+		     * - 문서 상태에 따라 상태별로 표시하고, 날짜를 한국 날짜 형식으로 변환하여 표시
+		     * - 문서가 없을 경우 ‘완료된 문서가 없습니다.’라는 메시지 표시
+
+		     * ### 기술
+		     * - **DOM 조작**: `document.getElementById()` 및 `innerHTML`을 사용해 완료된 문서 목록을 업데이트하고, 새로운 문서를 리스트에 추가
+		     * - **날짜 형식 변환**: JavaScript `Date` 객체의 `toLocaleDateString`을 사용해 한국어 날짜 형식으로 변환 후 표시
+		     * - **조건부 상태 표시**: `authorStatus`에 따라 승인(Y), 반려(N), 확인(C) 등의 상태를 텍스트로 변환하여 테이블에 표시
+		     * - **데이터 매핑**: `docTypeMap` 객체를 이용해 문서 유형을 한글로 매핑하고, 미매핑 시 원본 `doctype` 값을 그대로 표시
+		     */
+
 		 	// 완료된 문서 목록 업데이트
 		    function updateCompletedDocumentList(documents) {
 		        const completeList = document.getElementById('completeList');
@@ -972,7 +1102,21 @@
 		        });
 		    }
 
-		
+		     /**
+		      * ## 기능 및 기술 요약
+		      *
+		      * ### 기능
+		      * - 서버에서 기안 중인 문서 목록을 가져와 화면에 표시
+		      * - 성공적으로 데이터를 가져오면 `updateDraftDocumentList` 함수를 호출하여 화면에 목록을 업데이트
+		      * - 네트워크 응답이 실패하면 에러를 콘솔에 출력
+
+		      * ### 기술
+		      * - **API 호출**: `fetch()`를 사용해 `/authorization/drafts` API 엔드포인트로 기안 중인 문서 목록 요청
+		      * - **응답 처리**: 서버 응답이 정상적이면 `response.json()`을 통해 데이터를 받아옴
+		      * - **에러 처리**: 응답이 실패하면 `throw`를 사용하여 에러를 던지고, `catch` 블록에서 처리
+		      * - **데이터 디버깅**: `console.log()`를 사용하여 함수 호출 및 응답 데이터를 디버깅
+		      */
+
 		    // 기안 진행 목록 가져오기 
 		    function fetchDraftDocuments() {
 		        console.log('Fetching draft documents...'); // 함수 호출 확인
@@ -993,6 +1137,23 @@
 		            });
 		    }
 		
+		      /**
+		       * ## 기능 및 기술 요약
+		       *
+		       * ### 기능
+		       * - 기안 진행 중인 문서 목록을 화면에 업데이트
+		       * - `authorStatus`가 'P'인 문서만 표시 (대기 중인 문서)
+		       * - 기안 진행 중인 문서가 없으면 "기안 진행 중인 문서가 없습니다." 메시지 표시
+		       * - 각 문서에 대해 기안 등록일, 문서 유형, 제목, 상태(대기 중) 정보 표시
+
+		       * ### 기술
+		       * - **DOM 조작**: `document.getElementById()`를 사용하여 기안 진행 목록에 해당하는 HTML 요소를 선택
+		       * - **HTML 생성**: `createElement()`를 사용하여 `tr` 요소를 동적으로 생성
+		       * - **목록 초기화**: `innerHTML = ''`을 사용하여 이전 데이터를 지우고 새로고침
+		       * - **조건문 사용**: `if (doc.authorStatus === 'P')`로 대기 중인 문서만 표시
+		       * - **디버깅**: `console.log()` 없이 기본 로직만 처리
+		       */
+
 		 	// 기안 진행 목록 업데이트
 		    function updateDraftDocumentList(documents) {
 		        const resultList = document.getElementById('resultList'); // 기안 진행 목록의 HTML ID
@@ -1018,6 +1179,22 @@
 		        });
 		    }
 		 	
+		       /**
+		        * ## 기능 및 기술 요약
+		        *
+		        * ### 기능
+		        * - 완료된 문서 데이터를 API에서 가져와서 처리
+		        * - `fetch()` 메서드를 사용하여 `/authorization/completed` API 엔드포인트에서 완료된 문서 목록을 가져옴
+		        * - 응답을 JSON으로 변환 후 `updateCompletedDocumentList()` 함수에 데이터를 전달하여 화면을 업데이트
+		        * - 오류 발생 시 콘솔에 에러 메시지를 출력하고, 사용자에게 오류 정보를 알림
+
+		        * ### 기술
+		        * - **API 호출**: `fetch()` 메서드를 사용하여 RESTful API에서 데이터를 가져옴
+		        * - **응답 처리**: `response.json()`을 사용하여 응답을 JSON 형식으로 변환
+		        * - **에러 처리**: `catch()` 메서드를 사용하여 네트워크 오류나 응답 오류를 처리
+		        * - **디버깅**: `console.log()`로 데이터 상태를 출력하여 디버깅 및 확인
+		        */
+
 		 	// 완료 문서 데이터 로딩
 		    function fetchCompletedDocuments() {
 		        console.log('Fetching completed documents...'); // 함수 호출 확인
@@ -1038,7 +1215,17 @@
 		            });
 		    }
 		 	
-		
+		       /**
+		        * ## 기능 및 기술 요약
+		        *
+		        * ### 기능
+		        * - 문서 유형을 표시하기 위한 매핑 객체
+		        * - 각 문서 유형에 대해 사용자 친화적인 이름을 매핑하여 보여줌
+		        *
+		        * ### 기술
+		        * - **객체 구조**: `docTypeMap` 객체를 사용하여 문서 유형 코드(예: `"trip Report"`)를 해당하는 한글 문서명(예: `"해외 출장 신청서"`)으로 매핑
+		        * - **목적**: 문서 유형 코드 대신 사용자에게 이해하기 쉬운 한글 제목을 제공
+		        */
 		    const docTypeMap = {
 		        "trip Report": "해외 출장 신청서",
 		        "late Report": "지각 사유서",
@@ -1047,6 +1234,18 @@
 		        "outside Report": "외근 신청서"
 		    };
 		
+		    /**
+		     * ## 기능 및 기술 요약
+		     *
+		     * ### 기능
+		     * - 문서 유형을 한글로 변환하여 표시하는 함수
+		     * - 테이블 내 문서 유형 코드(`docType`)를 `docTypeMap` 객체를 이용해 한글로 변환
+		     * - 변환된 값을 해당 테이블 셀에 업데이트
+		     *
+		     * ### 기술
+		     * - **문서 유형 변환**: `querySelectorAll`을 이용해 문서 유형을 포함하는 테이블 셀을 선택
+		     * - **매핑 처리**: 선택된 문서 유형 코드 값을 `docTypeMap` 객체를 사용해 한글로 변환하고, 변환된 값을 테이블 셀에 업데이트
+		     */
 		    // 문서양식을 한글로 표시하기 위한 함수
 		    function displayDocTypeInKorean() {
 		        // 테이블에서 두 번째 열의 <td> 요소들을 선택합니다.
@@ -1108,7 +1307,19 @@
 	            40: '울산 울주지점',
 	            41: '제주도 제주지점'
 	        };
-		    
+
+	        /**
+	         * ## 기능 및 기술 요약
+	         *
+	         * ### 기능
+	         * - `distributorNo` 값을 이용해 해당하는 `distributorName`을 변환하여 표시하는 함수
+	         * - `distributorNo`가 존재하면, 이를 `distributorMap`을 통해 `distributorName`으로 변환
+	         * - 변환된 값을 입력 필드에 업데이트
+	         *
+	         * ### 기술
+	         * - **분배자 이름 변환**: `distributorNo` 값을 가져와 `distributorMap`을 이용해 변환
+	         * - **값 업데이트**: 변환된 `distributorName`을 해당 `input` 요소에 설정
+	         */
 	        function displayDistributorName() {
 	            // distributorNo를 선택하여 요소 가져오기
 	            let distributorElement = document.getElementById('distributorNo');
@@ -1120,7 +1331,21 @@
 	            }
 	        }
 	        
-
+	        /**
+	         * ## 기능 및 기술 요약
+	         *
+	         * ### 기능
+	         * - 주어진 `authorNo`에 대해 문서를 회수하는 기능을 수행
+	         * - `authorNo` 값이 없다면 경고창을 띄우고 종료
+	         * - 회수 진행 전에 사용자의 확인을 요청
+	         * - 서버로 문서 회수 요청을 보내고, 성공적으로 회수되면 알림을 제거
+	         * - 문서 회수 후, 성공적으로 완료되면 리스트 페이지로 리디렉션
+	         *
+	         * ### 기술
+	         * - **CSRF 토큰 처리**: 요청 헤더에 CSRF 토큰을 포함하여 보안 강화
+	         * - **알림 제거**: 문서 회수 후 알림을 제거하는 추가적인 fetch 호출
+	         * - **조건문 및 사용자 확인**: 문서 번호가 존재하지 않거나 회수 여부를 사용자가 확인해야 하는 기능
+	         */
 	        function recallDocument() {
 	            const authorNo = document.getElementById('authorNo').value;
 	            console.log('authorNo 값:', authorNo);  // 콘솔에 값이 출력되는지 확인
@@ -1190,6 +1415,20 @@
 	            }
 	        }
 
+	        /**
+	         * ## 기능 및 기술 요약
+	         *
+	         * ### 기능
+	         * - 주어진 `authorNo`에 대해 알림을 제거하는 기능을 수행
+	         * - CSRF 토큰을 포함하여 알림 제거 요청을 서버로 전송
+	         * - 응답 상태 코드와 알림 배지 및 메인 알림의 표시 여부를 로그로 기록
+	         * - 성공적으로 알림이 제거되면 UI에서 알림 배지와 메인 알림을 숨김 처리
+	         *
+	         * ### 기술
+	         * - **CSRF 토큰 처리**: 보안을 강화하기 위해 요청 헤더에 CSRF 토큰을 포함
+	         * - **디버깅을 위한 로그**: 각 단계에서 데이터를 로깅하여 문제 해결에 유용한 정보를 제공
+	         * - **DOM 조작**: 알림 배지 및 메인 알림의 표시를 제어하는 로직
+	         */
 		    // 완료 문서 알람 표기
 			function clearNotification(authorNo) {
 			    // 로그 추가: authorNo 확인
@@ -1237,14 +1476,6 @@
 			        console.error('Error clearing notification:', error);
 			    });
 			}
-
-
-
-
-
-
-
-
 		</script>
 
      </th:block>
