@@ -1,8 +1,6 @@
 package com.ware.spring.member.service;
 
-import java.lang.reflect.Member;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +8,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.ware.spring.commute.domain.Commute;
 import com.ware.spring.member.domain.Distributor;
 import com.ware.spring.member.domain.DistributorDto;
 import com.ware.spring.member.domain.MemberDto;
 import com.ware.spring.member.repository.DistributorRepository;
 import com.ware.spring.member.repository.MemberRepository;
+
 @Service
 public class DistributorService {
 
@@ -28,12 +26,18 @@ public class DistributorService {
         this.memberRepository = memberRepository;
     }
 
+    /**
+     * 모든 지점과 해당 지점의 멤버 정보를 포함한 리스트를 반환합니다.
+     * 기술: Spring Data JPA
+     * 설명: 각 지점에 포함된 멤버 정보를 함께 조회하여 DTO로 변환한 후 반환합니다.
+     * 
+     * @return 모든 지점과 그 지점의 멤버 리스트가 포함된 DistributorDto 리스트
+     */
     public List<DistributorDto> getAllDistributorsWithMembers() {
-        // 지점 정보와 해당 지점의 멤버 정보를 함께 포함한 distributor 반환
         return distributorRepository.findAll().stream().map(distributor -> {
             List<MemberDto> members = memberRepository.findMembersByDistributorNo(distributor.getDistributorNo())
                                         .stream()
-                                        .map(member -> MemberDto.toDto(member))  // MemberDto의 toDto 사용
+                                        .map(MemberDto::toDto)
                                         .collect(Collectors.toList());
             return new DistributorDto(
                 distributor.getDistributorNo(),
@@ -44,19 +48,38 @@ public class DistributorService {
                 distributor.getDistributorLatitude(),
                 distributor.getDistributorLongitude(),
                 distributor.getDistributorStatus(),
-                members // 멤버 추가
+                members
             );
         }).collect(Collectors.toList());
     }
 
+    /**
+     * 특정 지점에 속한 멤버들을 반환합니다.
+     * 기술: Spring Data JPA
+     * 설명: 주어진 지점 번호에 해당하는 멤버 리스트를 조회하고 DTO로 변환하여 반환합니다.
+     * 
+     * @param distributorNo 지점 번호
+     * @return 해당 지점의 멤버 리스트가 포함된 MemberDto 리스트
+     */
     public List<MemberDto> getMembersByDistributor(Long distributorNo) {
-        return memberRepository.findMembersByDistributorNo(distributorNo)  // JPQL 메서드 사용
+        return memberRepository.findMembersByDistributorNo(distributorNo)
                                .stream()
-                               .map(member -> MemberDto.toDto(member))  // MemberDto의 toDto 사용
+                               .map(MemberDto::toDto)
                                .collect(Collectors.toList());
     }
+
+    /**
+     * 검색 조건 및 필터를 사용하여 지점 리스트를 반환합니다.
+     * 기술: Spring Data JPA, 페이징 (Pageable)
+     * 설명: 지점 이름, 주소, 상태 필터에 따라 검색어에 맞는 지점 리스트를 페이징된 형태로 반환합니다.
+     * 
+     * @param searchType 검색 유형 ('name', 'address', 'status')
+     * @param searchText 검색어
+     * @param statusFilter 상태 필터 ('operating', 'closed', 'all')
+     * @param pageable 페이징 정보
+     * @return 페이징된 지점 리스트
+     */
     public Page<Distributor> searchDistributorsByCriteria(String searchType, String searchText, String statusFilter, Pageable pageable) {
-        // 검색어와 필터가 모두 비어있을 경우 전체 조회
         if ((searchText == null || searchText.isEmpty()) && ("all".equals(statusFilter) || statusFilter == null)) {
             return distributorRepository.findAll(pageable);
         }
@@ -65,7 +88,7 @@ public class DistributorService {
             if ("all".equals(statusFilter)) {
                 return distributorRepository.findByDistributorNameContaining(searchText, pageable);
             } else {
-                int status = "operating".equals(statusFilter) ? 1 : 0; // 운영중(1) 또는 폐점(0)
+                int status = "operating".equals(statusFilter) ? 1 : 0;
                 return distributorRepository.findByDistributorNameContainingAndDistributorStatus(searchText, status, pageable);
             }
         } else if ("address".equals(searchType)) {
@@ -80,21 +103,42 @@ public class DistributorService {
             return distributorRepository.findByDistributorStatus(status, pageable);
         }
 
-        // 기본적으로 전체 조회
         return distributorRepository.findAll(pageable);
     }
 
+    /**
+     * 특정 상태의 지점들을 페이징된 형태로 반환합니다.
+     * 기술: Spring Data JPA, 페이징 (Pageable)
+     * 설명: 주어진 상태에 해당하는 지점들을 페이징된 리스트로 반환합니다.
+     * 
+     * @param status 지점 상태 (1: 운영 중, 0: 폐점)
+     * @param pageable 페이징 정보
+     * @return 페이징된 지점 리스트
+     */
     public Page<Distributor> findAllByStatus(int status, Pageable pageable) {
         return distributorRepository.findByDistributorStatus(status, pageable);
     }
 
+    /**
+     * 모든 지점 리스트를 페이징된 형태로 반환합니다.
+     * 기술: Spring Data JPA, 페이징 (Pageable)
+     * 설명: 모든 지점을 페이징된 리스트로 반환합니다.
+     * 
+     * @param pageable 페이징 정보
+     * @return 페이징된 모든 지점 리스트
+     */
     public Page<Distributor> findAllDistributors(Pageable pageable) {
         return distributorRepository.findAll(pageable);
     }
 
-
+    /**
+     * 새로운 지점을 등록합니다.
+     * 기술: Spring Data JPA
+     * 설명: DTO로부터 지점 엔티티를 생성하여 데이터베이스에 저장합니다. 기본 상태는 '운영 중'으로 설정됩니다.
+     * 
+     * @param distributorDto 등록할 지점 정보를 담은 DTO
+     */
     public void registerDistributor(DistributorDto distributorDto) {
-        // DTO의 각 필드를 직접 사용하여 Distributor 엔티티 생성
         Distributor distributor = Distributor.builder()
                 .distributorNo(distributorDto.getDistributorNo())
                 .distributorName(distributorDto.getDistributorName())
@@ -103,20 +147,23 @@ public class DistributorService {
                 .distributorAddrDetail(distributorDto.getDistributorAddrDetail())
                 .distributorLatitude(distributorDto.getDistributorLatitude())
                 .distributorLongitude(distributorDto.getDistributorLongitude())
-                .distributorStatus(1)
+                .distributorStatus(1)  // 운영 중 상태로 설정
                 .build();
 
-        // 데이터베이스에 저장
         distributorRepository.save(distributor);
     }
+
+    /**
+     * 특정 지점을 조회하여 DTO로 반환합니다.
+     * 기술: Spring Data JPA
+     * 설명: 지점 번호로 지점을 조회하고, 해당 지점이 존재하지 않으면 예외를 발생시킵니다.
+     * 
+     * @param distributorNo 지점 번호
+     * @return 조회된 지점 정보를 담은 DistributorDto
+     */
     public DistributorDto getDistributorById(Long distributorNo) {
         Distributor distributor = distributorRepository.findById(distributorNo)
                 .orElseThrow(() -> new IllegalArgumentException("해당 지점을 찾을 수 없습니다. 지점 번호: " + distributorNo));
         return DistributorDto.toDto(distributor);
     }
-    
- 
 }
-
-
-
