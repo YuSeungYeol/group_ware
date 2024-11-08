@@ -18,6 +18,19 @@ public class DistributorViewController {
     @Autowired
     private DistributorService distributorService;
 
+    /**
+     * 지점 리스트 페이지를 반환합니다.
+     * 설명: 지점의 상태 필터와 검색 조건을 기반으로 지점 목록을 조회하여 페이징 처리된 결과를 반환합니다.
+     * 검색 조건이 있는 경우 검색어와 필터에 따라 지점 목록을 조회하고, 
+     * 검색 조건이 없는 경우 상태 필터에 따라 지점 목록을 필터링합니다.
+     * 
+     * @param statusFilter 상태 필터 (1: 운영 중, 2: 폐점, all: 모든 지점)
+     * @param searchType 검색 유형 ('name', 'address', 등)
+     * @param searchText 검색어
+     * @param page 페이지 번호 (0부터 시작)
+     * @param model 뷰에 전달할 데이터
+     * @return 지점 리스트 페이지 뷰 (distributor/distributor_list)
+     */
     @GetMapping("/distributor/list")
     public String listDistributors(
             @RequestParam(value = "statusFilter", required = false, defaultValue = "all") String statusFilter,
@@ -63,6 +76,13 @@ public class DistributorViewController {
 
         return "distributor/distributor_list";
     }
+
+    /**
+     * 지점 등록 페이지를 반환합니다.
+     * 설명: 지점 등록 폼이 있는 페이지로 이동합니다.
+     * 
+     * @return 지점 등록 페이지 뷰 (distributor/distributor_register)
+     */
     @GetMapping("/distributor/register")
     public String showRegisterPage() {
         return "distributor/distributor_register";
