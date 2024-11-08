@@ -12,9 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.ware.spring.commute.domain.Commute;
 import com.ware.spring.member.domain.Distributor;
 import com.ware.spring.member.domain.Member;
 import com.ware.spring.member.domain.Rank;
@@ -29,28 +27,38 @@ import com.ware.spring.security.vo.SecurityUser;
 public class MemberViewController {
 
     private final MemberService memberService;
-
     private final MemberRepository memberRepository;
     private final RankRepository rankRepository;
     private final DistributorRepository distributorRepository;
     private final DistributorService distributorService; 
 
     @Autowired
-    public MemberViewController(MemberService memberService,MemberRepository memberRepository, RankRepository rankRepository, DistributorRepository distributorRepository
-    		,DistributorService distributorService) {
+    public MemberViewController(MemberService memberService, MemberRepository memberRepository, RankRepository rankRepository, DistributorRepository distributorRepository, DistributorService distributorService) {
+        this.memberService = memberService;
         this.memberRepository = memberRepository;
         this.rankRepository = rankRepository;
         this.distributorRepository = distributorRepository;
-        this.memberService = memberService;
         this.distributorService = distributorService;
     }
 
-    
+    /**
+     * 로그인 페이지를 반환합니다.
+     * 설명: 회원 로그인 페이지로 이동합니다.
+     * 
+     * @return 로그인 페이지 뷰 (member/member_login)
+     */
     @GetMapping("/login")
     public String loginPage() {
         return "member/member_login"; 
     }
 
+    /**
+     * 회원 등록 페이지를 반환합니다.
+     * 설명: 회원 등록에 필요한 직급 및 지점 정보를 모델에 추가하여 회원 등록 페이지로 이동합니다.
+     * 
+     * @param model 뷰에 전달할 데이터
+     * @return 회원 등록 페이지 뷰 (member/member_register)
+     */
     @GetMapping("/member/register")
     public String showRegisterPage(Model model) {
         model.addAttribute("rank", memberService.getRank());
@@ -58,19 +66,48 @@ public class MemberViewController {
         return "member/member_register"; 
     }
 
+    /**
+     * 회원 가입 성공 페이지를 반환합니다.
+     * 설명: 회원 가입이 완료된 후 성공 페이지로 이동합니다.
+     * 
+     * @return 성공 페이지 뷰 (home)
+     */
     @GetMapping("/member/success")
     public String showSuccessPage() {
         return "home";  
     }
+
+    /**
+     * 마이페이지를 반환합니다.
+     * 설명: 로그인한 사용자의 정보, 직급 및 지점 정보를 모델에 추가하여 마이페이지로 이동합니다.
+     * 
+     * @param securityUser 현재 로그인한 사용자
+     * @param model 뷰에 전달할 데이터
+     * @return 마이페이지 뷰 (member/member_mypage)
+     */
     @GetMapping("/member/mypage")
     public String myPage(@AuthenticationPrincipal SecurityUser securityUser, Model model) {
-        // 현재 로그인한 사용자의 정보를 가져와서 모델에 추가
         Long memNo = securityUser.getMember().getMemNo();
         model.addAttribute("rank", memberService.getRank());
         model.addAttribute("distributors", memberService.getDistributors());
         model.addAttribute("member", memberService.getMemberById(memNo));
-        return "member/member_mypage";  // member_mypage.html 뷰를 반환
+        return "member/member_mypage"; 
     }
+
+    /**
+     * 회원 리스트 페이지를 반환합니다.
+     * 설명: 회원의 상태 필터와 검색 조건을 기반으로 회원 목록을 조회하여 페이징 처리된 결과를 반환합니다.
+     * 검색 조건이 있는 경우 검색어와 필터에 따라 회원 목록을 조회하고,
+     * 검색 조건이 없는 경우 상태 필터에 따라 회원 목록을 필터링합니다.
+     * 
+     * @param statusFilter 회원 상태 필터 (active, resigned, all 등)
+     * @param searchType 검색 유형 ('name', 'rank' 등)
+     * @param searchText 검색어
+     * @param page 페이지 번호 (0부터 시작)
+     * @param model 뷰에 전달할 데이터
+     * @param securityUser 현재 로그인한 사용자
+     * @return 회원 리스트 페이지 뷰 (member/member_list)
+     */
     @GetMapping("/member/list")
     public String listMembers(
             @RequestParam(value = "statusFilter", required = false, defaultValue = "active") String statusFilter,
@@ -83,12 +120,10 @@ public class MemberViewController {
         Pageable pageable = PageRequest.of(page, 10);
         Page<Member> members;
 
-        // 검색어가 있으면 필터 + 검색어로 결과를 조회, 없으면 필터만 적용된 결과 조회
         if (searchText != null && !searchText.isEmpty()) {
             Long currentUserDistributorNo = securityUser.getMember().getDistributor().getDistributorNo();
             members = memberService.searchMembersByCriteria(searchType, searchText, statusFilter, currentUserDistributorNo, pageable);
         } else {
-            // 검색어가 없을 경우 필터링만 적용
             if ("mybranch".equals(statusFilter)) {
                 Long currentUserDistributorNo = securityUser.getMember().getDistributor().getDistributorNo();
                 members = memberService.findMembersByCurrentDistributor(currentUserDistributorNo, pageable);
@@ -101,7 +136,6 @@ public class MemberViewController {
             }
         }
 
-        // 페이지네이션 처리
         int totalPages = members.getTotalPages();
         int pageNumber = members.getNumber();
         int pageGroupSize = 5;
@@ -122,29 +156,27 @@ public class MemberViewController {
         return "member/member_list";
     }
 
-
-
-
+    /**
+     * 회원 상세 정보 페이지를 반환합니다.
+     * 설명: 주어진 회원 ID를 기반으로 특정 회원의 정보를 조회하여 모델에 추가합니다.
+     * 모든 직급과 지점 정보도 함께 조회하여 뷰에 전달합니다.
+     * 
+     * @param id 회원 ID
+     * @param model 뷰에 전달할 데이터
+     * @return 회원 상세 정보 페이지 뷰 (member/member_info)
+     */
     @GetMapping("/member/detail/{id}")
     public String getMemberDetail(@PathVariable("id") Long id, Model model) {
-        // 주어진 ID로 Member 객체를 찾음
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
+        
+        List<Rank> rankList = rankRepository.findAll();
+        List<Distributor> distributorList = distributorRepository.findAll();
 
-        // 모든 Rank와 Distributor 정보도 함께 불러와서 뷰로 전달
-        List<Rank> rankList = rankRepository.findAll();  // 모든 직급 정보
-        List<Distributor> distributorList = distributorRepository.findAll();  // 모든 지점 정보
+        model.addAttribute("member", member);
+        model.addAttribute("rankList", rankList);
+        model.addAttribute("distributorList", distributorList);
 
-        // Model에 데이터를 추가하여 뷰로 전달
-        model.addAttribute("member", member);  // 특정 회원 정보
-        model.addAttribute("rankList", rankList);  // 직급 리스트
-        model.addAttribute("distributorList", distributorList);  // 지점 리스트
-
-        // member_info.html로 이동
         return "member/member_info";
     }
-
-
-
 }
-
