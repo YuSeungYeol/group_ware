@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class VehicleService {
 
-	@Autowired
+    @Autowired
     private final VehicleRepository vehicleRepository;
     @Autowired
     private final VehicleSalesRepository vehicleSalesRepository;
@@ -43,52 +43,74 @@ public class VehicleService {
     private final MemberRepository memberRepository;
     @Autowired
     private final VehicleSizeRepository vehicleSizeRepository;
+
+    /**
+     * 차량 정보를 저장합니다.
+     * 설명: VehicleDto와 이미지 경로를 받아 차량 크기를 설정한 후 차량을 저장합니다.
+     * 
+     * @param vehicleDto 저장할 차량의 정보가 담긴 DTO
+     * @param imagePath 차량 이미지 경로
+     * @return 저장된 Vehicle 객체
+     */
     public Vehicle saveVehicle(VehicleDto vehicleDto, String imagePath) {
-        // VehicleSize 찾기
         VehicleSize vehicleSize = vehicleSizeRepository.findById(vehicleDto.getVehicleSize().getSizeNo())
                 .orElseThrow(() -> new IllegalArgumentException("차량 크기를 찾을 수 없습니다."));
 
-        // Vehicle 엔티티 생성 및 설정
         Vehicle vehicle = vehicleDto.toEntity();
         vehicle.setVehicleSize(vehicleSize);
-        vehicle.setVehicleProfile(imagePath); // 이미지 경로 설정
+        vehicle.setVehicleProfile(imagePath);
 
-        // Vehicle 저장
         return vehicleRepository.save(vehicle);
     }
+
+    /**
+     * 모든 차량 목록을 반환합니다.
+     * 설명: 모든 차량 정보를 DTO로 변환하여 반환합니다.
+     * 
+     * @return 모든 VehicleDto 리스트
+     */
     public List<VehicleDto> getAllVehicles() {
         return vehicleRepository.findAll().stream()
                 .map(VehicleDto::toDto)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 특정 차량의 상세 정보를 조회합니다.
+     * 설명: 차량 번호로 특정 차량의 상세 정보를 조회하고, DTO로 반환합니다.
+     * 
+     * @param vehicleNo 차량 번호
+     * @return VehicleDto 차량 정보가 담긴 DTO
+     */
     public VehicleDto getVehicleDetail(Long vehicleNo) {
         Vehicle vehicle = vehicleRepository.findById(vehicleNo)
                 .orElseThrow(() -> new EntityNotFoundException("Vehicle not found with id: " + vehicleNo));
-
         return VehicleDto.toDto(vehicle);
     }
 
+    /**
+     * 차량 판매를 처리합니다.
+     * 설명: 차량 재고를 감소시키고 판매 내역을 기록합니다. 또한, 부서별 판매 내역을 업데이트합니다.
+     * 
+     * @param vehicleNo 판매된 차량 번호
+     * @param saleCount 판매 수량
+     * @param memNo 판매자 회원 번호
+     */
     @Transactional
     public void processSale(Long vehicleNo, int saleCount, Long memNo) {
-        // 차량 조회
         Vehicle vehicle = vehicleRepository.findById(vehicleNo)
                 .orElseThrow(() -> new EntityNotFoundException("Vehicle not found with id: " + vehicleNo));
 
-        // 회원 조회
         Member member = memberRepository.findById(memNo)
                 .orElseThrow(() -> new EntityNotFoundException("Member not found with id: " + memNo));
 
-        // 재고가 충분한지 확인
         if (vehicle.getVehicleInventory() < saleCount) {
             throw new IllegalArgumentException("Insufficient vehicle inventory");
         }
 
-        // 재고 감소
         vehicle.setVehicleInventory(vehicle.getVehicleInventory() - saleCount);
         vehicleRepository.save(vehicle);
 
-        // 개인 판매 내역 업데이트
         int totalSalePrice = vehicle.getVehiclePrice() * saleCount;
         VehicleSales vehicleSales = VehicleSales.builder()
                 .vehicle(vehicle)
@@ -99,7 +121,6 @@ public class VehicleService {
                 .build();
         vehicleSalesRepository.save(vehicleSales);
 
-        // 부서 판매 내역 업데이트
         Distributor distributor = member.getDistributor();
         LocalDate today = LocalDate.now();
         VehicleDistributorSales distributorSales = vehicleDistributorSalesRepository
@@ -117,6 +138,13 @@ public class VehicleService {
         vehicleDistributorSalesRepository.save(distributorSales);
     }
 
+    /**
+     * 현재 달의 개인 판매량 및 매출액을 조회합니다.
+     * 설명: 주어진 회원 번호에 대한 현재 달의 판매 내역을 조회하여 판매량과 매출액을 반환합니다.
+     * 
+     * @param memNo 회원 번호
+     * @return 개인 판매량 및 매출액 정보가 담긴 Map
+     */
     public Map<String, Integer> getCurrentMonthSales(Long memNo) {
         LocalDate now = LocalDate.now();
         List<VehicleSales> salesList = vehicleSalesRepository.findByMember_MemNoAndSaleDateBetween(
@@ -139,6 +167,14 @@ public class VehicleService {
         return result;
     }
 
+    /**
+     * 연간 개인 판매 데이터를 조회합니다.
+     * 설명: 주어진 회원 번호와 연도에 대한 월별 판매량 및 매출액을 반환합니다.
+     * 
+     * @param year 조회할 연도
+     * @param memNo 회원 번호
+     * @return 월별 판매량 및 매출액 정보를 담은 Map
+     */
     public Map<String, Map<Integer, Integer>> getYearlyIndividualSalesData(int year, Long memNo) {
         List<VehicleSales> salesList = vehicleSalesRepository.findByMember_MemNoAndSaleDateBetween(
                 memNo,
@@ -149,20 +185,17 @@ public class VehicleService {
         Map<Integer, Integer> monthlySales = new HashMap<>();
         Map<Integer, Integer> monthlySalePrices = new HashMap<>();
 
-        // 월별 집계 초기화
         for (int i = 1; i <= 12; i++) {
             monthlySales.put(i, 0);
             monthlySalePrices.put(i, 0);
         }
 
-        // 판매량 및 매출액 집계
         for (VehicleSales sale : salesList) {
             int month = sale.getSaleDate().getMonthValue();
             monthlySales.put(month, monthlySales.get(month) + sale.getSaleCount());
             monthlySalePrices.put(month, monthlySalePrices.get(month) + sale.getSalePrices());
         }
 
-        // 결과 반환
         Map<String, Map<Integer, Integer>> salesData = new HashMap<>();
         salesData.put("monthlySales", monthlySales);
         salesData.put("monthlySalePrices", monthlySalePrices);
@@ -170,8 +203,15 @@ public class VehicleService {
         return salesData;
     }
 
-
-    // 월별 개인 판매량 및 매출액 데이터 가져오기
+    /**
+     * 월간 개인 판매 데이터를 조회합니다.
+     * 설명: 주어진 회원 번호와 연, 월에 대한 개인 판매량 및 매출액을 반환합니다.
+     * 
+     * @param year 연도
+     * @param month 월
+     * @param memNo 회원 번호
+     * @return 개인 판매량 및 매출액 정보가 담긴 Map
+     */
     public Map<String, Integer> getMonthlyIndividualSalesData(int year, int month, Long memNo) {
         List<VehicleSales> salesList = vehicleSalesRepository.findByMember_MemNoAndSaleDateBetween(
                 memNo,
@@ -194,18 +234,32 @@ public class VehicleService {
         return salesData;
     }
 
-    // 부서별 이번 달 판매량 및 매출액 가져오기
+    /**
+     * 부서별 월간 판매 상위 5개를 조회합니다.
+     * 설명: 특정 연도와 월에 대한 부서별 월간 판매 상위 5개를 반환합니다.
+     * 
+     * @param year 연도
+     * @param month 월
+     * @return 상위 5개 부서의 VehicleDistributorSales 리스트
+     */
     public List<VehicleDistributorSales> getTop5DepartmentsByMonthlySales(int year, int month) {
         return vehicleDistributorSalesRepository.findTop5DepartmentsByMonth(year, month);
     }
+
+    /**
+     * 월간 상위 5개 부서를 조회합니다.
+     * 설명: 특정 연도와 월에 대한 상위 5개 부서의 판매 대수와 매출액을 반환합니다.
+     * 
+     * @param year 연도
+     * @param month 월
+     * @return VehicleDistributorSalesDto 상위 5개 부서의 판매 데이터
+     */
     public List<VehicleDistributorSalesDto> getTop5DistributorsBySales(int year, int month) {
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
 
-        // 전체 부서별 판매 데이터를 가져옵니다.
         List<VehicleDistributorSales> salesList = vehicleDistributorSalesRepository.findBySaleDateBetween(startDate, endDate);
 
-        // 부서별로 판매 대수와 매출액을 합산하여 Map으로 변환합니다.
         Map<Long, VehicleDistributorSalesDto> aggregatedSalesMap = new HashMap<>();
         for (VehicleDistributorSales sales : salesList) {
             Long distributorNo = sales.getDistributor().getDistributorNo();
@@ -224,17 +278,23 @@ public class VehicleService {
             aggregatedSalesMap.put(distributorNo, existingDto);
         }
 
-        // Map의 값을 리스트로 변환하고 상위 5개의 부서를 반환합니다.
         return aggregatedSalesMap.values().stream()
                 .sorted(Comparator.comparingInt(VehicleDistributorSalesDto::getDistributorSaleCount).reversed())
                 .limit(5)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 특정 기간 동안 판매된 상위 5개 차량을 조회합니다.
+     * 설명: 특정 기간 동안 판매된 차량을 판매 대수와 매출액 기준으로 상위 5개를 반환합니다.
+     * 
+     * @param startDate 시작 날짜
+     * @param endDate 종료 날짜
+     * @return VehicleSalesDto 상위 5개 차량의 판매 데이터
+     */
     public List<VehicleSalesDto> getTop5VehiclesBySales(LocalDate startDate, LocalDate endDate) {
         List<Object[]> results = vehicleSalesRepository.findTop5VehiclesBySales(startDate, endDate);
 
-        // Object[] 배열을 DTO로 변환
         return results.stream()
                 .map(result -> {
                     Long vehicleNo = ((Number) result[0]).longValue();
@@ -252,5 +312,4 @@ public class VehicleService {
                 })
                 .collect(Collectors.toList());
     }
-    
 }
