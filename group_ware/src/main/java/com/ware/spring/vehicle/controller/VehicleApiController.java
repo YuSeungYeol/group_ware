@@ -49,45 +49,66 @@ public class VehicleApiController {
     @Autowired
     private VehicleDistributorSalesRepository vehicleDistributorSalesRepository;
 
-    // 개인별 판매량 순위를 가져오는 API - 매출액 기준 상위 5명 반환
-
- 
-
-
-    // 연도별 개인 판매량 및 매출액을 가져오는 API
+    /**
+     * 연간 개인 판매량 및 매출액을 조회합니다.
+     * 설명: 특정 회원의 연간 개인 판매량 및 매출액 데이터를 월별로 집계하여 반환합니다.
+     * 
+     * @param year 조회할 연도
+     * @param memNo 회원 번호
+     * @return 월별 판매량 및 매출액 정보가 담긴 Map
+     */
     @GetMapping("/yearly")
     public Map<String, Map<Integer, Integer>> getYearlySalesData(@RequestParam("year") int year, @RequestParam("memNo") Long memNo) {
         return vehicleService.getYearlyIndividualSalesData(year, memNo);
     }
 
-    // 월별 개인 판매량 및 매출액을 가져오는 API
+    /**
+     * 월간 개인 판매량 및 매출액을 조회합니다.
+     * 설명: 특정 회원의 월간 개인 판매량 및 매출액 데이터를 반환합니다.
+     * 
+     * @param year 조회할 연도
+     * @param month 조회할 월
+     * @param memNo 회원 번호
+     * @return 월간 판매량 및 매출액 정보가 담긴 Map
+     */
     @GetMapping("/monthly")
     public Map<String, Integer> getMonthlySalesData(@RequestParam("year") int year, @RequestParam("month") int month, @RequestParam("memNo") Long memNo) {
         return vehicleService.getMonthlyIndividualSalesData(year, month, memNo);
     }
 
-    // 부서별 상위 5개 판매량 및 매출액을 가져오는 API
+    /**
+     * 상위 5개 부서별 판매 데이터를 조회합니다.
+     * 설명: 주어진 연도와 월에 대한 상위 5개 부서의 판매량 및 매출액을 반환합니다.
+     * 
+     * @param year 조회할 연도
+     * @param month 조회할 월
+     * @return 상위 5개 부서의 판매 데이터가 담긴 VehicleDistributorSalesDto 리스트
+     */
     @GetMapping("/top-distributors")
     public List<VehicleDistributorSalesDto> getTopDistributorsBySales(@RequestParam("year") int year, @RequestParam("month") int month) {
         return vehicleService.getTop5DistributorsBySales(year, month);
     }
 
-    // 상위 5개 판매된 차량 정보를 가져오는 API (차량 모델로)
+    /**
+     * 상위 5개 차량 판매 데이터를 조회합니다.
+     * 설명: 주어진 연도와 월에 대한 상위 5개 차량의 판매량 및 매출액을 반환합니다.
+     * 
+     * @param year 조회할 연도
+     * @param month 조회할 월
+     * @return 상위 5개 차량의 판매 데이터가 담긴 VehicleSalesDto 리스트
+     */
     @GetMapping("/top-vehicles")
     public List<VehicleSalesDto> getTop5VehiclesBySales(@RequestParam("year") int year, @RequestParam("month") int month) {
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
 
-        // Fetch data from repository
         List<Object[]> results = vehicleSalesRepository.findTop5VehiclesBySales(startDate, endDate);
 
-        // Convert the result to DTO list
         return results.stream().map(result -> {
             Long vehicleNo = ((Number) result[0]).longValue();
             int saleCount = ((Number) result[1]).intValue();
             int salePrices = ((Number) result[2]).intValue();
 
-            // Fetch vehicle model by vehicleNo
             Vehicle vehicle = vehicleRepository.findById(vehicleNo).orElse(null);
             String vehicleModel = (vehicle != null) ? vehicle.getVehicleModel() : "Unknown Model";
 
@@ -104,15 +125,18 @@ public class VehicleApiController {
         }).collect(Collectors.toList());
     }
 
-    // 부서별 월별 판매량 및 매출액을 반환하는 API
- // 부서별 월별 판매량 및 매출액을 반환하는 API
+    /**
+     * 부서의 월간 판매 데이터를 조회합니다.
+     * 설명: 현재 로그인된 사용자의 부서에 대한 월간 판매량 및 매출액을 반환합니다.
+     * 
+     * @return 부서의 판매 데이터와 지점 이름이 담긴 Map
+     */
     @GetMapping("/distributor-sales")
     public Map<String, Object> getDepartmentSales() {
-        // 현재 로그인된 사용자의 부서 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         SecurityUser userDetails = (SecurityUser) authentication.getPrincipal();
         Long distributorNo = userDetails.getMember().getDistributor().getDistributorNo();
-        String distributorName = userDetails.getMember().getDistributor().getDistributorName(); // 지점 이름 가져오기
+        String distributorName = userDetails.getMember().getDistributor().getDistributorName();
 
         int currentYear = LocalDate.now().getYear();
         int currentMonth = LocalDate.now().getMonthValue();
@@ -131,7 +155,6 @@ public class VehicleApiController {
             totalSalePrices += sales.getDistributorSalePrices();
         }
 
-        // 지점 이름과 판매 데이터 함께 반환
         Map<String, Object> salesData = new HashMap<>();
         salesData.put("distributorName", distributorName);
         salesData.put("salesCount", totalSaleCount);
@@ -139,59 +162,59 @@ public class VehicleApiController {
 
         return salesData;
     }
+
+    /**
+     * 새로운 차량을 등록합니다.
+     * 설명: 차량 정보와 이미지 파일을 받아서 차량을 저장하고, 이미지 파일은 지정된 경로에 저장합니다.
+     * 
+     * @param vehicleDto 차량 정보가 담긴 DTO
+     * @param file 차량 이미지 파일
+     * @param sizeNo 차량 크기 ID
+     * @return 등록 성공 여부와 메시지를 담은 응답
+     */
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> registerVehicle(
-            @ModelAttribute VehicleDto vehicleDto, // DTO를 @ModelAttribute로 처리
+            @ModelAttribute VehicleDto vehicleDto,
             @RequestParam("vehicleImage") MultipartFile file,
             @RequestParam("size_no") Long sizeNo) {
         
         Map<String, Object> response = new HashMap<>();
         
         try {
-            // VehicleSize 객체 찾기
             VehicleSize vehicleSize = vehicleSizeRepository.findById(sizeNo)
                     .orElseThrow(() -> new IllegalArgumentException("Invalid sizeNo: " + sizeNo));
             
-            // VehicleDto에 VehicleSize 설정
             vehicleDto.setVehicleSize(vehicleSize);
             
-            // 이미지 저장 경로 설정 및 저장
             if (file != null && !file.isEmpty()) {
                 String uploadDir = new File("src/main/resources/static/image/vehicles/").getAbsolutePath();
                 File directory = new File(uploadDir);
                 if (!directory.exists()) {
-                    directory.mkdirs(); // 경로가 없으면 생성
+                    directory.mkdirs();
                 }
                 String filePath = uploadDir + "/" + file.getOriginalFilename();
                 File dest = new File(filePath);
                 file.transferTo(dest);
 
-                // 이미지 경로를 vehicleDto에 설정
                 vehicleDto.setVehicleProfile("/image/vehicles/" + file.getOriginalFilename());
             }
 
-            // vehicleDto를 통해 vehicle 저장
             vehicleService.saveVehicle(vehicleDto, vehicleDto.getVehicleProfile());
 
-            // 성공 응답 설정
             response.put("success", true);
             response.put("res_msg", "차량이 성공적으로 등록되었습니다.");
             return ResponseEntity.ok(response);
             
         } catch (IOException e) {
-            // 예외 처리: 이미지 저장 중 오류
             e.printStackTrace();
             response.put("success", false);
             response.put("res_msg", "차량 등록 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         } catch (Exception e) {
-            // 기타 예외 처리
             e.printStackTrace();
             response.put("success", false);
             response.put("res_msg", "차량 등록 중 오류가 발생했습니다: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
 }
-
