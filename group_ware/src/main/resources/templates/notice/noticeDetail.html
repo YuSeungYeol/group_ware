@@ -62,6 +62,23 @@
 	</div>
 	 </section>
 	 <script>
+	 /**
+	  * ## 기능 및 기술 요약
+	  *
+	  * ### 기능
+	  * - **공지사항 삭제**: 사용자가 삭제 버튼을 클릭하면 해당 공지사항을 삭제.
+	  * - **사용자 확인**: 삭제 확인 메시지를 통해 사용자 실수를 방지.
+	  * - **삭제 후 리다이렉트**: 삭제가 완료되면 공지사항 목록 페이지로 이동.
+	  *
+	  * ### 기술
+	  * - **Fetch API**: 서버와 비동기 방식으로 HTTP DELETE 요청을 수행.
+	  * - **CSRF 보호**: CSRF 토큰을 포함해 보안 강화.
+	  * - **SweetAlert2**: 사용자에게 삭제 성공 또는 실패 메시지를 시각적으로 알림.
+	  *
+	  * ### 구현
+	  * - 사용자 확인을 거친 뒤 Fetch API를 사용해 서버로 삭제 요청 전송.
+	  * - 서버 응답에 따라 성공 또는 오류 메시지를 표시하고 후속 동작 처리.
+	  */
 	    const noticeDelete = function(noticeNo) {
 	        if (confirm("정말 삭제하시겠습니까?")) {
 	            // CSRF 토큰 추가
@@ -104,7 +121,22 @@
 	        }
 	    };
 	    
-	    <!-- 공지사항 읽음 처리 추가 -->
+	    /**
+	     * ## 기능 및 기술 요약
+	     *
+	     * ### 기능
+	     * - **읽음 처리**: 공지사항 상세 페이지에 접근 시, 해당 공지사항을 읽음 상태로 변경.
+	     * - **알림 상태 초기화**: 읽음 처리를 통해 알림 메시지 제거 또는 상태 갱신.
+	     *
+	     * ### 기술
+	     * - **Fetch API**: 서버와 비동기 방식으로 HTTP POST 요청을 전송.
+	     * - **CSRF 보호**: CSRF 토큰을 사용해 보안 강화.
+	     * - **DOMContentLoaded 이벤트**: DOM이 완전히 로드된 이후 읽음 처리 요청 수행.
+	     *
+	     * ### 구현
+	     * - 공지사항 번호와 CSRF 토큰을 사용해 서버로 읽음 처리 요청 전송.
+	     * - 응답 상태를 확인해 성공 또는 오류 로그 출력.
+	     */
 	    document.addEventListener("DOMContentLoaded", function() {
 	        const noticeNo = document.getElementById('noticeNo').value; // 서버에서 받아온 공지사항 번호
 	        const csrfToken = document.querySelector('input[name="_csrf"]').value;

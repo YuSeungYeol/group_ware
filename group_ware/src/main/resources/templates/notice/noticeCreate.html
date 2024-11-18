@@ -44,7 +44,20 @@
             </div>
        </section>  
         <script>
-	    // Quill 에디터 초기화
+        /**
+         * ## 기능 및 기술 요약
+         *
+         * ### 기능
+         * - **공지사항 본문 작성**: WYSIWYG 에디터를 통해 공지사항 내용을 편집할 수 있도록 UI 제공.
+         * - **툴바 지원**: 헤더, 텍스트 스타일(굵게, 기울임, 밑줄), 이미지 추가, 코드 블록 기능 제공.
+         *
+         * ### 기술
+         * - **Quill.js**: 오픈 소스 텍스트 편집기 라이브러리를 사용해 풍부한 텍스트 편집 인터페이스 구현.
+         * - **HTML DOM 바인딩**: `#notice-editor` 요소에 Quill 에디터를 초기화.
+         *
+         * ### 구현
+         * - Quill 객체를 생성해 DOM에 바인딩하며, 툴바의 기본 동작과 스타일 옵션 설정.
+         */
 	    var quill = new Quill('#notice-editor', {
 	        theme: 'snow',
 	        modules: {
@@ -61,7 +74,20 @@
 	    const noticeStartDate = document.getElementById('noticeStartDate');
 	    const noticeEndDate = document.getElementById('noticeEndDate');
 	
-	    // 체크박스가 선택되면 날짜 입력 활성화
+	    /**
+	     * ## 기능 및 기술 요약
+	     *
+	     * ### 기능
+	     * - **공지 기간 설정**: 사용자가 체크박스를 선택하거나 해제할 때 입력 필드 활성화/비활성화.
+	     * - **필드 초기화**: 체크박스가 해제되면 날짜 입력 필드를 비활성화하고 값을 초기화.
+	     *
+	     * ### 기술
+	     * - **이벤트 리스너**: `change` 이벤트를 사용하여 체크박스 상태를 감지.
+	     * - **HTML Form 요소 조작**: `disabled` 속성을 변경해 필드 활성화/비활성화.
+	     *
+	     * ### 구현
+	     * - 체크박스의 상태에 따라 날짜 입력 필드의 상태를 동적으로 업데이트.
+	     */
 	    noticeScheduleCheck.addEventListener('change', () => {
 	        console.log("체크박스 상태:", noticeScheduleCheck.checked); // 체크박스 상태 확인
 	        
@@ -79,6 +105,24 @@
 	        console.log("공지 종료일:", noticeEndDate.value);    // 공지 종료일 값 확인
 	    });
 	
+	    /**
+	     * ## 기능 및 기술 요약
+	     *
+	     * ### 기능
+	     * - **폼 데이터 전송**: 입력된 제목, 본문, 공지 기간 등의 데이터를 서버로 전송.
+	     * - **유효성 검사**: 제목, 내용, 날짜 입력 여부를 확인하고 잘못된 경우 사용자에게 알림.
+	     * - **CSRF 보호**: CSRF 토큰을 포함하여 보안 강화.
+	     *
+	     * ### 기술
+	     * - **FormData API**: 폼 데이터를 처리하여 서버로 전송.
+	     * - **Fetch API**: 서버와 비동기 통신을 수행하며, JSON 응답을 처리.
+	     * - **SweetAlert2**: 사용자에게 결과 메시지를 시각적으로 알림.
+	     *
+	     * ### 구현
+	     * - Quill 에디터의 HTML 내용을 숨겨진 textarea로 저장.
+	     * - 입력값에 대해 유효성 검사 수행 후 Fetch API로 서버에 데이터 전송.
+	     * - 서버 응답에 따라 결과 메시지와 후속 작업 처리.
+	     */
 	    form.addEventListener('submit', (e) => {
 	        e.preventDefault(); // 기본 폼 제출 방지
 	        

@@ -34,7 +34,26 @@
      </section>
 
      <script>
-         // Quill 에디터 초기화
+     /**
+      * ## 기능 및 기술 요약
+      *
+      * ### 기능
+      * - **Quill 에디터 초기화**: 사용자가 공지사항 내용을 HTML 형식으로 작성하거나 편집 가능.
+      * - **공지사항 수정 요청 처리**: 사용자가 수정한 내용을 서버로 전송하고, 성공 여부에 따라 알림 표시 및 페이지 이동.
+      *
+      * ### 기술
+      * - **Quill 라이브러리**: WYSIWYG 에디터로 사용자 입력을 HTML 형식으로 변환.
+      * - **Fetch API**: 서버로 HTTP POST 요청을 비동기적으로 전송.
+      * - **CSRF 보호**: 요청 헤더에 CSRF 토큰을 포함해 보안 강화.
+      * - **FormData API**: HTML Form 데이터를 손쉽게 전송 가능.
+      * - **SweetAlert2**: 사용자에게 결과를 시각적으로 알림.
+      *
+      * ### 구현
+      * - 페이지 로드 시 Quill 에디터를 초기화하고 기존 공지사항 내용을 에디터에 로드.
+      * - 수정 버튼 클릭 시 Quill 에디터의 내용을 숨겨진 textarea에 복사.
+      * - FormData API를 통해 수정된 데이터를 Fetch API로 서버에 전송.
+      * - 응답에 따라 알림 표시 및 공지사항 목록 페이지로 이동.
+      */0
          var quill = new Quill('#notice-editor', {
              theme: 'snow',
              modules: {

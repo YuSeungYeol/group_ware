@@ -61,6 +61,24 @@
 		</div>
 	 </section>
 	 <script>
+	 /**
+	  * ## 기능 및 기술 요약
+	  *
+	  * ### 기능
+	  * - **공지사항 읽음 처리**: 사용자가 공지사항을 클릭하면 해당 공지사항을 읽음 상태로 처리.
+	  * - **상세 페이지 이동**: 읽음 처리 완료 후 공지사항의 상세 페이지로 이동.
+	  *
+	  * ### 기술
+	  * - **DOM 이벤트 바인딩**: `DOMContentLoaded` 이벤트와 클릭 이벤트를 활용해 동작 제어.
+	  * - **Fetch API**: 서버와 비동기 방식으로 HTTP POST 요청을 전송.
+	  * - **CSRF 보호**: 요청 헤더에 CSRF 토큰을 포함해 보안 강화.
+	  * - **Attribute 접근**: `data-*` 속성을 사용해 공지사항 번호를 동적으로 추출.
+	  *
+	  * ### 구현
+	  * - 페이지 로드 시 각 공지사항 항목에 클릭 이벤트를 바인딩.
+	  * - 클릭 시 Fetch API를 사용해 읽음 처리 요청을 전송.
+	  * - 처리 성공 후, 해당 공지사항의 상세 페이지로 이동.
+	  */
 	 document.addEventListener("DOMContentLoaded", function() {
 		    // 공지사항 클릭 시 읽음 처리
 		    document.querySelectorAll('.notice-item').forEach(item => {
