@@ -32,7 +32,27 @@ public class AuthOffApiController {
         this.memberRepository = memberRepository;
         this.authorizationFileService = authorizationFileService;
     }
-
+    
+    /**
+     * ## 기능 및 기술 요약
+     *
+     * ### 기능
+     * - **휴가 신청서 생성**: DTO를 기반으로 휴가 신청서(`AuthOff`)와 권한 요청(`Authorization`) 객체를 생성하여 저장.
+     * - **연관 관계 설정**: `AuthOff`와 `Authorization` 간의 양방향 연관 관계를 설정.
+     *
+     * ### 기술
+     * - **Spring Data JPA**: `authOffRepository`와 `authorizationRepository`를 사용하여 데이터베이스에 객체 저장.
+     * - **DTO 변환**: `AuthOffDto`를 `AuthOff` 엔티티로 변환.
+     * - **MultipartFile 처리**: 파일 업로드를 처리하는 기능 제공.
+     * - **Cascade**: 엔티티 간 연관 관계를 기반으로 자동 저장.
+     * - **JSON 응답**: 결과 코드와 메시지를 JSON 형태로 반환하여 프론트엔드와 통신.
+     *
+     * ### 구현
+     * - DTO를 기반으로 `AuthOff` 엔티티를 생성하고 연관 회원 정보 설정.
+     * - `Authorization` 객체를 생성하여 기본 상태("P")와 제목을 설정한 뒤 저장.
+     * - 저장된 `Authorization` 객체와 `AuthOff` 객체 간 연관 관계를 설정하고 저장.
+     * - 최종적으로 생성된 휴가 신청서의 성공 여부에 따라 응답을 반환.
+     */
     @ResponseBody
     @PostMapping("/authOff")
     public Map<String, String> createAuthOff(AuthOffDto authOffDto, 
