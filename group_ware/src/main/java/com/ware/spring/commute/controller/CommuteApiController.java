@@ -32,7 +32,12 @@ public class CommuteApiController {
         this.commuteService = commuteService;
     }
 
-    // 오늘 출근 기록 확인 API
+    /**
+     * 오늘 출근 기록 여부를 확인
+     * 
+     * @param memNo 회원 번호
+     * @return 출근 기록이 있는 경우 true, 그렇지 않은 경우 false
+     */
     @GetMapping("/checkTodayCommute")
     public ResponseEntity<Boolean> checkTodayCommute(@RequestParam("memNo") Long memNo) {
         try {
