@@ -51,8 +51,8 @@ public class CommuteApiController {
     /**
      * 현재 로그인된 사용자의 회원 번호를 반환.
      * 
-     * @return 회원 번호 (memNo)* 
-     **/
+     * @return 회원 번호 (memNo)
+     */
     @GetMapping("/getMemNo")
     public Long getMemNo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -65,17 +65,21 @@ public class CommuteApiController {
         }
     }
 
-    // 출근 기록 처리 API
+    /**
+     * 출근 기록을 처리.
+     * 
+     * @param memNo 회원 번호
+     * @return 출근 완료 메시지와 지각 여부
+     */
     @PostMapping("/start")
     public ResponseEntity<Map<String, Object>> startWork(@RequestParam("memNo") Long memNo) {
         try {
             Commute commute = commuteService.startWork(memNo);
-            commuteService.updateTotalWorkingTime(memNo); // 총 근무 시간 업데이트
+            commuteService.updateTotalWorkingTime(memNo);
 
-            // 결과로 지각 여부와 메시지를 반환
             Map<String, Object> response = Map.of(
                 "message", "출근이 완료되었습니다.",
-                "isLate", commute.getIsLate() // 지각 여부 (Y/N)
+                "isLate", commute.getIsLate()
             );
 
             return ResponseEntity.ok(response);
@@ -87,19 +91,30 @@ public class CommuteApiController {
         }
     }
 
-    // 퇴근 기록 및 근무 시간 계산 API
+    /**
+     * 퇴근 기록을 처리하고 근무 시간을 계산.
+     * 
+     * @param memNo 회원 번호
+     * @return 근무 시간 정보
+     */
     @PostMapping("/end")
     public ResponseEntity<Map<String, Object>> endWork(@RequestParam("memNo") Long memNo) {
         try {
             Map<String, Object> workTime = commuteService.endWork(memNo);
-            commuteService.updateTotalWorkingTime(memNo); // 총 근무 시간 업데이트
+            commuteService.updateTotalWorkingTime(memNo);
             return ResponseEntity.ok(workTime);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    // 출근 상태 업데이트 API (착석, 외출, 외근, 식사)
+    /**
+     * 출근 상태를 업데이트.
+     * 
+     * @param memNo 회원 번호
+     * @param status 업데이트할 상태 (착석, 외출, 외근, 식사)
+     * @return 상태 업데이트 메시지
+     */
     @PostMapping("/updateStatus")
     public ResponseEntity<String> updateStatus(@RequestParam("memNo") Long memNo, @RequestParam("status") String status) {
         try {
@@ -110,30 +125,29 @@ public class CommuteApiController {
         }
     }
 
-    // 퇴근 시 플래그 상태 업데이트 API
+    /**
+     * 퇴근 상태를 업데이트.
+     * 
+     * @param memNo 회원 번호
+     * @return 상태 업데이트 완료 메시지
+     */
     @PostMapping("/endStatus")
     public ResponseEntity<String> updateEndStatus(@RequestParam("memNo") Long memNo) {
         try {
             commuteService.updateEndStatus(memNo);
-            commuteService.updateTotalWorkingTime(memNo); // 총 근무 시간 업데이트
+            commuteService.updateTotalWorkingTime(memNo);
             return ResponseEntity.ok("퇴근 상태가 업데이트되었습니다.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("퇴근 상태 업데이트 중 오류가 발생했습니다.");
         }
     }
 
-    // 오늘 출근 기록 여부 확인 API
-    @GetMapping("/hasTodayCommute")
-    public ResponseEntity<Boolean> hasTodayCommute(@RequestParam("memNo") Long memNo) {
-        try {
-            boolean hasCommute = commuteService.hasTodayCommute(memNo);
-            return ResponseEntity.ok(hasCommute);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
-        }
-    }
-
-    // 주간 근무 시간 조회 API
+    /**
+     * 주간 근무 시간 데이터를 반환
+     * 
+     * @param memNo 회원 번호
+     * @return 주간 근무 시간 데이터
+     */
     @GetMapping("/weeklyWorkingTime")
     public ResponseEntity<Map<String, Object>> getWeeklyWorkingTime(@RequestParam("memNo") Long memNo) {
         String weeklyWorkingTime = commuteService.getFormattedWeeklyWorkingTime(memNo);
@@ -142,7 +156,12 @@ public class CommuteApiController {
         return ResponseEntity.ok(response);
     }
 
-    // 총 근무 시간 조회 API
+    /**
+     * 특정 회원의 총 근무 시간을 반환
+     * 
+     * @param memNo 회원 번호
+     * @return 총 근무 시간 데이터
+     */
     @GetMapping("/totalWorkingTime")
     public ResponseEntity<Map<String, Object>> getTotalWorkingTime(@RequestParam("memNo") Long memNo) {
         try {
@@ -153,7 +172,13 @@ public class CommuteApiController {
         }
     }
 
-    // 연도별 근태 현황 데이터를 가져오는 API
+    /**
+     * 특정 연도에 대한 근태 데이터를 반환
+     * 
+     * @param year 조회할 연도
+     * @param principal 현재 로그인된 사용자 정보
+     * @return 연도별 근태 데이터
+     */
     @GetMapping("/status_single/data")
     public ResponseEntity<Map<String, Object>> getYearlyCommuteData(@RequestParam("year") int year, Principal principal) {
         try {
@@ -179,7 +204,14 @@ public class CommuteApiController {
             ));
         }
     }
-    // 특정 memNo에 대한 주간 근무 시간 및 지각 횟수 조회 API
+
+    /**
+     * 특정 회원의 주간 근무 시간 및 지각 데이터를 반환
+     * 
+     * @param memNo 회원 번호
+     * @param weekOffset 주차 오프셋
+     * @return 주간 근무 시간 데이터
+     */
     @GetMapping("/weekly/{memNo}/{weekOffset}")
     public ResponseEntity<?> getWeeklyWorkingTime(
             @PathVariable("memNo") Long memNo,
@@ -193,8 +225,13 @@ public class CommuteApiController {
         }
     }
 
-
-    // 특정 memNo에 대한 연간 근무 시간 및 지각 횟수 조회 API
+    /**
+     * 특정 회원의 연간 근무 시간 데이터를 반환
+     * 
+     * @param memNo 회원 번호
+     * @param yearOffset 연도 오프셋
+     * @return 연간 근무 시간 데이터
+     */
     @GetMapping("/annual/{memNo}/{yearOffset}")
     public ResponseEntity<Map<String, Object>> getAnnualWorkingTime(
             @PathVariable("memNo") Long memNo,
