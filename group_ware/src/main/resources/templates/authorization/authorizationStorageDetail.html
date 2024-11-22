@@ -189,6 +189,34 @@
 
         <!-- Quill Editor 초기화 스크립트 -->
         <script>
+        /**
+         * ## Quill 에디터 초기화
+         *
+         * ### 기능
+         * - **문서 편집 기능**: 사용자가 텍스트 문서를 작성 및 수정할 수 있는 편집기 제공.
+         * - **서식 지정**: 다양한 텍스트 스타일(굵게, 기울임, 밑줄 등)과 서식(헤더, 코드 블록 등)을 적용할 수 있음.
+         * - **이미지 삽입**: 문서에 이미지를 추가할 수 있는 기능 제공.
+         *
+         * ### 기술
+         * - **Quill.js**: WYSIWYG(What You See Is What You Get) 기반의 경량 편집기 라이브러리 사용.
+         * - **모듈 설정**: `toolbar` 모듈을 사용하여 사용자 인터페이스를 구성.
+         * - **테마**: `snow` 테마를 적용하여 사용자에게 직관적인 편집 환경 제공.
+         *
+         * ### 구현
+         * 1. **에디터 DOM 요소 선택**:
+         *    - `#document-editor`를 선택하여 해당 DOM 요소에 Quill 에디터를 초기화.
+         * 2. **테마 설정**:
+         *    - Quill의 `theme` 옵션에 `snow`를 설정하여 간결하고 사용하기 쉬운 인터페이스 제공.
+         * 3. **모듈 설정**:
+         *    - `toolbar` 모듈을 사용해 사용자 인터페이스에 필요한 도구 버튼을 추가.
+         *    - 툴바 버튼 구성:
+         *      - `header`: 1단계, 2단계 헤더 또는 기본 텍스트 옵션.
+         *      - `bold`, `italic`, `underline`: 텍스트를 굵게, 기울임꼴 또는 밑줄로 표시.
+         *      - `image`: 이미지를 문서에 삽입.
+         *      - `code-block`: 코드 블록을 문서에 추가.
+         * 4. **에디터 객체 생성**:
+         *    - `var quill`로 생성된 에디터 객체는 문서 편집과 관련된 동작을 처리할 수 있음.
+         */
             var quill = new Quill('#document-editor', {
                 theme: 'snow',
                 modules: {
@@ -200,7 +228,28 @@
                 }
             });
 
-            // Quill 에디터에 임시 저장된 내용 불러오기
+            /**
+             * ## Quill 에디터에 기존 내용 불러오기
+             *
+             * ### 기능
+             * - **임시 저장된 내용 로드**: 서버에서 저장된 문서 내용을 Quill 에디터에 불러와 편집 가능하도록 함.
+             * - **자동 로드**: 페이지가 로드될 때 자동으로 실행되어 사용자 편의를 높임.
+             *
+             * ### 기술
+             * - **Quill.js**: HTML 콘텐츠를 WYSIWYG 에디터에 삽입할 수 있는 `dangerouslyPasteHTML` 메서드 활용.
+             * - **Thymeleaf**: 서버에서 제공한 `authorization.authContent` 데이터를 에디터에 전달.
+             * - **JavaScript 이벤트 리스너**: `window` 객체의 `load` 이벤트를 사용하여 페이지가 완전히 로드된 후 동작 실행.
+             *
+             * ### 구현
+             * 1. **페이지 로드 이벤트**:
+             *    - `window.addEventListener('load', ...)`를 사용하여 페이지 로드가 완료되었을 때 Quill 에디터에 내용을 삽입.
+             * 2. **Quill 콘텐츠 로드**:
+             *    - 서버에서 제공한 `authorization.authContent` 데이터를 Thymeleaf로 HTML에 삽입.
+             *    - JavaScript 변수 `quillContent`에 저장.
+             * 3. **Quill 에디터에 내용 삽입**:
+             *    - Quill의 `clipboard.dangerouslyPasteHTML` 메서드를 호출하여 `quillContent` 내용을 에디터에 적용.
+             *    - `authContent`가 null인 경우 기본적으로 빈 문자열로 처리하여 오류 방지.
+             */
             window.addEventListener('load', function() {
                 var quillContent = /*[[${authorization.authContent != null ? authorization.authContent : ''}]]*/ '';
                 if (quillContent) {
@@ -208,12 +257,63 @@
                 }
             });
 
-            // "결재요청" 버튼 이벤트 리스너
+            /**
+             * ## "결재요청" 버튼 이벤트 처리
+             *
+             * ### 기능
+             * - **결재 요청 이벤트 처리**: 사용자가 "결재요청" 버튼을 클릭했을 때, 지정된 서버 엔드포인트로 요청을 전송.
+             * - **핸들러 호출**: `handleSubmit` 함수를 호출하여 요청을 처리하고 서버와 통신.
+             *
+             * ### 기술
+             * - **JavaScript 이벤트 리스너**: `addEventListener`를 통해 버튼 클릭 이벤트를 처리.
+             * - **Fetch API**: 서버로 데이터를 POST 요청 방식으로 전송 (기본 `handleSubmit` 함수의 구현을 가정).
+             * - **DOM API**: `getElementById`로 버튼을 식별하고 이벤트를 연결.
+             *
+             * ### 구현
+             * 1. **버튼 식별 및 이벤트 리스너 연결**:
+             *    - `document.getElementById`를 사용하여 HTML 버튼을 가져옴.
+             *    - 해당 버튼에 `click` 이벤트 리스너를 추가.
+             * 2. **클릭 이벤트 핸들링**:
+             *    - 버튼 클릭 시 `handleSubmit` 함수 호출.
+             *    - 첫 번째 매개변수로 `event` 객체 전달하여 기본 동작 방지 및 추가 데이터 활용.
+             *    - 두 번째 매개변수로 서버 엔드포인트 URL 전달.
+             */
             document.getElementById('submitRequest').addEventListener('click', function(event) {
                 handleSubmit(event, "/authorization");
             });
 
-            // "임시저장" 버튼 이벤트 리스너
+            /**
+             * ## "임시저장" 버튼 이벤트 처리
+             *
+             * ### 기능
+             * - **Quill 에디터의 현재 내용 저장**: 사용자가 "임시저장" 버튼을 클릭하면 에디터 내용을 서버에 전송.
+             * - **유효성 검사**: 내용이 비어 있으면 저장하지 않고 사용자에게 경고 표시.
+             * - **서버 통신**: Fetch API를 사용하여 비동기로 서버에 데이터를 전송.
+             * - **UI 알림**: SweetAlert2를 활용하여 성공 또는 실패 알림 제공.
+             *
+             * ### 기술
+             * - **JavaScript 이벤트 리스너**: `addEventListener`를 통해 버튼 클릭 이벤트를 처리.
+             * - **FormData API**: 서버로 전달할 데이터 생성 및 조작.
+             * - **Fetch API**: 서버로 POST 요청을 보내고 JSON 응답을 처리.
+             * - **SweetAlert2**: 알림 팝업을 통해 사용자 경험 향상.
+             *
+             * ### 구현
+             * 1. **클릭 이벤트 리스너**:
+             *    - 버튼 클릭 시 기본 동작 방지 (`event.preventDefault()`).
+             * 2. **내용 유효성 검사**:
+             *    - Quill 에디터 내용이 비어 있는지 확인.
+             *    - 비어 있을 경우 경고 메시지 표시 및 포커스 이동.
+             * 3. **FormData 생성**:
+             *    - HTML 폼 데이터를 기반으로 새 FormData 객체 생성.
+             *    - 에디터 내용 추가.
+             *    - 필요 없는 결재자 및 참조자 데이터 제거.
+             * 4. **Fetch API로 서버 요청**:
+             *    - 서버로 POST 요청을 전송.
+             *    - CSRF 토큰 및 JSON 응답 처리.
+             * 5. **응답 처리**:
+             *    - 성공 시: 성공 알림 후 페이지 이동.
+             *    - 실패 시: 오류 메시지 표시.
+             */
             document.getElementById('saveTemporary').addEventListener('click', function(event) {
                 event.preventDefault();
                 let content = quill.root.innerHTML;
@@ -265,7 +365,23 @@
                 });
             });
             
-         // 공통으로 처리하는 함수 (URL에 따라 동작 변경)
+            /**
+             * ## 공통 처리 함수: `handleSubmit`
+             *
+             * ### 기능
+             * - **Quill 에디터 내용 전송**: 사용자가 작성한 내용을 서버에 전송.
+             * - **결재자 및 참조자 설정**: 선택한 결재자와 참조자를 서버로 전송.
+             * - **추가 정보 필드 처리**: 휴가 유형 및 날짜 정보를 포함해 서버로 전송.
+             * - **응답 처리**: 성공/실패에 따라 알림 표시 및 페이지 이동.
+             *
+             * ### 기술
+             * - **JavaScript 유효성 검사**: Quill 에디터와 폼 데이터의 유효성을 사전에 확인.
+             * - **FormData API**: HTML 폼 데이터와 추가 데이터를 유연하게 조작.
+             * - **Fetch API**: 비동기로 서버와 통신, JSON 응답을 처리.
+             * - **SweetAlert2**: 사용자 피드백을 위한 알림 팝업 표시.
+             *
+             * ### 구현
+             */
             function handleSubmit(event, apiUrl) {
     		    event.preventDefault();
     		    let content = quill.root.innerHTML;
@@ -344,6 +460,19 @@
     		}
 
 
+            /**
+             * ## 부서 선택 이벤트 리스너
+             *
+             * ### 기능
+             * - 사용자가 부서를 선택하면, 해당 부서의 직원 정보를 서버에서 가져옵니다.
+             * - 직원 정보로 결재자 및 참조자 옵션을 업데이트합니다.
+             *
+             * ### 기술
+             * - **Fetch API**: 서버와 비동기 통신으로 직원 데이터를 가져옴.
+             * - **DOM 조작**: 셀렉트 박스의 옵션을 동적으로 업데이트.
+             * - **Error Handling**: 서버 응답 실패 및 데이터 형식 오류 처리.
+             * - **로그 확인**: 요청 및 응답 데이터를 콘솔에 출력하여 디버깅 지원.
+             */
             document.getElementById('departmentSelect').addEventListener('change', function () {
                 let departmentId = this.value;
 
@@ -398,7 +527,18 @@
 
 
 
-            // 결재자 저장 전에 중복 체크 후 저장 (이 부분도 그대로 유지)
+            /**
+             * ## 결재자 저장 및 중복 체크
+             *
+             * ### 기능
+             * 1. 서버에 결재자가 이미 등록되어 있는지 확인 (GET 방식).
+             * 2. 중복이 없으면 결재자를 저장 (POST 방식).
+             *
+             * ### 기술적 요인
+             * - **RESTful API**: `GET`으로 중복 여부 확인, `POST`로 데이터 저장.
+             * - **JSON 데이터 처리**: 요청 및 응답 데이터는 JSON 형식으로 직렬화 및 역직렬화.
+             * - **Promise 기반 비동기 처리**: `fetch`를 활용한 비동기 HTTP 요청 처리.
+             */
             function saveApprover(authorNo, approverMemNo) {
                 fetch(`/approval/checkApprover?authorNo=${authorNo}&approverMemNo=${approverMemNo}`)
                     .then(response => {
@@ -442,8 +582,18 @@
                         console.error('Error checking approver:', error);
                     });
             }
-            // 결재자 참조자 멤버 리스트업
-    	
+            /**
+             * ## 결재자 참조자 멤버 리스트 업
+             *
+             * ### 기능
+             * - API 호출로 Distributor 데이터를 가져와 `departmentSelect` 옵션 업데이트.
+             *
+             * ### 기술적 요인
+             * - **API 데이터 활용**: 백엔드에서 Distributor 데이터 제공.
+             * - **DOM 조작**: `departmentSelect`의 옵션 동적 업데이트.
+             * - **배열 처리**: `Array.forEach`를 사용해 Distributor 목록 반복 처리.
+             * - **에러 핸들링**: `try-catch` 구조와 `console.error`를 활용한 에러 관리.
+             */
             fetch('/api/distributors/getAll')
             .then(response => response.json())
             .then(distributors => {
@@ -463,11 +613,32 @@
             });
     		
 
-         // 페이지 로드 시 결재자와 참조자 정보를 기본 설정
+            /**
+             * ## 페이지 로드 시 결재자 및 참조자 테이블 기본 설정
+             *
+             * ### 기능
+             * - 페이지 로드 후 초기화 작업으로 테이블 업데이트 실행.
+             *
+             * ### 기술적 요인
+             * - **이벤트 리스너**: `DOMContentLoaded` 이벤트로 페이지 로드 시점 감지.
+             * - **DOM 조작**: 결재자 및 참조자 테이블 정보를 동적으로 갱신.
+             */
             document.addEventListener('DOMContentLoaded', function() {
                 updateApproverTable(); // 페이지 로드 후 바로 업데이트 실행
             });
 
+            /**
+             * ## 결재자 및 참조자 정보 테이블 업데이트
+             *
+             * ### 기능
+             * - 선택된 결재자 및 참조자 정보를 테이블에 반영.
+             * - 선택되지 않았을 경우 기본 텍스트 유지.
+             *
+             * ### 기술적 요인
+             * - **옵션 선택 확인**: `querySelector`로 현재 선택된 옵션 검색.
+             * - **DOM 업데이트**: `innerText`로 동적 데이터 반영.
+             * - **조건부 렌더링**: 선택 여부에 따라 기본값과 실제 값을 다르게 표시.
+             */
             function updateApproverTable() {
                 const approver1 = document.querySelector('#approverSelect1 option:checked');
                 const approver2 = document.querySelector('#approverSelect2 option:checked');
@@ -536,7 +707,19 @@
                 }
             });
 
-            // 결재자 및 참조자 정보 업데이트
+            /**
+             * ## 부서 변경 시 데이터 갱신 이벤트
+             *
+             * ### 기능
+             * - 부서 선택 시, 선택된 부서 ID를 기반으로 직원 데이터를 API에서 가져옴.
+             * - 결재자 및 참조자 선택 옵션을 동적으로 업데이트.
+             *
+             * ### 기술적 요인
+             * - **이벤트 리스너**: `change` 이벤트를 활용하여 부서 선택 감지.
+             * - **비동기 API 호출**: 선택된 부서 ID를 쿼리 파라미터로 사용해 데이터 요청.
+             * - **DOM 조작**: 직원 데이터를 기반으로 `<select>` 요소의 옵션 동적 갱신.
+             * - **에러 핸들링**: 네트워크 오류 및 응답 데이터 처리 오류를 관리.
+             */
     		function updateApproverTable() {
     		    const approver1 = document.querySelector('#approverSelect1 option:checked');
     		    const approver2 = document.querySelector('#approverSelect2 option:checked');
