@@ -18,11 +18,13 @@ function checkIdDuplication() {
                 alert('사용 가능한 아이디입니다.');
             }
         })
-        .catch(error => {
+        .catch(error => {	
             console.error('Error:', error);
             alert('아이디 중복 검사 중 오류가 발생했습니다.');
         });
 }
+document.getElementById('mem_id').addEventListener('blur', checkIdDuplication);
+	
 
 // 이메일 도메인 설정 변경
 function handleEmailDomainChange(selectElement) {
@@ -37,8 +39,6 @@ function handleEmailDomainChange(selectElement) {
     }
 }
 
-// 이벤트 리스너 등록 (아이디 중복 검사)
-document.getElementById('mem_id').addEventListener('blur', checkIdDuplication);
 
 // 파일 선택창을 트리거하는 함수
 function triggerFileInput() {
@@ -74,10 +74,11 @@ imageInput.addEventListener("change", function(e) {
     reader.readAsDataURL(file);
 });
 
-// 이미지를 드래그 가능하게 함
+// 이미지를 드래그 가능하게 함 mousedown 이 클라이언트가 마우스로 클릭했을 때 이벤트가 발생하는거
 imgElement.addEventListener("mousedown", function(e) {
     if (imgElement.src !== '' && isImageUploaded) { // 파일이 추가된 상태에서만 드래그 가능
         isDragging = true;
+		//마우스와 이미지 간 거리 계산
         offsetX = e.clientX - imgElement.getBoundingClientRect().left;
         offsetY = e.clientY - imgElement.getBoundingClientRect().top;
         imgElement.style.cursor = 'grabbing';
@@ -230,7 +231,6 @@ document.addEventListener('DOMContentLoaded', function() {
 		})
 		.then(response => {
 		    if (!response.ok) {
-		        // 서버 응답이 200이 아닌 경우 처리
 		        return response.json().then(err => {
 		            throw new Error(err.res_msg || "서버 오류 발생");
 		        });

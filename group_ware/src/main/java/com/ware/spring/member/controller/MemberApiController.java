@@ -70,37 +70,28 @@ public class MemberApiController {
                                                               @ModelAttribute MemberDto memberDto) {
         Map<String, Object> response = new HashMap<>();
         memberDto.setMem_leave("N");
-
         // 부서 이름 가져오기
         String distributorName = memberService.getDistributorNameByNo(memberDto.getDistributor_no());
-
         // 크롭된 이미지 처리
         if (croppedImageData != null && !croppedImageData.isEmpty()) {
             try {
-                // Base64 디코딩 및 이미지 변환
                 String mimeType = croppedImageData.substring(croppedImageData.indexOf("/") + 1, croppedImageData.indexOf(";"));
                 String base64Image = croppedImageData.split(",")[1];
                 byte[] imageBytes = Base64.getDecoder().decode(base64Image);
-
                 ByteArrayInputStream bis = new ByteArrayInputStream(imageBytes);
                 BufferedImage originalImage = ImageIO.read(bis);
-
                 if (originalImage == null) {
                     throw new IOException("BufferedImage 생성 실패");
                 }
-
-                // 이미지 타입 변환
                 int imageType = BufferedImage.TYPE_INT_ARGB;
                 if (mimeType.equals("jpeg") || mimeType.equals("jpg")) {
                     imageType = BufferedImage.TYPE_INT_RGB;
                 }
                 BufferedImage formattedImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), imageType);
                 formattedImage.getGraphics().drawImage(originalImage, 0, 0, null);
-
                 // 이미지 저장 경로 설정 (부서 이름을 폴더 이름으로 사용)
                 String uploadDir = "src/main/resources/static/profile/" + distributorName;
                 Files.createDirectories(Paths.get(uploadDir));
-
                 // 파일 이름 설정 및 저장
                 String fileName = distributorName + "_" + memberDto.getMem_name() + "_프로필." + mimeType;
                 Path path = Paths.get(uploadDir, fileName);
@@ -220,7 +211,7 @@ public class MemberApiController {
     /**
      * 비밀번호를 검증합니다.
      * 설명: 클라이언트에서 제공한 비밀번호가 현재 로그인한 사용자의 비밀번호와 일치하는지 확인합니다.
-     * 
+     * 마이페이지 본인확인용도
      * @param requestBody 검증할 비밀번호가 포함된 요청 본문
      * @param securityUser 현재 로그인한 사용자
      * @return 비밀번호 일치 여부에 대한 메시지를 포함한 응답
