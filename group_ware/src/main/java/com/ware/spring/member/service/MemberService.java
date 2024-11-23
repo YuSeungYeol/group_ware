@@ -52,8 +52,8 @@ public class MemberService {
      * 설명: 사용자의 소속된 지점 번호, 등록일, 무작위 2자리 숫자를 조합하여 사원번호를 생성합니다.
      */
     public String generateEmpNo(MemberDto memberDto) {
-        String distributorNo = String.format("%02d", memberDto.getDistributor_no()); // 두 자리로 맞춤
-        String memRegDate = memberDto.getMem_reg_date().format(DateTimeFormatter.ofPattern("yyMM")); // YYMM 추출
+        String distributorNo = String.format("%02d", memberDto.getDistributor_no()); 
+        String memRegDate = memberDto.getMem_reg_date().format(DateTimeFormatter.ofPattern("yyMM")); 
         String randomTwoDigits = String.format("%02d", new Random().nextInt(100)); 
 
         String empNo = distributorNo + memRegDate + randomTwoDigits;
