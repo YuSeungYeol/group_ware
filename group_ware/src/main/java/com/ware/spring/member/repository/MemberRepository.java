@@ -16,9 +16,11 @@ import com.ware.spring.member.domain.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    // 회원 조회
+   
     Optional<Member> findByMemId(String memId);
     boolean existsByMemId(String memId);
+    
+    // 부서별 회원 조회
     List<Member> findByDistributor_DistributorNo(Long distributorNo);
 
     // 조직도 관련

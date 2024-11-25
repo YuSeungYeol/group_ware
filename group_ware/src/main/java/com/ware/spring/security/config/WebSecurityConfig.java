@@ -42,9 +42,8 @@ public class WebSecurityConfig {
         http
             .authorizeHttpRequests(requests -> 
                 requests
-                    .requestMatchers("/login", "/css/**", "/image/**").permitAll()  // 로그인 페이지 및 정적 리소스는 모두에게 허용
-                    .requestMatchers("/api/member/register").hasAnyAuthority("ROLE_차장", "ROLE_지점대표", "ROLE_대표")  // 특정 권한만 접근 허용
-                    .requestMatchers("/member/register").hasAnyAuthority("ROLE_차장", "ROLE_지점대표", "ROLE_대표")  // 특정 권한만 접근 허용
+                    .requestMatchers("/login", "/css/**", "/image/**").permitAll() 
+                    .requestMatchers("/member/register").hasAnyAuthority( "ROLE_지점대표", "ROLE_대표") 
                     .requestMatchers("/authorization/**", "/approval/**", "/notice/**","/board/**","/chat/**","/api/**","/commute/**","/vehicle/**","/clearNoticeNotification/**").authenticated()
                     .anyRequest().authenticated()  // 그 외 모든 요청은 인증 필요
             )

@@ -40,22 +40,22 @@
                 <div class="accordion-item">
                     <button class="accordion-btn">캘린더</button>
                     <div class="accordion-content">
-                        <a th:href="@{/calendar}">내 일정</a>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <button class="accordion-btn">드라이브</button>
-                    <div class="accordion-content">
-                        <a th:href="@{/folder/personal-drive}">개인드라이브</a>
-                        <a th:href="@{/folder/list}">부서드라이브</a>
-                    </div>
-                </div>
-                <div class="accordion-item" sec:authorize="hasAnyAuthority( 'ROLE_지점대표', 'ROLE_대표')">
-                <div class="accordion-item">
-                    <button class="accordion-btn">지점 정보</button>
-                    <div class="accordion-content">
-                        <a th:href="@{/distributor/list}">지점정보</a>
-						<a th:href="@{/distributor/register}">지점등록</a>
+	                        <a th:href="@{/calendar}">내 일정</a>
+	                    </div>
+	                </div>
+	                <div class="accordion-item">
+	                    <button class="accordion-btn">드라이브</button>
+	                    <div class="accordion-content">
+	                        <a th:href="@{/folder/personal-drive}">개인드라이브</a>
+	                        <a th:href="@{/folder/list}">부서드라이브</a>
+	                    </div>
+	                </div>
+	                <div class="accordion-item" sec:authorize="hasAnyAuthority( 'ROLE_지점대표', 'ROLE_대표')">
+	                <div class="accordion-item">
+	                    <button class="accordion-btn">지점 정보</button>
+	                    <div class="accordion-content">
+	                        <a th:href="@{/distributor/list}">지점정보</a>
+							<a th:href="@{/distributor/register}">지점등록</a>
                     </div>
                 </div>
                </div>

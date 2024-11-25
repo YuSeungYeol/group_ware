@@ -52,8 +52,8 @@ public class MemberService {
      * 설명: 사용자의 소속된 지점 번호, 등록일, 무작위 2자리 숫자를 조합하여 사원번호를 생성합니다.
      */
     public String generateEmpNo(MemberDto memberDto) {
-        String distributorNo = String.format("%02d", memberDto.getDistributor_no()); // 두 자리로 맞춤
-        String memRegDate = memberDto.getMem_reg_date().format(DateTimeFormatter.ofPattern("yyMM")); // YYMM 추출
+        String distributorNo = String.format("%02d", memberDto.getDistributor_no()); 
+        String memRegDate = memberDto.getMem_reg_date().format(DateTimeFormatter.ofPattern("yyMM")); 
         String randomTwoDigits = String.format("%02d", new Random().nextInt(100)); 
 
         String empNo = distributorNo + memRegDate + randomTwoDigits;
@@ -105,7 +105,21 @@ public class MemberService {
         // 회원 정보 저장
         return memberRepository.save(member);
     }
+    /**
+     * 프로필 이미지 저장 (saveProfilePicture)
+     * 기술: 파일 입출력, java.nio.file.Files, StandardCopyOption
+     * 설명: 프로필 이미지를 지정된 디렉토리에 저장하며, 기존 파일이 있는 경우 덮어씁니다.
+     */
+    private String saveProfilePicture(MultipartFile profilePicture, String distributorName, String memberName) throws IOException {
+        String uploadDir = "src/main/resources/static/profile/" + distributorName;
+        Files.createDirectories(Paths.get(uploadDir));
 
+        String fileName = distributorName + "_" + memberName + "_프로필." + getExtension(profilePicture.getOriginalFilename());
+        Path filePath = Paths.get(uploadDir, fileName);
+        Files.copy(profilePicture.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        return fileName;
+    }
     /**
      * 회원 정보 수정 (updateMember)
      * 기술: Spring Data JPA, 파일 입출력, MultipartFile, DTO 패턴
@@ -146,21 +160,7 @@ public class MemberService {
         Member member = memberDto.toEntity(existingMember.getRank(), existingMember.getDistributor());
         memberRepository.save(member);  // 업데이트 처리
     }
-    /**
-     * 프로필 이미지 저장 (saveProfilePicture)
-     * 기술: 파일 입출력, java.nio.file.Files, StandardCopyOption
-     * 설명: 프로필 이미지를 지정된 디렉토리에 저장하며, 기존 파일이 있는 경우 덮어씁니다.
-     */
-    private String saveProfilePicture(MultipartFile profilePicture, String distributorName, String memberName) throws IOException {
-        String uploadDir = "src/main/resources/static/profile/" + distributorName;
-        Files.createDirectories(Paths.get(uploadDir));
 
-        String fileName = distributorName + "_" + memberName + "_프로필." + getExtension(profilePicture.getOriginalFilename());
-        Path filePath = Paths.get(uploadDir, fileName);
-        Files.copy(profilePicture.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        return fileName;
-    }
     /**
      * 파일 확장자 추출 (getExtension)
      * 기술: 문자열 조작
@@ -248,7 +248,7 @@ public class MemberService {
     }
 
     /**
-     * 특정 배급사에 속한 회원을 반환합니다.
+     * 특정 지점에 속한 회원을 반환합니다.
      * 기술: Spring Data JPA, 페이징 (Pageable)
      * 설명: 주어진 distributorNo에 해당하는 배급사에 속한 회원들을 반환합니다.
      * 
@@ -261,7 +261,7 @@ public class MemberService {
     }
 
     /**
-     * 현재 배급사에 속한 회원을 반환합니다.
+     * 현재 지점에 속한 회원을 반환합니다.
      * 기술: Spring Data JPA, 페이징 (Pageable)
      * 설명: 주어진 distributorNo에 해당하는 현재 배급사에 속한 회원들을 반환합니다.
      * 
