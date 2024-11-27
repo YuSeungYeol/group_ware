@@ -26,7 +26,7 @@ public class CommuteDto {
     private String isLate;  // 지각 여부 (Y/N)
 
     
-    // 엔티티로 변환하는 메서드
+    // 엔티티로 변환메서드
     public Commute toEntity() {
         return Commute.builder()
                 .commuteNo(this.commuteNo)
