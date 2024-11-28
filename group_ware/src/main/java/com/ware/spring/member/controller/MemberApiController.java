@@ -185,7 +185,6 @@ public class MemberApiController {
                 new SecurityContextLogoutHandler().logout(request, response, authentication);
             }
 
-            // 응답 데이터 구성
             responseMap.put("success", true);
             responseMap.put("message", passwordChanged 
                 ? "비밀번호가 변경되었습니다. 다시 로그인해주세요." 

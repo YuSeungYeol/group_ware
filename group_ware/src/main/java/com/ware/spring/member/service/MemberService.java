@@ -135,22 +135,19 @@ public class MemberService {
      * 설명: 기존 회원 정보를 가져와 필요한 필드를 수정하고, 프로필 사진이 업로드된 경우 파일을 저장하며 변경 사항을 데이터베이스에 반영합니다.
      */
     public void updateMember(MemberDto memberDto, MultipartFile profilePicture) throws IOException {
-        // 기존 회원 정보 가져오기
         Member existingMember = memberRepository.findById(memberDto.getMem_no())
             .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다: " + memberDto.getMem_no()));
 
-        // 필수 필드 유지
-        memberDto.setMem_id(existingMember.getMemId());  // 아이디 유지
-        memberDto.setEmp_no(existingMember.getEmpNo());  // 사원번호 유지
+        memberDto.setMem_id(existingMember.getMemId());  
+        memberDto.setEmp_no(existingMember.getEmpNo());  
         if (memberDto.getMem_leave() == null || memberDto.getMem_leave().isEmpty()) {
             memberDto.setMem_leave(existingMember.getMemLeave() != null ? existingMember.getMemLeave() : "N");
         }
-        // 비밀번호가 비어있지 않으면 암호화하고, 비어있으면 기존 비밀번호 유지
         if (memberDto.getMem_pw() != null && !memberDto.getMem_pw().isEmpty()) {
             String encodedPassword = passwordEncoder.encode(memberDto.getMem_pw());
             memberDto.setMem_pw(encodedPassword);
         } else {
-            memberDto.setMem_pw(existingMember.getMemPw());  // 기존 비밀번호 유지
+            memberDto.setMem_pw(existingMember.getMemPw());  
         }
 
         // 프로필 사진 처리: 새로운 파일이 있는 경우에만 저장
@@ -158,16 +155,15 @@ public class MemberService {
             String savedFileName = saveProfilePicture(profilePicture, existingMember.getDistributor().getDistributorName(), existingMember.getMemName());
             memberDto.setProfile_saved(savedFileName);
         } else {
-            memberDto.setProfile_saved(existingMember.getProfileSaved());  // 기존 사진 유지
+            memberDto.setProfile_saved(existingMember.getProfileSaved()); 
         }
 
         // 등록일 유지, 수정일 갱신
         memberDto.setMem_reg_date(existingMember.getMemRegDate());
         memberDto.setMem_mod_date(LocalDate.now());
 
-        // DTO를 엔티티로 변환하여 저장
         Member member = memberDto.toEntity(existingMember.getRank(), existingMember.getDistributor());
-        memberRepository.save(member);  // 업데이트 처리
+        memberRepository.save(member); 
     }
 
     /**
