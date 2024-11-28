@@ -174,17 +174,32 @@ public class MemberApiController {
         Map<String, Object> responseMap = new HashMap<>();
         
         try {
+            // 비밀번호 변경 여부 확인 로직
+            boolean passwordChanged = memberService.isPasswordChanged(memberDto);
+            
+            // 회원 정보 업데이트 수행
             memberService.updateMember(memberDto, profileImage);
-            new SecurityContextLogoutHandler().logout(request, response, authentication);
+
+            // 비밀번호가 변경된 경우에만 로그아웃 처리
+            if (passwordChanged) {
+                new SecurityContextLogoutHandler().logout(request, response, authentication);
+            }
+
+            // 응답 데이터 구성
             responseMap.put("success", true);
-            responseMap.put("message", "회원 정보가 성공적으로 수정되었습니다. 다시 로그인해주세요.");
+            responseMap.put("message", passwordChanged 
+                ? "비밀번호가 변경되었습니다. 다시 로그인해주세요." 
+                : "회원 정보가 성공적으로 수정되었습니다.");
+            responseMap.put("passwordChanged", passwordChanged); 
             return ResponseEntity.ok().body(responseMap);
+
         } catch (Exception e) {
             responseMap.put("success", false);
             responseMap.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap);
         }
     }
+
 
     /**
      * 마이페이지 정보를 반환합니다.

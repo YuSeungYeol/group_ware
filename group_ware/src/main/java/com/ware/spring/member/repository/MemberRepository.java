@@ -19,23 +19,15 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
    
     Optional<Member> findByMemId(String memId);
     boolean existsByMemId(String memId);
-    
+    // 비밀번호 변경 필요 MyPage관련
+    @Query("SELECT m.memPw FROM Member m WHERE m.memNo = :memNo")
+    String findPasswordById(@Param("memNo") Long memNo);
     // 부서별 회원 조회
     List<Member> findByDistributor_DistributorNo(Long distributorNo);
 
     // 조직도 관련
     @Query("SELECT m FROM Member m WHERE m.distributor.distributorNo = :distributorNo")
     List<Member> findMembersByDistributorNo(@Param("distributorNo") Long distributorNo);
-
-    // 수정 관련
-    @Modifying
-    @Query("UPDATE Member m SET m.memPw = :memPw WHERE m.memNo = :memNo")
-    void updatePassword(@Param("memNo") int memNo, @Param("memPw") String memPw);
-
-    @Modifying
-    @Query("UPDATE Member m SET m.memName = :memName, m.memPhone = :memPhone, m.memEmail = :memEmail WHERE m.memNo = :memNo")
-    void updateMemberInfo(@Param("memNo") int memNo, @Param("memName") String memName, 
-                          @Param("memPhone") String memPhone, @Param("memEmail") String memEmail);
 
     @Modifying
     @Query("UPDATE Member m SET m.profileSaved = :profileSaved WHERE m.memNo = :memNo")

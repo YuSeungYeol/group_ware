@@ -46,6 +46,15 @@ public class MemberService {
         this.passwordEncoder = passwordEncoder;
 
     }
+    
+    public boolean isPasswordChanged(MemberDto memberDto) {
+        String currentPassword = memberRepository.findPasswordById(memberDto.getMem_no());
+
+        if (memberDto.getMem_pw() == null || memberDto.getMem_pw().isEmpty()) {
+            return false;
+        }
+        return !passwordEncoder.matches(memberDto.getMem_pw(), currentPassword);
+    }
     /**
      * 사원번호 생성 로직
      * 기술: 문자열 조작, Random
@@ -207,19 +216,6 @@ public class MemberService {
         memberDto.setDistributor_name(member.getDistributor().getDistributorName());  // Distributor의 distributor_name 설정
 
         return memberDto;
-    }
-    /**
-     * 비밀번호 업데이트 (updatePassword)
-     * 기술: PasswordEncoder, Spring Data JPA
-     * 설명: 비밀번호를 암호화한 후 데이터베이스에 업데이트합니다.
-     */
-    public void updatePassword(int memNo, String rawPassword) {
-        String encodedPassword = passwordEncoder.encode(rawPassword);
-        memberRepository.updatePassword(memNo, encodedPassword);
-    }
-
-    public void updateMemberInfo(int memNo, String memName, String memPhone, String memEmail) {
-        memberRepository.updateMemberInfo(memNo, memName, memPhone, memEmail);
     }
 
     /**
