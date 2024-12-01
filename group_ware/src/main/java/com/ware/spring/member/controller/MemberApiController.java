@@ -177,7 +177,7 @@ public class MemberApiController {
             // 비밀번호 변경 여부 확인 로직
             boolean passwordChanged = memberService.isPasswordChanged(memberDto);
             
-            // 회원 정보 업데이트 수행
+            // 회원 정보 업데이트
             memberService.updateMember(memberDto, profileImage);
 
             // 비밀번호가 변경된 경우에만 로그아웃 처리

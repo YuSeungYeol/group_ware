@@ -56,7 +56,7 @@ public class MemberService {
         return !passwordEncoder.matches(memberDto.getMem_pw(), currentPassword);
     }
     /**
-     * 사원번호 생성 로직
+     * 사원번호 자동생성 로직
      * 기술: 문자열 조작, Random
      * 설명: 사용자의 소속된 지점 번호, 등록일, 무작위 2자리 숫자를 조합하여 사원번호를 생성합니다.
      */
