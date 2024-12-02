@@ -43,14 +43,16 @@
                         <col width="10%">
                     </colgroup>
                     <thead>
-                        <tr>
-                            <th onclick="sortTable(0)">이름</th>
-                            <th onclick="sortTable(1)">전화번호</th>
-                            <th onclick="sortTable(2)">주소</th>
-                            <th>상세보기</th>
-                            <th>상태</th>
-                        </tr>
-                    </thead>
+					    <tr>
+	    <th onclick="sortTable('distributorName')">이름</th>
+        <th onclick="sortTable('distributorPhone')">전화번호</th>
+        <th onclick="sortTable('distributorAddr')">주소</th>
+        <th>상세보기</th>
+        <th>상태</th>
+    
+					    </tr>
+					</thead>
+
                     <tbody>
                         <!-- 서버에서 데이터를 렌더링 -->
                         <tr th:each="distributor : ${distributorList}"        
@@ -99,80 +101,58 @@
         </div>
 
         <!-- 테이블 정렬 관련 스크립트 -->
-  <!-- JavaScript -->
-<script>
-    // 검색 기능을 위한 JavaScript 함수 추가
-    function searchDistributors() {
-        // 검색어와 필터 값 가져오기
-        var searchText = document.getElementById('search_distributor_input').value;
-        var searchType = document.getElementById('searchType').value;
-        var statusFilter = document.getElementById('statusFilter').value;
-
-        // 검색 조건에 맞게 페이지 이동
-        var url = '/distributor/list?searchType=' + searchType + '&searchText=' + encodeURIComponent(searchText) + '&statusFilter=' + statusFilter;
-        
-        // 현재 페이지를 검색 결과 페이지로 변경
-        window.location.href = url;
-
-        // 폼의 기본 제출 방지
-        return false;
-    }
-
-    function sortTable(columnIndex) {
-        var table, rows, switching, i, x, y, shouldSwitch, direction, switchcount = 0;
-        table = document.querySelector(".distributor_list table");
-        switching = true;
-        direction = "asc"; // 기본 정렬 방향
-
-        // 모든 th 요소에서 기존 정렬 클래스 제거
-        var headers = table.querySelectorAll("th");
-        headers.forEach(function(header) {
-            header.classList.remove("asc", "desc");
-        });
-
-        while (switching) {
-            switching = false;
-            rows = table.rows;
-
-            // 테이블의 각 행을 반복
-            for (i = 1; i < (rows.length - 1); i++) {
-                shouldSwitch = false;
-                x = rows[i].getElementsByTagName("TD")[columnIndex];
-                y = rows[i + 1].getElementsByTagName("TD")[columnIndex];
-                
-                if (direction === "asc") {
-                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-                        shouldSwitch = true;
-                        break;
-                    }
-                } else if (direction === "desc") {
-                    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-                        shouldSwitch = true;
-                        break;
-                    }
-                }
-            }
-
-            if (shouldSwitch) {
-                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                switching = true;
-                switchcount++;
-            } else {
-                if (switchcount === 0 && direction === "asc") {
-                    direction = "desc";
-                    switching = true;
-                }
-            }
-        }
-
-        // 클릭한 열에 정렬 방향 클래스 추가
-        if (direction === "asc") {
-            headers[columnIndex].classList.add("asc");
-        } else {
-            headers[columnIndex].classList.add("desc");
-        }
-    }
-</script>
+	  <!-- JavaScript -->
+	<script>
+	//검색 기능을 위한 JavaScript 함수
+	function searchDistributors() {
+	    // 검색어와 필터 값 가져오기
+	    var searchText = document.getElementById('search_distributor_input').value;
+	    var searchType = document.getElementById('searchType').value;
+	    var statusFilter = document.getElementById('statusFilter').value;
+	
+	    // 검색 조건에 맞게 URL 생성
+	    var url = '/distributor/list?searchType=' + searchType +
+	              '&searchText=' + encodeURIComponent(searchText) +
+	              '&statusFilter=' + statusFilter;
+	
+	    // 현재 페이지를 검색 결과 페이지로 변경
+	    window.location.href = url;
+	
+	    // 폼의 기본 제출 방지
+	    return false;
+	}
+	
+	// 테이블 정렬 기능
+	function sortTable(sortField) {
+	    // 현재 URL에서 기존 검색 조건 및 정렬 상태 가져오기
+	    const params = new URLSearchParams(window.location.search);
+	    const currentSortField = params.get('sortField'); // 현재 정렬 기준
+	    const currentSortDirection = params.get('sortDirection') || 'asc'; // 기본 정렬 방향: asc
+	
+	    // 정렬 방향 결정: 현재 필드가 동일하면 방향 반전, 아니면 기본 오름차순
+	    let sortDirection = 'asc';
+	    if (currentSortField === sortField && currentSortDirection === 'asc') {
+	        sortDirection = 'desc';
+	    }
+	
+	    // 기존 검색 조건 유지
+	    const statusFilter = document.getElementById('statusFilter').value;
+	    const searchType = document.getElementById('searchType') ? document.getElementById('searchType').value : '';
+	    const searchText = document.getElementById('search_distributor_input') ? document.getElementById('search_distributor_input').value : '';
+	    const page = params.get('page') || 0;
+	
+	    // 서버로 요청할 URL 생성
+	    const url = `/distributor/list?sortField=${sortField}` +
+	                `&sortDirection=${sortDirection}` +
+	                `&statusFilter=${statusFilter}` +
+	                `&searchType=${searchType}` +
+	                `&searchText=${encodeURIComponent(searchText)}` +
+	                `&page=${page}`;
+	
+	    // 페이지 이동
+	    window.location.href = url;
+	}
+	</script>
 
     </th:block>
 </html>

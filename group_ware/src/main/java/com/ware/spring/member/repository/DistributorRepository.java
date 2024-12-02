@@ -18,7 +18,15 @@ public interface DistributorRepository extends JpaRepository<Distributor, Long> 
     @Query("SELECT d FROM Distributor d LEFT JOIN FETCH d.members")
     List<Distributor> findAllWithMembers();
     
-
+    @Query("SELECT d FROM Distributor d " +
+            "WHERE (:searchType = 'name' AND LOWER(d.distributorName) LIKE LOWER(CONCAT('%', :searchText, '%'))) " +
+            "OR (:searchType = 'address' AND LOWER(d.distributorAddr) LIKE LOWER(CONCAT('%', :searchText, '%'))) " +
+            "AND (:status = -1 OR d.distributorStatus = :status)")
+     Page<Distributor> findBySearchTypeAndTextAndStatus(
+             @Param("searchType") String searchType,
+             @Param("searchText") String searchText,
+             @Param("status") int status,
+             Pageable pageable);
     Page<Distributor> findByDistributorNameContaining(String name, Pageable pageable);
 
     Page<Distributor> findByDistributorNameContainingAndDistributorStatus(String name, int status, Pageable pageable);
