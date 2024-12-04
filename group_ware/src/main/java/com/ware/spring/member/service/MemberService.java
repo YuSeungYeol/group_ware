@@ -19,8 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ware.spring.commute.domain.Commute;
-import com.ware.spring.commute.repository.CommuteRepository;
+
 import com.ware.spring.member.domain.Distributor;
 import com.ware.spring.member.domain.Member;
 import com.ware.spring.member.domain.MemberDto;
@@ -311,7 +310,7 @@ public class MemberService {
         }
 
         if (searchText != null && !searchText.isEmpty()) {
-            // 검색어가 있을 때
+            // 검색 조건이 있을 때
             if ("mybranch".equals(statusFilter)) {
                 return memberRepository.findByDistributor_DistributorNoAndMemLeaveAndSearchText(distributorNo, "N", searchText, pageable);
             } else if (memLeave != null) {
@@ -346,6 +345,7 @@ public class MemberService {
                 }
             }
         } else {
+            // 검색 조건이 없을 때 상태 필터만 처리
             if ("mybranch".equals(statusFilter)) {
                 return memberRepository.findByDistributor_DistributorNoAndMemLeave(distributorNo, "N", pageable);
             } else if (memLeave != null) {
@@ -355,6 +355,7 @@ public class MemberService {
             }
         }
     }
+
 
     /**
      * 회원 번호로 회원을 조회합니다.

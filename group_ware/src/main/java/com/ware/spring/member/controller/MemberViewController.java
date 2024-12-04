@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -113,41 +114,57 @@ public class MemberViewController {
             @RequestParam(value = "statusFilter", required = false, defaultValue = "active") String statusFilter,
             @RequestParam(value = "searchType", required = false) String searchType,
             @RequestParam(value = "searchText", required = false) String searchText,
+            @RequestParam(value = "sortField", required = false, defaultValue = "empNo") String sortField,
+            @RequestParam(value = "sortDirection", required = false, defaultValue = "asc") String sortDirection,
             @RequestParam(value = "page", defaultValue = "0") int page,
             Model model,
             @AuthenticationPrincipal SecurityUser securityUser
     ) {
-        Pageable pageable = PageRequest.of(page, 10);
+        // 정렬 조건 설정
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
+        Pageable pageable = PageRequest.of(page, 10, sort);
+
         Page<Member> members;
 
+        // 검색 조건 처리
         if (searchText != null && !searchText.isEmpty()) {
-            Long currentUserDistributorNo = securityUser.getMember().getDistributor().getDistributorNo();
-            members = memberService.searchMembersByCriteria(searchType, searchText, statusFilter, currentUserDistributorNo, pageable);
+            Long distributorNo = securityUser.getMember().getDistributor().getDistributorNo();
+            members = memberService.searchMembersByCriteria(searchType, searchText, statusFilter, distributorNo, pageable);
         } else {
-            if ("mybranch".equals(statusFilter)) {
-                Long currentUserDistributorNo = securityUser.getMember().getDistributor().getDistributorNo();
-                members = memberService.findMembersByCurrentDistributor(currentUserDistributorNo, pageable);
-            } else if ("resigned".equals(statusFilter)) {
-                members = memberService.findAllByMemLeaveOrderByEmpNoAsc("Y", pageable);
-            } else if ("all".equals(statusFilter)) {
-                members = memberService.findAllOrderByEmpNoAsc(pageable);
-            } else {
-                members = memberService.findAllByMemLeaveOrderByEmpNoAsc("N", pageable);
+            // 상태 필터 처리
+            switch (statusFilter) {
+                case "mybranch":
+                    Long distributorNo = securityUser.getMember().getDistributor().getDistributorNo();
+                    members = memberService.findMembersByCurrentDistributor(distributorNo, pageable);
+                    break;
+                case "resigned":
+                    members = memberService.findAllByMemLeaveOrderByEmpNoAsc("Y", pageable);
+                    break;	
+                case "all":
+                    members = memberService.findAllOrderByEmpNoAsc(pageable);
+                    break;
+                default: // active 상태
+                    members = memberService.findAllByMemLeaveOrderByEmpNoAsc("N", pageable);
+                    break;
             }
         }
 
+        // 페이징 네비게이션 데이터 계산
         int totalPages = members.getTotalPages();
         int pageNumber = members.getNumber();
         int pageGroupSize = 5;
-        int currentGroup = (pageNumber / pageGroupSize);
+        int currentGroup = pageNumber / pageGroupSize;
         int startPage = currentGroup * pageGroupSize + 1;
         int endPage = Math.min(startPage + pageGroupSize - 1, totalPages);
 
+        // 뷰에 데이터 전달
         model.addAttribute("memberList", members.getContent());
         model.addAttribute("page", members);
         model.addAttribute("statusFilter", statusFilter);
         model.addAttribute("searchType", searchType);
         model.addAttribute("searchText", searchText);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDirection", sortDirection);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("pageNumber", pageNumber);
         model.addAttribute("startPage", startPage);
