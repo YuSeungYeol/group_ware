@@ -120,18 +120,16 @@ public class MemberViewController {
             Model model,
             @AuthenticationPrincipal SecurityUser securityUser
     ) {
-        // 정렬 조건 설정
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
         Pageable pageable = PageRequest.of(page, 10, sort);
 
         Page<Member> members;
 
-        // 검색 조건 처리
         if (searchText != null && !searchText.isEmpty()) {
             Long distributorNo = securityUser.getMember().getDistributor().getDistributorNo();
             members = memberService.searchMembersByCriteria(searchType, searchText, statusFilter, distributorNo, pageable);
         } else {
-            // 상태 필터 처리
+         
             switch (statusFilter) {
                 case "mybranch":
                     Long distributorNo = securityUser.getMember().getDistributor().getDistributorNo();
@@ -143,7 +141,7 @@ public class MemberViewController {
                 case "all":
                     members = memberService.findAllOrderByEmpNoAsc(pageable);
                     break;
-                default: // active 상태
+                default: 
                     members = memberService.findAllByMemLeaveOrderByEmpNoAsc("N", pageable);
                     break;
             }
