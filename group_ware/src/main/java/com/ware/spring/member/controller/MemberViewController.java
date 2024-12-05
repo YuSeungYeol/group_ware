@@ -148,16 +148,12 @@ public class MemberViewController {
                     break;
             }
         }
-
-        // 페이징 네비게이션 데이터 계산
         int totalPages = members.getTotalPages();
         int pageNumber = members.getNumber();
         int pageGroupSize = 5;
         int currentGroup = pageNumber / pageGroupSize;
         int startPage = currentGroup * pageGroupSize + 1;
         int endPage = Math.min(startPage + pageGroupSize - 1, totalPages);
-
-        // 뷰에 데이터 전달
         model.addAttribute("memberList", members.getContent());
         model.addAttribute("page", members);
         model.addAttribute("statusFilter", statusFilter);
