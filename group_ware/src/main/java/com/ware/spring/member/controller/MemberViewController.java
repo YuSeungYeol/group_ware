@@ -114,25 +114,26 @@ public class MemberViewController {
             @RequestParam(value = "statusFilter", required = false, defaultValue = "active") String statusFilter,
             @RequestParam(value = "searchType", required = false) String searchType,
             @RequestParam(value = "searchText", required = false) String searchText,
-            @RequestParam(value = "sortField", required = false, defaultValue = "empNo") String sortField1,
-            @RequestParam(value = "sortField", required = false, defaultValue = "distributorName") String sortField2,
-            @RequestParam(value = "sortField", required = false, defaultValue = "memName") String sortField3,
-            @RequestParam(value = "sortField", required = false, defaultValue = "memRegDate") String sortField4,
+            @RequestParam(value = "sortField", required = false, defaultValue = "empNo") String sortField,
             @RequestParam(value = "sortDirection", required = false, defaultValue = "asc") String sortDirection,
             @RequestParam(value = "page", defaultValue = "0") int page,
             Model model,
             @AuthenticationPrincipal SecurityUser securityUser
     ) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField1, sortField2, sortField3, sortField4);
+        // 1. 기본 정렬 설정 (empNo 기준 오름차순)
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
+
+        // 2. 페이징 정보 생성
         Pageable pageable = PageRequest.of(page, 10, sort);
 
+        // 3. 멤버 조회 로직
         Page<Member> members;
-
         if (searchText != null && !searchText.isEmpty()) {
+            // 검색 조건이 있는 경우
             Long distributorNo = securityUser.getMember().getDistributor().getDistributorNo();
             members = memberService.searchMembersByCriteria(searchType, searchText, statusFilter, distributorNo, pageable);
         } else {
-         
+            // 검색 조건이 없는 경우 상태 필터에 따라 조회
             switch (statusFilter) {
                 case "mybranch":
                     Long distributorNo = securityUser.getMember().getDistributor().getDistributorNo();
@@ -140,11 +141,11 @@ public class MemberViewController {
                     break;
                 case "resigned":
                     members = memberService.findAllByMemLeaveOrderByEmpNoAsc("Y", pageable);
-                    break;	
+                    break;
                 case "all":
                     members = memberService.findAllOrderByEmpNoAsc(pageable);
                     break;
-                default: 
+                default:
                     members = memberService.findAllByMemLeaveOrderByEmpNoAsc("N", pageable);
                     break;
             }
@@ -155,23 +156,22 @@ public class MemberViewController {
         int currentGroup = pageNumber / pageGroupSize;
         int startPage = currentGroup * pageGroupSize + 1;
         int endPage = Math.min(startPage + pageGroupSize - 1, totalPages);
-        model.addAttribute("memberList", members.getContent());
-        model.addAttribute("page", members);
-        model.addAttribute("statusFilter", statusFilter);
-        model.addAttribute("searchType", searchType);
-        model.addAttribute("searchText", searchText);
-        model.addAttribute("sortField", sortField1);
-        model.addAttribute("sortField", sortField2);
-        model.addAttribute("sortField", sortField3);
-        model.addAttribute("sortField", sortField4);
-        model.addAttribute("sortDirection", sortDirection);
-        model.addAttribute("totalPages", totalPages);
-        model.addAttribute("pageNumber", pageNumber);
-        model.addAttribute("startPage", startPage);
-        model.addAttribute("endPage", endPage);
 
-        return "member/member_list";
+        model.addAttribute("memberList", members.getContent()); // 멤버 데이터 리스트
+        model.addAttribute("page", members); // 페이지 정보
+        model.addAttribute("statusFilter", statusFilter); // 필터 상태
+        model.addAttribute("searchType", searchType); // 검색 타입
+        model.addAttribute("searchText", searchText); // 검색 텍스트
+        model.addAttribute("sortField", sortField); // 정렬 필드
+        model.addAttribute("sortDirection", sortDirection); // 정렬 방향
+        model.addAttribute("totalPages", totalPages); // 전체 페이지 수
+        model.addAttribute("pageNumber", pageNumber); // 현재 페이지 번호
+        model.addAttribute("startPage", startPage); // 페이지네이션 시작 번호
+        model.addAttribute("endPage", endPage); // 페이지네이션 끝 번호
+
+        return "member/member_list"; // 뷰 이름 반환
     }
+
 
     /**
      * 회원 상세 정보 페이지를 반환합니다.
