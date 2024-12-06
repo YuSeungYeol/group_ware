@@ -114,13 +114,16 @@ public class MemberViewController {
             @RequestParam(value = "statusFilter", required = false, defaultValue = "active") String statusFilter,
             @RequestParam(value = "searchType", required = false) String searchType,
             @RequestParam(value = "searchText", required = false) String searchText,
-            @RequestParam(value = "sortField", required = false, defaultValue = "empNo") String sortField,
+            @RequestParam(value = "sortField", required = false, defaultValue = "empNo") String sortField1,
+            @RequestParam(value = "sortField", required = false, defaultValue = "distributorName") String sortField2,
+            @RequestParam(value = "sortField", required = false, defaultValue = "memName") String sortField3,
+            @RequestParam(value = "sortField", required = false, defaultValue = "memRegDate") String sortField4,
             @RequestParam(value = "sortDirection", required = false, defaultValue = "asc") String sortDirection,
             @RequestParam(value = "page", defaultValue = "0") int page,
             Model model,
             @AuthenticationPrincipal SecurityUser securityUser
     ) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField1, sortField2, sortField3, sortField4);
         Pageable pageable = PageRequest.of(page, 10, sort);
 
         Page<Member> members;
@@ -157,7 +160,10 @@ public class MemberViewController {
         model.addAttribute("statusFilter", statusFilter);
         model.addAttribute("searchType", searchType);
         model.addAttribute("searchText", searchText);
-        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortField", sortField1);
+        model.addAttribute("sortField", sortField2);
+        model.addAttribute("sortField", sortField3);
+        model.addAttribute("sortField", sortField4);
         model.addAttribute("sortDirection", sortDirection);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("pageNumber", pageNumber);
