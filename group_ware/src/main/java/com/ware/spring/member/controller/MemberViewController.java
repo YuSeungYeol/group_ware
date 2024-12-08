@@ -129,11 +129,9 @@ public class MemberViewController {
         // 3. 멤버 조회 로직
         Page<Member> members;
         if (searchText != null && !searchText.isEmpty()) {
-            // 검색 조건이 있는 경우
             Long distributorNo = securityUser.getMember().getDistributor().getDistributorNo();
             members = memberService.searchMembersByCriteria(searchType, searchText, statusFilter, distributorNo, pageable);
         } else {
-            // 검색 조건이 없는 경우 상태 필터에 따라 조회
             switch (statusFilter) {
                 case "mybranch":
                     Long distributorNo = securityUser.getMember().getDistributor().getDistributorNo();
@@ -150,6 +148,8 @@ public class MemberViewController {
                     break;
             }
         }
+
+        // 4. 페이지네이션 정보 계산
         int totalPages = members.getTotalPages();
         int pageNumber = members.getNumber();
         int pageGroupSize = 5;
@@ -157,17 +157,18 @@ public class MemberViewController {
         int startPage = currentGroup * pageGroupSize + 1;
         int endPage = Math.min(startPage + pageGroupSize - 1, totalPages);
 
-        model.addAttribute("memberList", members.getContent()); // 멤버 데이터 리스트
-        model.addAttribute("page", members); // 페이지 정보
-        model.addAttribute("statusFilter", statusFilter); // 필터 상태
-        model.addAttribute("searchType", searchType); // 검색 타입
-        model.addAttribute("searchText", searchText); // 검색 텍스트
-        model.addAttribute("sortField", sortField); // 정렬 필드
-        model.addAttribute("sortDirection", sortDirection); // 정렬 방향
-        model.addAttribute("totalPages", totalPages); // 전체 페이지 수
-        model.addAttribute("pageNumber", pageNumber); // 현재 페이지 번호
-        model.addAttribute("startPage", startPage); // 페이지네이션 시작 번호
-        model.addAttribute("endPage", endPage); // 페이지네이션 끝 번호
+        // 5. 모델 데이터 추가
+        model.addAttribute("memberList", members.getContent());
+        model.addAttribute("page", members);
+        model.addAttribute("statusFilter", statusFilter);
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("searchText", searchText);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDirection", sortDirection);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("pageNumber", pageNumber);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
 
         return "member/member_list"; // 뷰 이름 반환
     }

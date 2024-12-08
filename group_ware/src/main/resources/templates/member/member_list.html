@@ -7,7 +7,7 @@
         <link th:href="@{/css/member/member_list.css}" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        
+
         <div class="list-container">
             <div class="word">
                 <h3>직원 목록</h3>
@@ -24,7 +24,7 @@
                         <option value="mybranch" th:selected="${statusFilter == 'mybranch'}">우리 지점만 보기</option>
                     </select>
                 </form>
-                
+
                 <form th:action="@{/member/list}" method="get" class="search-form">
                     <input type="hidden" name="statusFilter" th:value="${statusFilter}">
                     <select id="searchType" name="searchType">
@@ -52,12 +52,12 @@
                     </colgroup>
                     <thead>
                         <tr>
-                            <th onclick="sortTable('empNo')">사원번호</th>
-                            <th onclick="sortTable('distributorName')">지점</th>
-                            <th onclick="sortTable('memName')">이름</th>
-                            <th onclick="sortTable('memRegDate')">입사일자</th>
+                            <th onclick="sortTable('empNo')">사원번호 <span th:if="${sortField == 'empNo'}" th:text="${sortDirection == 'asc' ? '▲' : '▼'}"></span></th>
+                            <th onclick="sortTable('distributorName')">지점 <span th:if="${sortField == 'distributorName'}" th:text="${sortDirection == 'asc' ? '▲' : '▼'}"></span></th>
+                            <th onclick="sortTable('memName')">이름 <span th:if="${sortField == 'memName'}" th:text="${sortDirection == 'asc' ? '▲' : '▼'}"></span></th>
+                            <th onclick="sortTable('memRegDate')">입사일자 <span th:if="${sortField == 'memRegDate'}" th:text="${sortDirection == 'asc' ? '▲' : '▼'}"></span></th>
                             <th>상세보기</th>
-                            <th onclick="sortTable('memLeave')">재직여부</th>
+                            <th onclick="sortTable('memLeave')">재직여부 <span th:if="${sortField == 'memLeave'}" th:text="${sortDirection == 'asc' ? '▲' : '▼'}"></span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -88,10 +88,10 @@
             <div class="center" th:if="${totalPages > 1}">
                 <div class="pagination">
                     <th:block th:if="${startPage > 1}">
-                        <a th:href="@{/member/list(page=${startPage - 2},statusFilter=${statusFilter})}">&lt;&lt;</a>
+                        <a th:href="@{/member/list(page=${startPage - 2},statusFilter=${statusFilter},sortField=${sortField},sortDirection=${sortDirection})}">&lt;&lt;</a>
                     </th:block>
                     <th:block th:if="${pageNumber > 0}">
-                        <a th:href="@{/member/list(page=${pageNumber - 1},statusFilter=${statusFilter})}">&lt;</a>
+                        <a th:href="@{/member/list(page=${pageNumber - 1},statusFilter=${statusFilter},sortField=${sortField},sortDirection=${sortDirection})}">&lt;</a>
                     </th:block>
                     <th:block th:each="pageNum: ${#numbers.sequence(startPage, endPage)}">
                         <a th:text="${pageNum}" 
@@ -99,10 +99,10 @@
                            th:classappend="${pageNum == pageNumber + 1} ? 'active'">1</a>
                     </th:block>
                     <th:block th:if="${pageNumber < totalPages - 1}">
-                        <a th:href="@{/member/list(page=${pageNumber + 1},statusFilter=${statusFilter})}">&gt;</a>
+                        <a th:href="@{/member/list(page=${pageNumber + 1},statusFilter=${statusFilter},sortField=${sortField},sortDirection=${sortDirection})}">&gt;</a>
                     </th:block>
                     <th:block th:if="${endPage < totalPages}">
-                        <a th:href="@{/member/list(page=${endPage},statusFilter=${statusFilter})}">&gt;&gt;</a>
+                        <a th:href="@{/member/list(page=${endPage},statusFilter=${statusFilter},sortField=${sortField},sortDirection=${sortDirection})}">&gt;&gt;</a>
                     </th:block>
                 </div>
             </div>
@@ -122,15 +122,9 @@
                 }
 
                 // URL 파라미터 생성
-                const statusFilter = params.get('statusFilter') || 'active';
-                const searchType = params.get('searchType') || '';
-                const searchText = params.get('searchText') || '';
-                const page = params.get('page') || 0;
-
-                const url = `/member/list?sortField=${sortField}&sortDirection=${sortDirection}` +
-                            `&statusFilter=${statusFilter}&searchType=${searchType}` +
-                            `&searchText=${encodeURIComponent(searchText)}&page=${page}`;
-                window.location.href = url;
+                params.set('sortField', sortField);
+                params.set('sortDirection', sortDirection);
+                window.location.href = `${window.location.pathname}?${params.toString()}`;
             }
         </script>
     </th:block>
