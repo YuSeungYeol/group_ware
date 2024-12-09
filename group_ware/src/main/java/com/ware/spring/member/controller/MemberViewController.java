@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -111,45 +112,28 @@ public class MemberViewController {
      */
     @GetMapping("/member/list")
     public String listMembers(
-            @RequestParam(value = "statusFilter", required = false, defaultValue = "active") String statusFilter,
+            @RequestParam(value = "statusFilter", required = false, defaultValue = "all") String statusFilter,
             @RequestParam(value = "searchType", required = false) String searchType,
             @RequestParam(value = "searchText", required = false) String searchText,
             @RequestParam(value = "sortField", required = false, defaultValue = "empNo") String sortField,
             @RequestParam(value = "sortDirection", required = false, defaultValue = "asc") String sortDirection,
             @RequestParam(value = "page", defaultValue = "0") int page,
-            Model model,
-            @AuthenticationPrincipal SecurityUser securityUser
+            Model model
     ) {
-        // 1. 기본 정렬 설정 (empNo 기준 오름차순)
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
-
-        // 2. 페이징 정보 생성
-        Pageable pageable = PageRequest.of(page, 10, sort);
-
-        // 3. 멤버 조회 로직
+        Pageable pageable;
         Page<Member> members;
-        if (searchText != null && !searchText.isEmpty()) {
-            Long distributorNo = securityUser.getMember().getDistributor().getDistributorNo();
-            members = memberService.searchMembersByCriteria(searchType, searchText, statusFilter, distributorNo, pageable);
+
+        // `distributorName` 정렬 처리
+        if ("distributorName".equals(sortField)) {
+            pageable = PageRequest.of(page, 10); // 페이징 크기 10 설정
+            members = memberService.searchMembersWithDistributorSorting(searchText, sortDirection, pageable);
         } else {
-            switch (statusFilter) {
-                case "mybranch":
-                    Long distributorNo = securityUser.getMember().getDistributor().getDistributorNo();
-                    members = memberService.findMembersByCurrentDistributor(distributorNo, pageable);
-                    break;
-                case "resigned":
-                    members = memberService.findAllByMemLeaveOrderByEmpNoAsc("Y", pageable);
-                    break;
-                case "all":
-                    members = memberService.findAllOrderByEmpNoAsc(pageable);
-                    break;
-                default:
-                    members = memberService.findAllByMemLeaveOrderByEmpNoAsc("N", pageable);
-                    break;
-            }
+            Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
+            pageable = PageRequest.of(page, 10, sort);
+            members = memberService.searchMembersByCriteria(searchType, searchText, statusFilter, null, pageable);
         }
 
-        // 4. 페이지네이션 정보 계산
+        // 페이징 데이터 계산
         int totalPages = members.getTotalPages();
         int pageNumber = members.getNumber();
         int pageGroupSize = 5;
@@ -157,7 +141,7 @@ public class MemberViewController {
         int startPage = currentGroup * pageGroupSize + 1;
         int endPage = Math.min(startPage + pageGroupSize - 1, totalPages);
 
-        // 5. 모델 데이터 추가
+        // 모델에 데이터 전달
         model.addAttribute("memberList", members.getContent());
         model.addAttribute("page", members);
         model.addAttribute("statusFilter", statusFilter);
@@ -170,8 +154,14 @@ public class MemberViewController {
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
 
-        return "member/member_list"; // 뷰 이름 반환
+        return "member/member_list";
     }
+
+
+
+
+
+
 
 
     /**

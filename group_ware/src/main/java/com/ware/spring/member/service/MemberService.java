@@ -17,8 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 
 import com.ware.spring.member.domain.Distributor;
 import com.ware.spring.member.domain.Member;
@@ -287,7 +287,29 @@ public class MemberService {
         }
         return memberRepository.findAll(pageable);
     }
+    // 지점명 정렬
+    @Transactional(readOnly = true)
+    public Page<Member> searchMembersWithDistributorSorting(String searchText, String sortDirection, Pageable pageable) {
+        if ("desc".equalsIgnoreCase(sortDirection)) {
+            return memberRepository.findAllWithDistributorNameDesc(searchText, pageable);
+        }
+        return memberRepository.findAllWithDistributorNameAsc(searchText, pageable);
+    }
 
+    // 직급으로 검색
+    public Page<Member> searchMembersByRank(String rankName, String memLeave, Pageable pageable) {
+        return memberRepository.findByRank(rankName, memLeave, pageable);
+    }
+
+    // 지점명으로 검색
+    public Page<Member> searchMembersByDistributor(String distributorName, String memLeave, Pageable pageable) {
+        return memberRepository.findByDistributor(distributorName, memLeave, pageable);
+    }
+
+    // 사원번호로 검색
+    public Page<Member> searchMembersByEmpNo(String empNo, String memLeave, Pageable pageable) {
+        return memberRepository.findByEmpNo(empNo, memLeave, pageable);
+    }
     /**
      * 검색 조건 및 필터에 따라 회원 리스트를 반환합니다.
      * 기술: Spring Data JPA, 페이징 (Pageable)
@@ -355,7 +377,16 @@ public class MemberService {
             }
         }
     }
-
+    @Transactional(readOnly = true)
+    public List<Member> sortMembersByDistributorName(List<Member> members, String sortDirection) {
+        return members.stream()
+                .sorted((m1, m2) -> {
+                    String name1 = m1.getDistributor() != null ? m1.getDistributor().getDistributorName() : "";
+                    String name2 = m2.getDistributor() != null ? m2.getDistributor().getDistributorName() : "";
+                    return "desc".equalsIgnoreCase(sortDirection) ? name2.compareTo(name1) : name1.compareTo(name2);
+                })
+                .toList();
+    }
 
     /**
      * 회원 번호로 회원을 조회합니다.

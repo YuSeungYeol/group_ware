@@ -38,7 +38,16 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // mem_leave에 따른 필터링 (퇴사 여부)
     @EntityGraph(attributePaths = {"rank", "distributor"})
     Page<Member> findAllByMemLeaveOrderByEmpNoAsc(String memLeave, Pageable pageable);
-
+    @Query("SELECT m FROM Member m " +
+    	       "WHERE m.distributor.distributorNo = :distributorNo AND m.memLeave = :memLeave AND " +
+    	       "(m.memName LIKE %:searchText% OR m.rank.rankName LIKE %:searchText% OR " +
+    	       " CAST(m.memRegDate AS string) LIKE %:searchText% OR m.distributor.distributorName LIKE %:searchText% OR " +
+    	       " m.empNo LIKE %:searchText%)")
+    	Page<Member> findByDistributor_DistributorNoAndMemLeaveAndSearchText(
+    	        @Param("distributorNo") Long distributorNo,
+    	        @Param("memLeave") String memLeave,
+    	        @Param("searchText") String searchText,
+    	        Pageable pageable);
     // 모든 상태의 회원을 사번 오름차순으로 조회
     Page<Member> findAllByOrderByEmpNoAsc(Pageable pageable);
 
@@ -60,17 +69,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             @Param("memLeave") String memLeave,
             Pageable pageable);
 
-    // 특정 지점과 검색 조건으로 필터링
-    @Query("SELECT m FROM Member m WHERE m.distributor.distributorNo = :distributorNo AND " +
-           "m.memLeave = :memLeave AND " +
-           "(m.memName LIKE %:searchText% OR m.rank.rankName LIKE %:searchText% OR " +
-           "CAST(m.memRegDate AS string) LIKE %:searchText% OR m.distributor.distributorName LIKE %:searchText% OR " +
-           "m.empNo LIKE %:searchText%)")
-    Page<Member> findByDistributor_DistributorNoAndMemLeaveAndSearchText(
-            @Param("distributorNo") Long distributorNo,
-            @Param("memLeave") String memLeave,
-            @Param("searchText") String searchText,
-            Pageable pageable);
+
+
 
     // 검색 조건 없이 특정 지점과 memLeave로 필터링
     @Query("SELECT m FROM Member m WHERE m.distributor.distributorNo = :distributorNo AND m.memLeave = :memLeave")
@@ -105,4 +105,44 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // 회원 번호로 회원 조회
     Optional<Member> findByMemNo(Long memNo);
     Optional<Member> findByMemName(String memName);
+
+ // 직급으로 검색
+    @Query("SELECT m FROM Member m WHERE LOWER(m.rank.rankName) LIKE LOWER(CONCAT('%', :rankName, '%')) AND " +
+           "(:memLeave IS NULL OR m.memLeave = :memLeave)")
+    Page<Member> findByRank(@Param("rankName") String rankName,
+                            @Param("memLeave") String memLeave,
+                            Pageable pageable);
+
+    // 지점명으로 검색
+    @Query("SELECT m FROM Member m JOIN m.distributor d WHERE LOWER(d.distributorName) LIKE LOWER(CONCAT('%', :distributorName, '%')) AND " +
+           "(:memLeave IS NULL OR m.memLeave = :memLeave)")
+    Page<Member> findByDistributor(@Param("distributorName") String distributorName,
+                                   @Param("memLeave") String memLeave,
+                                   Pageable pageable);
+
+    // 사원번호로 검색
+    @Query("SELECT m FROM Member m WHERE CAST(m.empNo AS string) LIKE CONCAT('%', :empNo, '%') AND " +
+           "(:memLeave IS NULL OR m.memLeave = :memLeave)")
+    Page<Member> findByEmpNo(@Param("empNo") String empNo,
+                             @Param("memLeave") String memLeave,
+                             Pageable pageable);
+    @Query("SELECT m FROM Member m JOIN m.distributor d " +
+    	       "WHERE (:searchText IS NULL OR LOWER(m.memName) LIKE LOWER(CONCAT('%', :searchText, '%'))) " +
+    	       "ORDER BY LOWER(d.distributorName) ASC")
+    	Page<Member> findAllWithDistributorNameSorted(
+    	        @Param("searchText") String searchText,
+    	        Pageable pageable);
+    @Query("SELECT m FROM Member m JOIN m.distributor d " +
+    	       "WHERE (:searchText IS NULL OR LOWER(m.memName) LIKE LOWER(CONCAT('%', :searchText, '%'))) " +
+    	       "ORDER BY LOWER(d.distributorName) ASC")
+    	Page<Member> findAllWithDistributorNameAsc(
+    	        @Param("searchText") String searchText,
+    	        Pageable pageable);
+
+    	@Query("SELECT m FROM Member m JOIN m.distributor d " +
+    	       "WHERE (:searchText IS NULL OR LOWER(m.memName) LIKE LOWER(CONCAT('%', :searchText, '%'))) " +
+    	       "ORDER BY LOWER(d.distributorName) DESC")
+    	Page<Member> findAllWithDistributorNameDesc(
+    	        @Param("searchText") String searchText,
+    	        Pageable pageable);
 }

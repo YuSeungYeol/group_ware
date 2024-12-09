@@ -7,7 +7,7 @@
         <link th:href="@{/css/member/member_list.css}" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+        
         <div class="list-container">
             <div class="word">
                 <h3>직원 목록</h3>
@@ -15,6 +15,7 @@
 
             <!-- 필터 및 검색 폼 -->
             <div class="form-container">
+                <!-- 재직 여부 필터 -->
                 <form th:action="@{/member/list}" method="get" class="filter-form">
                     <label for="statusFilter">재직여부</label>
                     <select id="statusFilter" name="statusFilter" onchange="this.form.submit()">
@@ -24,9 +25,13 @@
                         <option value="mybranch" th:selected="${statusFilter == 'mybranch'}">우리 지점만 보기</option>
                     </select>
                 </form>
-
+                
+                <!-- 검색 폼 -->
                 <form th:action="@{/member/list}" method="get" class="search-form">
+                    <!-- 숨겨진 필드: 재직 여부와 정렬 상태 유지 -->
                     <input type="hidden" name="statusFilter" th:value="${statusFilter}">
+                    <input type="hidden" name="sortField" th:value="${sortField}">
+                    <input type="hidden" name="sortDirection" th:value="${sortDirection}">
                     <select id="searchType" name="searchType">
                         <option value="name" th:selected="${searchType == 'name'}">이름</option>
                         <option value="rank" th:selected="${searchType == 'rank'}">직급</option>
@@ -34,7 +39,7 @@
                         <option value="branch" th:selected="${searchType == 'branch'}">지점</option>
                         <option value="empNo" th:selected="${searchType == 'empNo'}">사원번호</option>
                     </select>
-                    <input type="text" name="searchText" th:value="${searchText}" placeholder="검색어 입력" />
+                    <input type="text" name="searchText" th:value="${searchText}" placeholder="검색어 입력">
                     <button type="submit">검색</button>
                 </form>
             </div>
@@ -52,12 +57,12 @@
                     </colgroup>
                     <thead>
                         <tr>
-                            <th onclick="sortTable('empNo')">사원번호 <span th:if="${sortField == 'empNo'}" th:text="${sortDirection == 'asc' ? '▲' : '▼'}"></span></th>
-                            <th onclick="sortTable('distributorName')">지점 <span th:if="${sortField == 'distributorName'}" th:text="${sortDirection == 'asc' ? '▲' : '▼'}"></span></th>
-                            <th onclick="sortTable('memName')">이름 <span th:if="${sortField == 'memName'}" th:text="${sortDirection == 'asc' ? '▲' : '▼'}"></span></th>
-                            <th onclick="sortTable('memRegDate')">입사일자 <span th:if="${sortField == 'memRegDate'}" th:text="${sortDirection == 'asc' ? '▲' : '▼'}"></span></th>
+                            <th onclick="sortTable('empNo')">사원번호</th>
+                            <th onclick="sortTable('distributorName')">지점</th>
+                            <th onclick="sortTable('memName')">이름</th>
+                            <th onclick="sortTable('memRegDate')">입사일자</th>
                             <th>상세보기</th>
-                            <th onclick="sortTable('memLeave')">재직여부 <span th:if="${sortField == 'memLeave'}" th:text="${sortDirection == 'asc' ? '▲' : '▼'}"></span></th>
+                            <th onclick="sortTable('memLeave')">재직여부</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -75,57 +80,90 @@
                                     <span th:if="${!(#authentication.principal.member.rank.rankName == '대표' || 
                                                      (#authentication.principal.member.rank.rankName == '지점대표' &&
                                                       member.distributor.distributorNo == #authentication.principal.member.distributor.distributorNo))}" 
-                                          style="color: gray;">비공개</span>
+                                          style="color: gray;">타지점</span>
                                 </td>
                                 <td th:text="${member.memLeave == 'Y' ? '퇴사' : '재직'}"></td>
                             </tr>
                         </th:block>
                     </tbody>
                 </table>
-            </div>
 
-            <!-- 페이징 -->
-            <div class="center" th:if="${totalPages > 1}">
-                <div class="pagination">
-                    <th:block th:if="${startPage > 1}">
-                        <a th:href="@{/member/list(page=${startPage - 2},statusFilter=${statusFilter},sortField=${sortField},sortDirection=${sortDirection})}">&lt;&lt;</a>
-                    </th:block>
-                    <th:block th:if="${pageNumber > 0}">
-                        <a th:href="@{/member/list(page=${pageNumber - 1},statusFilter=${statusFilter},sortField=${sortField},sortDirection=${sortDirection})}">&lt;</a>
-                    </th:block>
-                    <th:block th:each="pageNum: ${#numbers.sequence(startPage, endPage)}">
-                        <a th:text="${pageNum}" 
-                           th:href="@{/member/list(page=${pageNum - 1},statusFilter=${statusFilter},sortField=${sortField},sortDirection=${sortDirection})}" 
-                           th:classappend="${pageNum == pageNumber + 1} ? 'active'">1</a>
-                    </th:block>
-                    <th:block th:if="${pageNumber < totalPages - 1}">
-                        <a th:href="@{/member/list(page=${pageNumber + 1},statusFilter=${statusFilter},sortField=${sortField},sortDirection=${sortDirection})}">&gt;</a>
-                    </th:block>
-                    <th:block th:if="${endPage < totalPages}">
-                        <a th:href="@{/member/list(page=${endPage},statusFilter=${statusFilter},sortField=${sortField},sortDirection=${sortDirection})}">&gt;&gt;</a>
-                    </th:block>
-                </div>
+<br>
+<!-- 페이징 -->
+			<div class="center" th:if="${totalPages > 1}">
+			    <div class="pagination"
+			        th:with="
+			        pageNumber = ${page.pageable.pageNumber},
+			        totalPages = ${page.totalPages},
+			        startPage = ${startPage},
+			        endPage = ${endPage}
+			        ">
+			       
+			        <!-- 이전 페이지 그룹 링크 -->
+			        <th:block th:if="${startPage > 1}">
+			            <a th:href="@{/member/list(page=${startPage - 2},statusFilter=${statusFilter},sortField=${sortField},sortDirection=${sortDirection})}">&lt;&lt;</a>
+			        </th:block>
+			
+					<!-- 이전 페이지 링크 -->
+					<th:block th:if="${pageNumber > 0}">
+					    <a th:href="@{/member/list(page=${pageNumber - 1},statusFilter=${statusFilter},sortField=${sortField},sortDirection=${sortDirection})}">&lt;</a>
+					</th:block>
+					
+					<!-- 페이지 번호 반복 -->
+					<th:block th:each="pageNum: ${#numbers.sequence(startPage, endPage)}">
+					    <a th:text="${pageNum}"
+					       th:href="@{/member/list(page=${pageNum - 1},statusFilter=${statusFilter},sortField=${sortField},sortDirection=${sortDirection})}"
+					       th:classappend="${pageNum == pageNumber + 1} ? 'active'"></a>
+					</th:block>
+					
+					<!-- 다음 페이지 링크 -->
+					<th:block th:if="${pageNumber < totalPages - 1}">
+					    <a th:href="@{/member/list(page=${pageNumber + 1},statusFilter=${statusFilter},sortField=${sortField},sortDirection=${sortDirection})}">&gt;</a>
+					</th:block>
+			
+			        <!-- 다음 페이지 그룹 링크 -->
+			        <th:block th:if="${endPage < totalPages}">
+			            <a th:href="@{/member/list(page=${endPage},statusFilter=${statusFilter},sortField=${sortField},sortDirection=${sortDirection})}">&gt;&gt;</a>
+			        </th:block>
+			    </div>
+			</div>
             </div>
         </div>
+            <!-- 테이블 정렬 및 검색 관련 스크립트 -->
+            <script>
+               function sortTable(sortField) {
+				    const params = new URLSearchParams(window.location.search);
+				    const currentSortField = params.get('sortField');
+				    const currentSortDirection = params.get('sortDirection') || 'asc';
+				
+				    let sortDirection = 'asc';
+				    if (currentSortField === sortField && currentSortDirection === 'asc') {
+				        sortDirection = 'desc';
+				    }
+				
+				    const url = `/member/list?sortField=${sortField}&sortDirection=${sortDirection}` +
+				                `&statusFilter=${params.get('statusFilter') || 'all'}` +
+				                `&searchType=${params.get('searchType') || ''}` +
+				                `&searchText=${encodeURIComponent(params.get('searchText') || '')}&page=0`;
+				
+				    window.location.href = url;
+				}
 
-        <!-- 테이블 정렬 관련 스크립트 -->
-        <script>
-            function sortTable(sortField) {
-                const params = new URLSearchParams(window.location.search);
-                const currentSortField = params.get('sortField');
-                const currentSortDirection = params.get('sortDirection') || 'asc';
-                let sortDirection = 'asc';
+                // 검색 폼 제출 이벤트
+                document.querySelector('.search-form').addEventListener('submit', function (event) {
+                    event.preventDefault(); // 기본 동작 막기
 
-                // 현재 정렬 상태에 따라 방향 결정
-                if (currentSortField === sortField && currentSortDirection === 'asc') {
-                    sortDirection = 'desc';
-                }
+                    const params = new URLSearchParams(window.location.search); // 여기에 새로 정의
+                    const statusFilter = document.querySelector('input[name="statusFilter"]').value || 'all';
+                    const searchType = document.querySelector('select[name="searchType"]').value || '';
+                    const searchText = document.querySelector('input[name="searchText"]').value || '';
 
-                // URL 파라미터 생성
-                params.set('sortField', sortField);
-                params.set('sortDirection', sortDirection);
-                window.location.href = `${window.location.pathname}?${params.toString()}`;
-            }
-        </script>
+                    const url = `/member/list?statusFilter=${statusFilter}&searchType=${searchType}` +
+                                `&searchText=${encodeURIComponent(searchText)}&sortField=${params.get('sortField') || 'empNo'}` +
+                                `&sortDirection=${params.get('sortDirection') || 'asc'}&page=0`;
+                    window.location.href = url;
+                });
+            </script>
+        </div>
     </th:block>
 </html>
