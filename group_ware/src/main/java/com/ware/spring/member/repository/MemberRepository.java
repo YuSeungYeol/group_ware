@@ -68,10 +68,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             @Param("searchType") String searchType,
             @Param("memLeave") String memLeave,
             Pageable pageable);
-
-
-
-
     // 검색 조건 없이 특정 지점과 memLeave로 필터링
     @Query("SELECT m FROM Member m WHERE m.distributor.distributorNo = :distributorNo AND m.memLeave = :memLeave")
     Page<Member> findByDistributor_DistributorNoAndMemLeave(
