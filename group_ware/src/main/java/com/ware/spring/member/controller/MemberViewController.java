@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,7 +20,6 @@ import com.ware.spring.member.domain.Rank;
 import com.ware.spring.member.repository.DistributorRepository;
 import com.ware.spring.member.repository.MemberRepository;
 import com.ware.spring.member.repository.RankRepository;
-import com.ware.spring.member.service.DistributorService;
 import com.ware.spring.member.service.MemberService;
 import com.ware.spring.security.vo.SecurityUser;
 
@@ -32,15 +30,15 @@ public class MemberViewController {
     private final MemberRepository memberRepository;
     private final RankRepository rankRepository;
     private final DistributorRepository distributorRepository;
-    private final DistributorService distributorService; 
+
 
     @Autowired
-    public MemberViewController(MemberService memberService, MemberRepository memberRepository, RankRepository rankRepository, DistributorRepository distributorRepository, DistributorService distributorService) {
+    public MemberViewController(MemberService memberService, MemberRepository memberRepository, RankRepository rankRepository, DistributorRepository distributorRepository) {
         this.memberService = memberService;
         this.memberRepository = memberRepository;
         this.rankRepository = rankRepository;
         this.distributorRepository = distributorRepository;
-        this.distributorService = distributorService;
+
     }
 
     /**
@@ -122,26 +120,20 @@ public class MemberViewController {
     ) {
         Pageable pageable;
         Page<Member> members;
-
-        // `distributorName` 정렬 처리
         if ("distributorName".equals(sortField)) {
-            pageable = PageRequest.of(page, 10); // 페이징 크기 10 설정
+            pageable = PageRequest.of(page, 10);
             members = memberService.searchMembersWithDistributorSorting(searchText, sortDirection, pageable);
         } else {
             Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
             pageable = PageRequest.of(page, 10, sort);
             members = memberService.searchMembersByCriteria(searchType, searchText, statusFilter, null, pageable);
         }
-
-        // 페이징 데이터 계산
         int totalPages = members.getTotalPages();
         int pageNumber = members.getNumber();
         int pageGroupSize = 5;
         int currentGroup = pageNumber / pageGroupSize;
         int startPage = currentGroup * pageGroupSize + 1;
         int endPage = Math.min(startPage + pageGroupSize - 1, totalPages);
-
-        // 모델에 데이터 전달
         model.addAttribute("memberList", members.getContent());
         model.addAttribute("page", members);
         model.addAttribute("statusFilter", statusFilter);
@@ -153,14 +145,8 @@ public class MemberViewController {
         model.addAttribute("pageNumber", pageNumber);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
-
         return "member/member_list";
     }
-
-
-
-
-
 
 
 

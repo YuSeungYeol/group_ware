@@ -106,21 +106,16 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByMemNo(Long memNo);
     Optional<Member> findByMemName(String memName);
 
- // 직급으로 검색
     @Query("SELECT m FROM Member m WHERE LOWER(m.rank.rankName) LIKE LOWER(CONCAT('%', :rankName, '%')) AND " +
            "(:memLeave IS NULL OR m.memLeave = :memLeave)")
     Page<Member> findByRank(@Param("rankName") String rankName,
                             @Param("memLeave") String memLeave,
                             Pageable pageable);
-
-    // 지점명으로 검색
     @Query("SELECT m FROM Member m JOIN m.distributor d WHERE LOWER(d.distributorName) LIKE LOWER(CONCAT('%', :distributorName, '%')) AND " +
            "(:memLeave IS NULL OR m.memLeave = :memLeave)")
     Page<Member> findByDistributor(@Param("distributorName") String distributorName,
                                    @Param("memLeave") String memLeave,
                                    Pageable pageable);
-
-    // 사원번호로 검색
     @Query("SELECT m FROM Member m WHERE CAST(m.empNo AS string) LIKE CONCAT('%', :empNo, '%') AND " +
            "(:memLeave IS NULL OR m.memLeave = :memLeave)")
     Page<Member> findByEmpNo(@Param("empNo") String empNo,
