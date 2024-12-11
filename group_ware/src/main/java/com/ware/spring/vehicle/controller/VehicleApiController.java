@@ -187,7 +187,7 @@ public class VehicleApiController {
                 File directory = new File(uploadDir);
                 if (!directory.exists()) {
                     directory.mkdirs();
-                }
+                }	
                 String filePath = uploadDir + "/" + file.getOriginalFilename();
                 File dest = new File(filePath);
                 file.transferTo(dest);
