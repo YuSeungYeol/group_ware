@@ -176,16 +176,12 @@ public class VehicleApiController {
     public ResponseEntity<Map<String, Object>> registerVehicle(
             @ModelAttribute VehicleDto vehicleDto,
             @RequestParam("vehicleImage") MultipartFile file,
-            @RequestParam("size_no") Long sizeNo) {
-        
-        Map<String, Object> response = new HashMap<>();
-        
+            @RequestParam("size_no") Long sizeNo) {     
+        Map<String, Object> response = new HashMap<>();   
         try {
             VehicleSize vehicleSize = vehicleSizeRepository.findById(sizeNo)
                     .orElseThrow(() -> new IllegalArgumentException("Invalid sizeNo: " + sizeNo));
-            
-            vehicleDto.setVehicleSize(vehicleSize);
-            
+            vehicleDto.setVehicleSize(vehicleSize);          
             if (file != null && !file.isEmpty()) {
                 String uploadDir = new File("src/main/resources/static/image/vehicles/").getAbsolutePath();
                 File directory = new File(uploadDir);
@@ -198,13 +194,10 @@ public class VehicleApiController {
 
                 vehicleDto.setVehicleProfile("/image/vehicles/" + file.getOriginalFilename());
             }
-
             vehicleService.saveVehicle(vehicleDto, vehicleDto.getVehicleProfile());
-
             response.put("success", true);
             response.put("res_msg", "차량이 성공적으로 등록되었습니다.");
             return ResponseEntity.ok(response);
-            
         } catch (IOException e) {
             e.printStackTrace();
             response.put("success", false);

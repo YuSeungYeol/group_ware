@@ -1,14 +1,22 @@
 document.getElementById('vehicleForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // 기본 폼 제출 방지
+    event.preventDefault(); 
 
-    // 배기량에 'cc' 붙이기
     const vehicleDisplacement = document.getElementById('vehicleDisplacement');
+    if (vehicleDisplacement.value && (!/^[0-9]+$/.test(vehicleDisplacement.value))) {
+        Swal.fire({
+            icon: 'error',
+            title: '입력 오류',
+            text: '배기량은 0 이상의 숫자로 입력되어야 합니다.',
+            confirmButtonText: '확인'
+        });
+        return;
+    }
     if (vehicleDisplacement.value && !vehicleDisplacement.value.includes('cc')) {
         vehicleDisplacement.value += 'cc';
     }
 
-    // 연비 값에 '/' 포함 확인 또는 '미정' 입력 확인
     const vehicleEfficiency = document.getElementById('vehicleEfficiency').value;
+    // 연비 검증
     if (!vehicleEfficiency.includes('/') && vehicleEfficiency !== '미정') {
         Swal.fire({
             icon: 'error',
@@ -19,8 +27,8 @@ document.getElementById('vehicleForm').addEventListener('submit', function(event
         return;
     }
 
-    // 출시일에서 월, 일이 입력되지 않으면 '연도 - 미정'으로 변경
     const vehicleReg = document.getElementById('vehicleReg').value;
+    // 차량 등록일 검증
     if (vehicleReg) {
         const [year, month, day] = vehicleReg.split('-');
         if (!month || !day) {
@@ -41,14 +49,13 @@ document.getElementById('vehicleForm').addEventListener('submit', function(event
     formData.append('size_no', document.getElementById('sizeNo').value);
     formData.append('vehicleImage', document.getElementById('vehicleImage').files[0]);
 
-    const csrfToken = document.querySelector('input[name="_csrf"]').value; // CSRF 토큰 가져오기
+    const csrfToken = document.querySelector('input[name="_csrf"]').value; 
 
-    // 폼 데이터를 서버로 전송 (CSRF 토큰을 헤더에 추가)
     fetch('/api/vehicle/register', {
         method: 'POST',
         body: formData,
         headers: {
-            'X-CSRF-TOKEN': csrfToken // CSRF 토큰을 헤더에 추가
+            'X-CSRF-TOKEN': csrfToken 
         }
     })
     .then(response => {
@@ -59,7 +66,6 @@ document.getElementById('vehicleForm').addEventListener('submit', function(event
         }
     })
     .then(data => {
-        // 성공 응답 처리
         if (data.success) {
             Swal.fire({
                 icon: 'success',
@@ -67,7 +73,7 @@ document.getElementById('vehicleForm').addEventListener('submit', function(event
                 text: data.res_msg,
                 confirmButtonText: '확인'
             }).then(() => {
-                window.location.href = "/vehicle/list"; // 등록 후 리다이렉트
+                window.location.href = "/vehicle/list";
             });
         } else {
             Swal.fire({
@@ -90,15 +96,19 @@ document.getElementById('vehicleForm').addEventListener('submit', function(event
 });
 
 document.getElementById('vehicleImage').addEventListener('change', previewImage);
-
 function previewImage(event) {
     const file = event.target.files[0];
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
 
     if (file) {
         if (!allowedTypes.includes(file.type)) {
-            alert('허용된 파일 형식이 아닙니다. JPG, PNG, GIF 형식만 가능합니다.');
-            event.target.value = ''; // 선택된 파일 초기화
+            Swal.fire({
+                icon: 'error',
+                title: '파일 형식 오류',
+                text: '허용된 파일 형식이 아닙니다. JPG, PNG, GIF 형식만 가능합니다.',
+                confirmButtonText: '확인'
+            });
+            event.target.value = '';
             return;
         }
 
