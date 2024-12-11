@@ -2,7 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{include/layout}">
-
     <th:block layout:fragment="content">
         <link th:href="@{/css/distributor/distributor_list.css}" rel="stylesheet" type="text/css">
         
@@ -10,7 +9,6 @@
             <div class="word">
                 <h1>지점 목록</h1>
             </div>
-
             <div class="form-container">
                 <!-- 필터링 폼 -->
                <form th:action="@{/distributor/list}" id="filterForm" method="get" class="filter-form">
@@ -21,7 +19,6 @@
 				        <option value="all" th:selected="${statusFilter == 'all'}">모두 보기</option>
 				    </select>
 				</form>
-				
 				<!-- 검색 폼 -->
 				<form th:action="@{/distributor/list}" method="get" class="search-form">
 				    <select id="searchType" name="searchType">
@@ -151,9 +148,7 @@
 	
 	    // 페이지 이동
 	    window.location.href = url;
-
 	}
 	</script>
-
     </th:block>
 </html>

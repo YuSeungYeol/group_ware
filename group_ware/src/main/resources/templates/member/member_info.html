@@ -1,206 +1,208 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{include/layout}">
-<th:block layout:fragment="content">
-    <link th:href="@{/css/member/member_info.css}" rel="stylesheet" type="text/css">
-    <div class="member-info-container">
-        <h1>직원 정보 수정</h1>
-        <form id="editForm" enctype="multipart/form-data">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-            <!-- mem_no를 hidden 필드로 추가 -->
-            <input type="hidden" id="memNoHidden" name="memNo" th:value="${member.memNo}">
-            <div class="member-detail">
-                <label>사원번호 </label>
-                <input type="text" id="empNo" name="empNo" th:value="${member.empNo}" readonly>
-            </div>
-            <div class="member-detail">
-                <label>이름 </label>
-                <input type="text" id="memName" name="memName" th:value="${member.memName}">
-            </div>
-            <div class="member-detail">
-                <label>직급 </label>
-                <select id="rank" name="rank.rankNo">
-                    <option th:value="${member.rank.rankNo}" th:text="${member.rank.rankName}" selected="selected"></option>
-                    <option th:each="rank : ${rankList}" th:value="${rank.rankNo}"
-                            th:text="${rank.rankName}" th:if="${rank.rankNo != member.rank.rankNo}"></option>
-                </select>
-            </div>
-            <div class="member-detail">
-                <label>지점 </label>
-                <select id="distributor" name="distributor.distributorNo">
-                    <option th:value="${member.distributor.distributorNo}" th:text="${member.distributor.distributorName}" selected="selected"></option>
-                    <option th:each="distributor : ${distributorList}" th:value="${distributor.distributorNo}"
-                            th:text="${distributor.distributorName}" th:if="${distributor.distributorNo != member.distributor.distributorNo}"></option>
-                </select>
-            </div>
-            <div class="member-detail">
-                <label>이메일 </label>
-                <input type="email" id="memEmail" name="memEmail" th:value="${member.memEmail}">
-            </div>
-            <div class="member-detail">
-                <label>연락처 </label>
-                <input type="text" id="memPhone" name="memPhone" th:value="${member.memPhone}">
-            </div>
-            <div class="member-detail">
-    <label>프로필 사진</label>
-    <div id="image_container" class="profile-images draggable-container" style="position: relative; width: 200px; height: 200px;">
-        <img id="profile-pic"
-             th:src="@{/profile/{distributorName}/{fileName}(distributorName=${member.distributor.distributorName}, fileName=${member.profileSaved})}"
-             alt="Profile Image"
-             class="profile-image draggable-image"
-             style="max-width: 100%; max-height: 100%;  display: block;" />
-    </div>
-    <button type="button" id="changeImageButton" onclick="triggerFileInput()">첨부하기</button>
-    <input type="file" id="profileImage" name="profileSaved" style="display: none;" accept="image/*">
-</div>
-            <div class="member-detail">
-                <label>남은 연차 </label>
-                <input type="text" id="memOff" name="memOff" th:value="${member.memOff}" readonly>
-            </div>
-            <div class="button-div">
-                <button type="button" class="register-button" onclick="submitForm()">정보 수정</button>
-            </div>
-        </form>
-    </div>
-<script>
-//폼 데이터를 JSON과 파일로 변환하여 서버로 전송하는 함수
-function submitForm() {
-    // CSRF 토큰 가져오기
-    const token = $("meta[name='_csrf']").attr("content");
-    const header = $("meta[name='_csrf_header']").attr("content");
-    // FormData 객체 생성
-    const formData = new FormData();  // formData 변수를 생성합니다.
-    // memberData를 JSON으로 변환하여 FormData에 추가
-    formData.append("memberData", new Blob([JSON.stringify({
-        mem_no: $("#memNoHidden").val(),
-        emp_no: $("#empNo").val(),
-        mem_name: $("#memName").val(),
-        rank_no: $("#rank").val(),  // 객체 대신 숫자로 전달
-        distributor_no: $("#distributor").val(),  // 객체 대신 숫자로 전달
-        mem_email: $("#memEmail").val(),
-        mem_phone: $("#memPhone").val(),
-        mem_off: $("#memOff").val()
-    })], { type: "application/json" }));
-    // 디버깅용 로그
-    console.log("Rank:", $("#rank").val());
-    console.log("Distributor:", $("#distributor").val());
-    // 프로필 이미지가 있으면 FormData에 추가
-    const profileImage = $("#profileImage")[0].files[0];
-    if (profileImage) {
-        formData.append("profileImage", profileImage);
-    }
-    // 서버에 AJAX 요청
-    $.ajax({
-        type: "POST",
-        url: "/api/member/edit",
-        data: formData,
-        processData: false,  // FormData 객체이므로 false로 설정
-        contentType: false,  // FormData 객체이므로 false로 설정
-        beforeSend: function(xhr) {
-            xhr.setRequestHeader(header, token);
-        },
-        success: function(response) {
-            alert("회원 정보가 성공적으로 수정되었습니다.");
-            window.location.href = "/member/list";
-        },
-        error: function(error) {
-            alert("정보 수정 중 오류가 발생했습니다.");
-        }
-    });
-}
-//파일 선택창을 트리거하는 함수
-function triggerFileInput() {
-    const fileInput = document.getElementById("profileImage");
-    fileInput.click();
-}
-// 프로필 이미지 업로드 및 위치 설정
-const imageInput = document.querySelector("#profileImage");
-const imgElement = document.querySelector("#profile-pic");
-const container = document.querySelector("#image_container");
-let isImageUploaded = false;
-let offsetX = 0;
-let offsetY = 0;
-let isDragging = false;
-imageInput.addEventListener("change", function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        imgElement.src = event.target.result;
-        imgElement.style.display = 'block';
-        imgElement.style.position = 'absolute';
-        imgElement.style.left = '0px';
-        imgElement.style.top = '0px';
-        imgElement.style.width = 'auto';
-        imgElement.style.height = '100%';
-        isImageUploaded = true;
-    };
-    reader.readAsDataURL(file);
-});
-// 이미지를 드래그 가능하게 함
-imgElement.addEventListener("mousedown", function(e) {
-    if (imgElement.src !== '' && isImageUploaded) { // 파일이 추가된 상태에서만 드래그 가능
-        isDragging = true;
-        offsetX = e.clientX - imgElement.getBoundingClientRect().left;
-        offsetY = e.clientY - imgElement.getBoundingClientRect().top;
-        imgElement.style.cursor = 'grabbing';
-    }
-});
-document.addEventListener("mousemove", function(e) {
-    if (isDragging) {
-        const left = e.clientX - offsetX - container.getBoundingClientRect().left;
-        const top = e.clientY - offsetY - container.getBoundingClientRect().top;
-        imgElement.style.left = `${left}px`;
-        imgElement.style.top = `${top}px`;
-    }
-});
-document.addEventListener("mouseup", function() {
-    isDragging = false;
-    imgElement.style.cursor = 'grab';
-});
-// 이미지 크롭 함수
-function cropImage() {
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-    const img = document.getElementById("profile-pic");
-    const container = document.getElementById("image_container");
-    // 컨테이너의 크기와 동일하게 캔버스 설정
-    const containerWidth = container.offsetWidth;
-    const containerHeight = container.offsetHeight;
-    canvas.width = containerWidth;
-    canvas.height = containerHeight;
-    // 이미지에서 잘라낼 부분 계산 (이미지의 현재 위치를 기준으로)
-    const imgLeft = parseFloat(img.style.left || 0);
-    const imgTop = parseFloat(img.style.top || 0);
-    const imgWidth = img.naturalWidth;
-    const imgHeight = img.naturalHeight;
-    // 이미지의 실제 크기 비율에 맞추어 컨테이너에서 보이는 부분만 잘라내기
-    const scaleX = imgWidth / img.offsetWidth;
-    const scaleY = imgHeight / img.offsetHeight;
-    const sourceX = Math.max(0, -imgLeft * scaleX);
-    const sourceY = Math.max(0, -imgTop * scaleY);
-    const sourceWidth = Math.min(containerWidth * scaleX, imgWidth - sourceX);
-    const sourceHeight = Math.min(containerHeight * scaleY, imgHeight - sourceY);
-    // 잘라낸 이미지를 캔버스에 그리기
-    context.drawImage(
-        img,
-        sourceX, sourceY, // 원본 이미지의 시작 좌표
-        sourceWidth, sourceHeight, // 원본 이미지에서 잘라낼 크기
-        0, 0, // 캔버스 시작 좌표
-        containerWidth, containerHeight // 캔버스 크기
-    );
-    // 원본 파일 확장자 확인
-    const fileExtension = imageInput.files[0].type.split("/")[1];
-    let croppedImage;
-    if (fileExtension === "png") {
-        croppedImage = canvas.toDataURL("image/png");
-    } else {
-        croppedImage = canvas.toDataURL("image/jpeg");
-    }
-    return croppedImage;  // 이 값을 서버로 전송
-}
-</script>
-<script th:src="@{/js/member_register.js}"></script>
-</th:block>
-</html>
+    <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{include/layout}">
+    <th:block layout:fragment="content">
+        <link th:href="@{/css/member/member_info.css}" rel="stylesheet" type="text/css">
+        <div class="member-info-container">
+            <h1>직원 정보 수정</h1>
+            <form id="editForm" enctype="multipart/form-data">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <!-- mem_no를 hidden 필드로 추가 -->
+                <input type="hidden" id="memNoHidden" name="memNo" th:value="${member.memNo}">
+                <div class="member-detail">
+                    <label>사원번호 </label>
+                    <input type="text" id="empNo" name="empNo" th:value="${member.empNo}" readonly>
+                </div>
+                <div class="member-detail">
+                    <label>이름 </label>
+                    <input type="text" id="memName" name="memName" th:value="${member.memName}">
+                </div>
+                <div class="member-detail">
+                    <label>직급 </label>
+                    <select id="rank" name="rank.rankNo">
+                        <option th:value="${member.rank.rankNo}" th:text="${member.rank.rankName}" selected="selected">
+                        </option>
+                        <option th:each="rank : ${rankList}" th:value="${rank.rankNo}" th:text="${rank.rankName}"
+                            th:if="${rank.rankNo != member.rank.rankNo}"></option>
+                    </select>
+                </div>
+                <div class="member-detail">
+                    <label>지점 </label>
+                    <select id="distributor" name="distributor.distributorNo">
+                        <option th:value="${member.distributor.distributorNo}"
+                            th:text="${member.distributor.distributorName}" selected="selected"></option>
+                        <option th:each="distributor : ${distributorList}" th:value="${distributor.distributorNo}"
+                            th:text="${distributor.distributorName}"
+                            th:if="${distributor.distributorNo != member.distributor.distributorNo}"></option>
+                    </select>
+                </div>
+                <div class="member-detail">
+                    <label>이메일 </label>
+                    <input type="email" id="memEmail" name="memEmail" th:value="${member.memEmail}">
+                </div>
+                <div class="member-detail">
+                    <label>연락처 </label>
+                    <input type="text" id="memPhone" name="memPhone" th:value="${member.memPhone}">
+                </div>
+                <div class="member-detail">
+                    <label>프로필 사진</label>
+                    <div id="image_container" class="profile-images draggable-container"
+                        style="position: relative; width: 200px; height: 200px;">
+                        <img id="profile-pic"
+                            th:src="@{/profile/{distributorName}/{fileName}(distributorName=${member.distributor.distributorName}, fileName=${member.profileSaved})}"
+                            alt="Profile Image" class="profile-image draggable-image"
+                            style="max-width: 100%; max-height: 100%;  display: block;" />
+                    </div>
+                    <button type="button" id="changeImageButton" onclick="triggerFileInput()">첨부하기</button>
+                    <input type="file" id="profileImage" name="profileSaved" style="display: none;" accept="image/*">
+                </div>
+                <div class="member-detail">
+                    <label>남은 연차 </label>
+                    <input type="text" id="memOff" name="memOff" th:value="${member.memOff}" readonly>
+                </div>
+                <div class="button-div">
+                    <button type="button" class="register-button" onclick="submitForm()">정보 수정</button>
+                </div>
+            </form>
+        </div>
+        <script>
+            //폼 데이터를 JSON과 파일로 변환하여 서버로 전송하는 함수
+            function submitForm() {
+                // CSRF 토큰 가져오기
+                const token = $("meta[name='_csrf']").attr("content");
+                const header = $("meta[name='_csrf_header']").attr("content");
+                // FormData 객체 생성
+                const formData = new FormData();  // formData 변수를 생성합니다.
+                // memberData를 JSON으로 변환하여 FormData에 추가
+                formData.append("memberData", new Blob([JSON.stringify({
+                    mem_no: $("#memNoHidden").val(),
+                    emp_no: $("#empNo").val(),
+                    mem_name: $("#memName").val(),
+                    rank_no: $("#rank").val(),  // 객체 대신 숫자로 전달
+                    distributor_no: $("#distributor").val(),  // 객체 대신 숫자로 전달
+                    mem_email: $("#memEmail").val(),
+                    mem_phone: $("#memPhone").val(),
+                    mem_off: $("#memOff").val()
+                })], { type: "application/json" }));
+                // 디버깅용 로그
+                console.log("Rank:", $("#rank").val());
+                console.log("Distributor:", $("#distributor").val());
+                // 프로필 이미지가 있으면 FormData에 추가
+                const profileImage = $("#profileImage")[0].files[0];
+                if (profileImage) {
+                    formData.append("profileImage", profileImage);
+                }
+                // 서버에 AJAX 요청
+                $.ajax({
+                    type: "POST",
+                    url: "/api/member/edit",
+                    data: formData,
+                    processData: false,  // FormData 객체이므로 false로 설정
+                    contentType: false,  // FormData 객체이므로 false로 설정
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader(header, token);
+                    },
+                    success: function (response) {
+                        alert("회원 정보가 성공적으로 수정되었습니다.");
+                        window.location.href = "/member/list";
+                    },
+                    error: function (error) {
+                        alert("정보 수정 중 오류가 발생했습니다.");
+                    }
+                });
+            }
+            //파일 선택창을 트리거하는 함수
+            function triggerFileInput() {
+                const fileInput = document.getElementById("profileImage");
+                fileInput.click();
+            }
+            // 프로필 이미지 업로드 및 위치 설정
+            const imageInput = document.querySelector("#profileImage");
+            const imgElement = document.querySelector("#profile-pic");
+            const container = document.querySelector("#image_container");
+            let isImageUploaded = false;
+            let offsetX = 0;
+            let offsetY = 0;
+            let isDragging = false;
+            imageInput.addEventListener("change", function (e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    imgElement.src = event.target.result;
+                    imgElement.style.display = 'block';
+                    imgElement.style.position = 'absolute';
+                    imgElement.style.left = '0px';
+                    imgElement.style.top = '0px';
+                    imgElement.style.width = 'auto';
+                    imgElement.style.height = '100%';
+                    isImageUploaded = true;
+                };
+                reader.readAsDataURL(file);
+            });
+            // 이미지를 드래그 가능하게 함
+            imgElement.addEventListener("mousedown", function (e) {
+                if (imgElement.src !== '' && isImageUploaded) { // 파일이 추가된 상태에서만 드래그 가능
+                    isDragging = true;
+                    offsetX = e.clientX - imgElement.getBoundingClientRect().left;
+                    offsetY = e.clientY - imgElement.getBoundingClientRect().top;
+                    imgElement.style.cursor = 'grabbing';
+                }
+            });
+            document.addEventListener("mousemove", function (e) {
+                if (isDragging) {
+                    const left = e.clientX - offsetX - container.getBoundingClientRect().left;
+                    const top = e.clientY - offsetY - container.getBoundingClientRect().top;
+                    imgElement.style.left = `${left}px`;
+                    imgElement.style.top = `${top}px`;
+                }
+            });
+            document.addEventListener("mouseup", function () {
+                isDragging = false;
+                imgElement.style.cursor = 'grab';
+            });
+            // 이미지 크롭 함수
+            function cropImage() {
+                const canvas = document.createElement("canvas");
+                const context = canvas.getContext("2d");
+                const img = document.getElementById("profile-pic");
+                const container = document.getElementById("image_container");
+                // 컨테이너의 크기와 동일하게 캔버스 설정
+                const containerWidth = container.offsetWidth;
+                const containerHeight = container.offsetHeight;
+                canvas.width = containerWidth;
+                canvas.height = containerHeight;
+                // 이미지에서 잘라낼 부분 계산 (이미지의 현재 위치를 기준으로)
+                const imgLeft = parseFloat(img.style.left || 0);
+                const imgTop = parseFloat(img.style.top || 0);
+                const imgWidth = img.naturalWidth;
+                const imgHeight = img.naturalHeight;
+                // 이미지의 실제 크기 비율에 맞추어 컨테이너에서 보이는 부분만 잘라내기
+                const scaleX = imgWidth / img.offsetWidth;
+                const scaleY = imgHeight / img.offsetHeight;
+                const sourceX = Math.max(0, -imgLeft * scaleX);
+                const sourceY = Math.max(0, -imgTop * scaleY);
+                const sourceWidth = Math.min(containerWidth * scaleX, imgWidth - sourceX);
+                const sourceHeight = Math.min(containerHeight * scaleY, imgHeight - sourceY);
+                // 잘라낸 이미지를 캔버스에 그리기
+                context.drawImage(
+                    img,
+                    sourceX, sourceY, // 원본 이미지의 시작 좌표
+                    sourceWidth, sourceHeight, // 원본 이미지에서 잘라낼 크기
+                    0, 0, // 캔버스 시작 좌표
+                    containerWidth, containerHeight // 캔버스 크기
+                );
+                // 원본 파일 확장자 확인
+                const fileExtension = imageInput.files[0].type.split("/")[1];
+                let croppedImage;
+                if (fileExtension === "png") {
+                    croppedImage = canvas.toDataURL("image/png");
+                } else {
+                    croppedImage = canvas.toDataURL("image/jpeg");
+                }
+                return croppedImage;  // 이 값을 서버로 전송
+            }
+        </script>
+        <script th:src="@{/js/member_register.js}"></script>
+    </th:block>
+    </html>
