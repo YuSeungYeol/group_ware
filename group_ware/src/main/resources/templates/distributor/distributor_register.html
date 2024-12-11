@@ -43,7 +43,6 @@
                 <div id="map"></div>
             </div>
         </div>
-
         <!-- Leaflet CSS & JS -->
         <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -53,19 +52,12 @@
 
         <!-- 지도 관련 스크립트 -->
         <script>
-            // 기본 지도 설정: 서울 중심
             const map = L.map('map').setView([37.5665, 126.9780], 12); // 초기 위치: 서울
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
             }).addTo(map);
-
-            // 마커 설정 (드래그 가능)
             const marker = L.marker([37.5665, 126.9780], { draggable: true }).addTo(map);
-
-            // Nominatim 지오코더 추가
             const geocoder = L.Control.Geocoder.nominatim();
-
-            // 마커 드래그가 끝났을 때 위도와 경도 업데이트 및 주소 검색
             marker.on('dragend', function () {
                 const latlng = marker.getLatLng();
                 document.getElementById('latitude').value = latlng.lat;
@@ -77,8 +69,6 @@
                     }
                 });
             });
-
-            // 지도 클릭 시 마커 위치 이동 및 위도/경도 업데이트 및 주소 검색
             map.on('click', function (e) {
                 marker.setLatLng(e.latlng);
                 document.getElementById('latitude').value = e.latlng.lat;
@@ -110,21 +100,16 @@
 
             // 지점 등록 폼 제출 처리 (AJAX 사용)
             document.getElementById('distributor-form').addEventListener('submit', function (event) {
-                event.preventDefault(); // 폼의 기본 제출 동작을 막음
-
-                // CSRF 토큰 가져오기
+                event.preventDefault();
                 const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
                 const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-                // 폼 데이터 가져오기
                 const distributorName = document.getElementById('distributor_name').value;
                 const distributorPhone = document.getElementById('distributor_phone').value;
                 const distributorAddr = document.getElementById('distributor_addr').value;
                 const distributorAddrDetail = document.getElementById('distributor_addr_detail').value;
                 const distributorLatitude = document.getElementById('latitude').value;
                 const distributorLongitude = document.getElementById('longitude').value;
-
-                // DTO 형태로 데이터 구성
                 const distributorData = {
                     distributorName: distributorName,
                     distributorPhone: distributorPhone,
@@ -133,13 +118,11 @@
                     distributorLatitude: parseFloat(distributorLatitude),
                     distributorLongitude: parseFloat(distributorLongitude)
                 };
-
-                // AJAX 요청 보내기
                 fetch('/api/distributors/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        [csrfHeader]: csrfToken // CSRF 토큰 추가
+                        [csrfHeader]: csrfToken
                     },
                     body: JSON.stringify(distributorData)
                 })
@@ -151,11 +134,11 @@
                     }
                 })
                 .then(data => {
-                    alert(data); // 성공 메시지 알림
-                    window.location.reload(); // 페이지 새로고침하여 입력 초기화
+                    alert(data);
+                    window.location.reload(); 
                 })
                 .catch(error => {
-                    alert(error.message); // 오류 메시지 알림
+                    alert(error.message);
                 });
             });
         </script>

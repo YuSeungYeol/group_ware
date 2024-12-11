@@ -35,8 +35,7 @@
                     <colgroup>
                         <col width="25%">
                         <col width="25%">
-                        <col width="30%">
-                        <col width="10%">
+                        <col width="40%">
                         <col width="10%">
                     </colgroup>
                     <thead>
@@ -44,12 +43,10 @@
 						    <th onclick="sortTable('distributorName')">이름</th>
 					        <th onclick="sortTable('distributorPhone')">전화번호</th>
 					        <th onclick="sortTable('distributorAddr')">주소</th>
-					        <th>상세보기</th>
 					        <th>상태</th>
 					    
 					    </tr>
 					</thead>
-
                     <tbody>
                         <!-- 서버에서 데이터를 렌더링 -->
                         <tr th:each="distributor : ${distributorList}"        
@@ -57,9 +54,6 @@
                             <td th:text="${distributor.distributorName}"></td>
                             <td th:text="${distributor.distributorPhone}"></td>
                             <td th:text="${distributor.distributorAddr}"></td>
-							<td>
-                                <a th:href="@{'/distributor/dashboard/' + ${distributor.distributorNo}}" target="_blank"><u>상세보기</u></a>
-						    </td>                            
 						    <td th:text="${distributor.distributorStatus == 1 ? '운영중' : '폐점'}"></td>
   
                         </tr>

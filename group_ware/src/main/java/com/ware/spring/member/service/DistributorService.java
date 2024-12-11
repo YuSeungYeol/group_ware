@@ -147,9 +147,8 @@ public class DistributorService {
                 .distributorAddrDetail(distributorDto.getDistributorAddrDetail())
                 .distributorLatitude(distributorDto.getDistributorLatitude())
                 .distributorLongitude(distributorDto.getDistributorLongitude())
-                .distributorStatus(1)  // 운영 중 상태로 설정
+                .distributorStatus(1)
                 .build();
-
         distributorRepository.save(distributor);
     }
 
@@ -181,7 +180,6 @@ public class DistributorService {
      * @return 페이징된 지점 리스트
      */
     public Page<Distributor> getDistributorsWithSorting(String searchType, String searchText, String statusFilter, String sortField, String sortDirection, Pageable pageable) {
-        // 상태 필터 처리
         int status = -1; // 기본값: 전체
         if ("operating".equals(statusFilter)) {
             status = 1;

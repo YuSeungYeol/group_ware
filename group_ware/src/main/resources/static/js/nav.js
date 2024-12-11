@@ -77,16 +77,34 @@ function generateTree(distributors) {
         return;
     }
 
-    const treeData = distributors.map(distributor => ({
-        "id": `distributor_${distributor.distributorNo}`,  // distributorNo를 ID로 설정
-        "text": distributor.distributorName,  // 지점 이름
-        "children": distributor.members.map(member => ({  // 각 지점의 멤버를 children으로 추가
-            "id": `member_${member.mem_no}`,  // 멤버 ID
-            "text": `${member.mem_name} ${member.rank_name}`,  // 멤버 이름과 직급
-            "icon": "fa fa-user"  // 아이콘 추가
-        })),
-        "state": { "opened": false }  // 기본적으로 닫힌 상태로 표시
-    }));
+    // 직급 순서 정의
+    const positionOrder = {
+        '대표': 1,
+        '지점대표': 2,
+        '부장': 3,
+        '차장': 4,
+        '과장': 5,
+        '대리': 6,
+        '사원': 7
+    };
+
+    const treeData = distributors.map(distributor => {
+        // 멤버 정렬
+        const sortedMembers = distributor.members.sort((a, b) => {
+            return (positionOrder[a.rank_name] || 9) - (positionOrder[b.rank_name] || 9);
+        });
+
+        return {
+            "id": `distributor_${distributor.distributorNo}`, // distributorNo를 ID로 설정
+            "text": distributor.distributorName, // 지점 이름
+            "children": sortedMembers.map(member => ({ // 정렬된 멤버를 children으로 추가
+                "id": `member_${member.mem_no}`, // 멤버 ID
+                "text": `${member.mem_name} ${member.rank_name}`, // 멤버 이름과 직급
+                "icon": "fa fa-user" // 아이콘 추가
+            })),
+            "state": { "opened": false } // 기본적으로 닫힌 상태로 표시
+        };
+    });
 
     // jstree 적용
     $('#organizationTree').jstree({
@@ -104,18 +122,17 @@ function generateTree(distributors) {
             const distributorId = nodeId.replace('distributor_', '');
             console.log('Selected distributorId:', distributorId);
 
-            fetchMembersByDistributor(distributorId);  // 해당 지점의 멤버들을 가져옴
+            fetchMembersByDistributor(distributorId); // 해당 지점의 멤버들을 가져옴
         } 
         // 멤버가 선택되었을 때
         else if (nodeId.startsWith("member_")) {
             const memberId = nodeId.replace('member_', '');
             console.log('Selected memberId:', memberId);
 
-            fetchMemberProfile(memberId);  // 멤버의 프로필 정보를 가져와 모달 표시
+            fetchMemberProfile(memberId); // 멤버의 프로필 정보를 가져와 모달 표시
         }
     });
 }
-
 
 // 특정 지점의 회원 목록을 가져와 jstree 노드에 추가
 function fetchMembersByDistributor(distributorNo) {
@@ -159,62 +176,54 @@ function fetchMemberProfile(memberId) {
         })
         .catch(error => console.error('Error fetching member profile:', error));
 }
-document.getElementById("statusButton").addEventListener("click", function() {
-        window.location.href = "/commute/status_single";
-    });
+
 // 멤버 정보를 모달로 표시
-	function showMemberProfile(member) {
-	    const modalContent = `
-	        <div class="profile-modal-content"> <!-- profile-modal-content 클래스 추가 -->
-	       		<span id="closeProfileModal" class="close">&times;</span>
-	        	<div class="profile-image-container">
-	                <img src="/profile/${member.distributor_name}/${member.profile_saved}" alt="Profile Image" class="md-profile-img"> <!-- 원형 이미지 -->
-	            </div>
-	            <div class="profile-details">
-	                <p class="profile-name">${member.mem_name}${member.rank_name}</p> <!-- 이름과 직급 -->
-	                <p class="profile-phone">${member.mem_phone}</p> <!-- 전화번호 -->
-	                <p class="profile-branch">${member.distributor_name}</p> <!-- 지점 -->
-	                <p class="profile-email">${member.mem_email}</p> <!-- 이메일 -->
-	            </div>
-				<div class="bottom-buttons">
-				                <button class="btn" id="ScheduleBtn">일정보기</button>
-				                <input type="hidden" value="${member.mem_no}" id="mem_no" />
-				                <button class="btn" id="messageBtn">메신저</button>
-				            </div>
-				        </div>
-				    `;
-				    const modal = document.getElementById("profileModal");
-				    modal.querySelector('.modal-content').innerHTML = modalContent;
-				    modal.style.display = "block";  // 모달 열기
-				}
-				// 메신저 버튼 클릭 이벤트
-				$(document).on("click", "#messageBtn", function() {
-				    window.location.href = "/chat/room/list"; // Redirecting to the chat room list
-				});
-				// 일정 보기 버튼 클릭 이벤트
-				$(document).on("click", "#ScheduleBtn", function() {
-				    const memberNo = document.getElementById("mem_no").value; // hidden input에서 memberNo 값 가져오기
-				    console.log('클릭한 멤버 번호:', memberNo); // 콘솔에 멤버 번호 출력
-				    window.location.href = `/calendar/${memberNo}`; // 해당 멤버의 일정 페이지로 이동
-				});
+function showMemberProfile(member) {
+    const modalContent = `
+        <div class="profile-modal-content"> <!-- profile-modal-content 클래스 추가 -->
+            <span id="closeProfileModal" class="close">&times;</span>
+            <div class="profile-image-container">
+                <img src="/profile/${member.distributor_name}/${member.profile_saved}" alt="Profile Image" class="md-profile-img"> <!-- 원형 이미지 -->
+            </div>
+            <div class="profile-details">
+                <p class="profile-name">${member.mem_name} ${member.rank_name}</p> <!-- 이름과 직급 -->
+                <p class="profile-phone">${member.mem_phone}</p> <!-- 전화번호 -->
+                <p class="profile-branch">${member.distributor_name}</p> <!-- 지점 -->
+                <p class="profile-email">${member.mem_email}</p> <!-- 이메일 -->
+            </div>
+            <div class="bottom-buttons">
+                <button class="btn" id="ScheduleBtn">일정보기</button>
+                <input type="hidden" value="${member.mem_no}" id="mem_no" />
+                <button class="btn" id="messageBtn">메신저</button>
+            </div>
+        </div>
+    `;
+    const modal = document.getElementById("profileModal");
+    modal.querySelector('.modal-content').innerHTML = modalContent;
+    modal.style.display = "block";  // 모달 열기
+}
 
+// 메신저 버튼 클릭 이벤트
+$(document).on("click", "#messageBtn", function() {
+    window.location.href = "/chat/room/list"; // 메신저 페이지로 이동
+});
 
+// 일정 보기 버튼 클릭 이벤트
+$(document).on("click", "#ScheduleBtn", function() {
+    const memberNo = document.getElementById("mem_no").value; // hidden input에서 memberNo 값 가져오기
+    console.log('클릭한 멤버 번호:', memberNo); // 콘솔에 멤버 번호 출력
+    window.location.href = `/calendar/${memberNo}`; // 해당 멤버의 일정 페이지로 이동
+});
+
+// 문서 로드 후 모달 관련 이벤트 등록
 document.addEventListener('DOMContentLoaded', function () {
     // 모든 .close 요소에 대해 클릭 이벤트 리스너 추가
-    document.querySelectorAll('close').forEach(closeBtn => {
-        closeBtn.addEventListener('click', function () {
-            const modal = this.closest('.modal, .modal1'); // 가장 가까운 .modal 또는 .modal1 요소 찾기
-            if (modal) {
-                modal.style.display = 'none'; // 모달 닫기
-            }
-        });
+    $(document).on('click', '#closeProfileModal', function() {
+        document.getElementById('profileModal').style.display = 'none';  // 프로필 모달 닫기
     });
-	$(document).on('click', '#closeProfileModal', function() {
-	    document.getElementById('profileModal').style.display = 'none';  // 프로필 모달 닫기
-	});
-	$(document).on('click', '.close', function() {
-	    document.getElementById('organizationModal').style.display = 'none';  // 조직도 모달 닫기
-	});
+    $(document).on('click', '.close', function() {
+        document.getElementById('organizationModal').style.display = 'none';  // 조직도 모달 닫기
+    });
 
     // 외부 클릭 시 모달 닫기
     window.onclick = function(event) {
@@ -228,7 +237,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 });
-
 
 
 
