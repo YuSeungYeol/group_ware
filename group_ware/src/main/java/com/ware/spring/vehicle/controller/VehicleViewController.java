@@ -63,12 +63,10 @@ public class VehicleViewController {
     @GetMapping("/vehicle/{vehicleNo}/detail")
     public String getVehicleDetail(@PathVariable("vehicleNo") Long vehicleNo, Model model) {
         VehicleDto vehicleDetail = vehicleService.getVehicleDetail(vehicleNo);
-
         Integer vehicleSalesCount = vehicleSalesRepository.sumSaleCountByVehicleNo(vehicleNo);
         if (vehicleSalesCount == null) {
             vehicleSalesCount = 0;
         }
-
         model.addAttribute("vehicle", vehicleDetail);
         model.addAttribute("vehicleSalesCount", vehicleSalesCount);
         return "vehicle/vehicle_detail";
