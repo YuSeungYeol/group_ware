@@ -16,7 +16,6 @@ document.getElementById('vehicleForm').addEventListener('submit', function(event
     }
 
     const vehicleEfficiency = document.getElementById('vehicleEfficiency').value;
-    // 연비 검증
     if (!vehicleEfficiency.includes('/') && vehicleEfficiency !== '미정') {
         Swal.fire({
             icon: 'error',
@@ -26,9 +25,7 @@ document.getElementById('vehicleForm').addEventListener('submit', function(event
         });
         return;
     }
-
     const vehicleReg = document.getElementById('vehicleReg').value;
-    // 차량 등록일 검증
     if (vehicleReg) {
         const [year, month, day] = vehicleReg.split('-');
         if (!month || !day) {
