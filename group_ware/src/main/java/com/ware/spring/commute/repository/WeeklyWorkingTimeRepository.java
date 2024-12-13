@@ -16,7 +16,6 @@ public interface WeeklyWorkingTimeRepository extends JpaRepository<WeeklyWorking
 
     Optional<WeeklyWorkingTime> findByMemNoAndStartOfWeek(Long memNo, LocalDate startOfWeek);
 
-    
     @Query("SELECT COALESCE(SUM(TIME_TO_SEC(c.commuteOutTime)), 0) FROM Commute c " +
            "WHERE c.member.memNo = :memNo " +
            "AND c.commuteOnStartTime BETWEEN :startOfWeek AND :endOfWeek")
