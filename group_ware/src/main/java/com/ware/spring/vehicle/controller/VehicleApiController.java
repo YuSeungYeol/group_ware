@@ -61,7 +61,6 @@ public class VehicleApiController {
     public Map<String, Map<Integer, Integer>> getYearlySalesData(@RequestParam("year") int year, @RequestParam("memNo") Long memNo) {
         return vehicleService.getYearlyIndividualSalesData(year, memNo);
     }
-
     /**
      * 월간 개인 판매량 및 매출액을 조회합니다.
      * 설명: 특정 회원의 월간 개인 판매량 및 매출액 데이터를 반환합니다.
