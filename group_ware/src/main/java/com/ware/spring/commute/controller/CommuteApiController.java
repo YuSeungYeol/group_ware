@@ -31,7 +31,6 @@ public class CommuteApiController {
     public CommuteApiController(CommuteService commuteService) {
         this.commuteService = commuteService;
     }
-
     /**
      * 오늘 출근 기록 여부를 확인
      * 

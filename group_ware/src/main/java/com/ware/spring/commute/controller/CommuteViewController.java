@@ -33,7 +33,6 @@ public class CommuteViewController {
         this.memberService = memberService;
         this.memberRepository = memberRepository;
     }
-
     /**
      * 출근 페이지를 표시합니다.
      * 설명: 로그인한 사용자의 정보를 모델에 추가하여 출근 페이지로 이동합니다.
