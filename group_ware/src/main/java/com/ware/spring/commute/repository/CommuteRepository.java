@@ -23,7 +23,6 @@ public interface CommuteRepository extends JpaRepository<Commute, Long> {
         LocalDateTime endOfDay = LocalDateTime.now().toLocalDate().atTime(23, 59, 59);
         return findTodayCommuteByMemberAndCommuteOnStartTimeBetween(member, startOfDay, endOfDay);
     }
-
     // 특정 주차에 해당하는 근무 시간 합계 (초 단위)
     @Query("SELECT COALESCE(SUM(TIME_TO_SEC(c.commuteOutTime)), 0) FROM Commute c " +
            "WHERE c.member.memNo = :memNo " +
