@@ -40,7 +40,6 @@ public class CommuteService {
         this.weeklyWorkingTimeRepository = weeklyWorkingTimeRepository;
         this.workingTimeRepository = workingTimeRepository;
     }
-
     // 오늘 출근 기록 여부 확인
     public boolean hasTodayCommute(Long memNo) {
         Member member = memberRepository.findById(memNo)
