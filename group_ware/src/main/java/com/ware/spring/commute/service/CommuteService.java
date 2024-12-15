@@ -7,10 +7,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -93,7 +91,6 @@ public class CommuteService {
         try {
             System.out.println("endWork 시작: memNo = " + memNo);
 
-            // memNo로 Member 객체 조회
             Member member = memberRepository.findById(memNo)
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다. memNo: " + memNo));
 
@@ -105,7 +102,6 @@ public class CommuteService {
                 commute.setCommuteFlagBlue("N");
                 commute.setCommuteFlagPurple("N");
 
-                // 출근 시간과 퇴근 시간의 차이를 계산
                 LocalDateTime startTime = commute.getCommuteOnStartTime();
                 if (startTime == null) {
                     throw new IllegalStateException("출근 시간이 null입니다. memNo: " + memNo);
@@ -114,18 +110,11 @@ public class CommuteService {
                 Duration duration = Duration.between(startTime, endTime);
                 long hoursWorked = duration.toHours();
                 long minutesWorked = duration.toMinutes() % 60;
-
-                // commute_out_time 계산 및 설정
                 commute.setCommuteOutTime(java.sql.Time.valueOf(String.format("%02d:%02d:00", hoursWorked, minutesWorked)));
-                
-                // DB 업데이트
-                commuteRepository.save(commute);
 
-                // 주간 및 총 근무 시간 업데이트
+                commuteRepository.save(commute);
                 updateWeeklyWorkingTime(memNo);
                 updateTotalWorkingTime(memNo);
-
-                // 결과를 Map으로 반환
                 Map<String, Object> result = new HashMap<>();
                 result.put("hoursWorked", hoursWorked);
                 result.put("minutesWorked", minutesWorked);
@@ -139,36 +128,31 @@ public class CommuteService {
             }
         } catch (Exception e) {
             System.err.println("endWork 오류 발생: memNo = " + memNo);
-            e.printStackTrace(); // 자세한 오류 로그 출력
-            throw e; // 오류를 다시 던져서 컨트롤러에서 처리할 수 있게 함
+            e.printStackTrace(); 
+            throw e; 
         }
     }
 
 
-    // 주간 근무 시간 업데이트 메서드
+    // 주간 근무 시간 업데이트 
     private void updateWeeklyWorkingTime(Long memNo) {
-        // 한국 시간 기준으로 오늘 날짜 가져오기
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
         LocalDateTime startOfWeek = today.with(DayOfWeek.MONDAY).atStartOfDay();
         LocalDateTime endOfWeek = today.with(DayOfWeek.SUNDAY).atTime(23, 59, 59);
 
-        // 주간 근무 시간(초 단위) 조회
         long totalSeconds = commuteRepository.findTotalCommuteOutTimeForWeek(memNo, startOfWeek, endOfWeek);
-
         int totalHours = (int) (totalSeconds / 3600);
         int totalMinutes = (int) ((totalSeconds % 3600) / 60);
 
-        // 해당 주차에 대해 memNo가 동일한 데이터 조회
+
         Optional<WeeklyWorkingTime> weeklyWorkingTimeOpt = weeklyWorkingTimeRepository.findByMemNoAndStartOfWeek(memNo, startOfWeek.toLocalDate());
         WeeklyWorkingTime weeklyWorkingTime;
 
         if (weeklyWorkingTimeOpt.isPresent()) {
-            // 기존 주간 근무 시간이 있으면 업데이트
             weeklyWorkingTime = weeklyWorkingTimeOpt.get();
             weeklyWorkingTime.setWeekHours(totalHours);
             weeklyWorkingTime.setWeekMinutes(totalMinutes);
         } else {
-            // 없으면 새로 생성하여 주간 근무 시간 추가
             weeklyWorkingTime = WeeklyWorkingTime.builder()
                     .memNo(memNo)
                     .weekHours(totalHours)
@@ -178,7 +162,6 @@ public class CommuteService {
                     .build();
         }
 
-        // 변경된 주간 근무 시간 저장
         weeklyWorkingTimeRepository.save(weeklyWorkingTime);
     }
 
@@ -186,7 +169,6 @@ public class CommuteService {
 
     // 상태 업데이트 메서드 (착석, 외출, 외근, 식사)
     public void updateStatus(Long memNo, String status) {
-        // memNo로 Member 객체 조회
         Member member = memberRepository.findById(memNo)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
