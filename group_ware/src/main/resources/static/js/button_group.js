@@ -12,15 +12,15 @@ document.addEventListener("DOMContentLoaded", function() {
             return response.json();
         })
         .then(data => {
-            memNo = data;  // 로그인된 사용자의 memNo 설정
-            
-            checkTodayCommute(memNo);  // 오늘 출근 기록 확인 로직 추가
+            memNo = data;  
+            checkTodayCommute(memNo);  
         })
         .catch(error => {
             console.error("사용자 정보를 가져오지 못했습니다:", error.message);
             Swal.fire("오류", "사용자 정보를 불러올 수 없습니다.", "error");
         });
 });
+
 function resetButtonsToInitialState() {
     // 출근 버튼 활성화, 퇴근 및 외출 버튼 비활성화
     document.getElementById("btnStartWork").disabled = false;
@@ -31,6 +31,7 @@ function resetButtonsToInitialState() {
     document.getElementById("btnOut").classList.remove("purple");
     document.getElementById("btnOut").classList.add("gray");
 }
+
 // 오늘 출근 기록 확인 API 호출
 function checkTodayCommute(memNo) {
     fetch("/api/commute/checkTodayCommute?memNo=" + memNo)
@@ -109,6 +110,14 @@ function selectMenu(option) {
     document.getElementById("dropdownMenu").classList.remove("show");
 }
 
+// 타이머를 시작하는 함수 (백그라운드에서 실행)
+function startTimer() {
+    timer = setInterval(function() {
+        secondsElapsed++;
+        localStorage.setItem("secondsElapsed", secondsElapsed); 
+    }, 1000);  
+}
+
 // 출근 버튼 클릭 시 실행될 함수
 function startWork() {
     fetch("/api/commute/start?memNo=" + memNo, {
@@ -121,7 +130,6 @@ function startWork() {
         return response.json();
     })
     .then(data => {
-        // 출근 성공 시 알림
         if (data.isLate === 'Y') {
             Swal.fire({
                 title: '지각입니다!',
@@ -137,14 +145,8 @@ function startWork() {
                 confirmButtonText: '확인'
             });
         }
-
-        // 출근 상태 저장
         localStorage.setItem("workStatus", "started");
-
-        // 출근 성공 후 타이머 시작
         startTimer();
-
-        // 버튼 상태 변경 (출근 버튼 비활성화, 퇴근 버튼 활성화)
         document.getElementById("btnStartWork").disabled = true;
         document.getElementById("btnEndWork").disabled = false;
         document.getElementById("btnOut").disabled = false;
@@ -160,15 +162,7 @@ function startWork() {
         });
     });
 }
-// 타이머를 시작하는 함수 (백그라운드에서 실행)
-function startTimer() {
 
-    // 1초마다 실행되는 인터벌 함수
-    timer = setInterval(function() {
-        secondsElapsed++;
-        localStorage.setItem("secondsElapsed", secondsElapsed);  // 경과 시간 저장
-    }, 1000);  // 1000ms (1초)마다 실행
-}
 
 // 퇴근 버튼 클릭 시 실행될 함수
 function endWork() {
