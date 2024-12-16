@@ -38,6 +38,36 @@ public class CommuteService {
         this.weeklyWorkingTimeRepository = weeklyWorkingTimeRepository;
         this.workingTimeRepository = workingTimeRepository;
     }
+    // 출근 기록
+    public Commute startWork(Long memNo) {
+    	Member member = memberRepository.findById(memNo)
+    			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+    	
+
+    	Optional<Commute> existingCommute = commuteRepository.findTodayCommuteByMember(member);
+    	
+    	if (existingCommute.isPresent()) {
+    		return existingCommute.get(); 
+    	} else {
+
+    		LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+
+    		boolean isWeekend = now.getDayOfWeek() == DayOfWeek.SATURDAY || now.getDayOfWeek() == DayOfWeek.SUNDAY;
+
+    		String isLate = isWeekend ? "N" : (now.getHour() >= 9 ? "Y" : "N");
+
+    		Commute commute = Commute.builder()
+    				.member(member)
+    				.commuteOnStartTime(now)
+    				.commuteFlagBlue("Y")
+    				.commuteFlagPurple("N")
+    				.isLate(isLate)
+    				.build();
+    		
+    		return commuteRepository.save(commute);
+    	}
+    }
+    
     // 오늘 출근 기록 여부 확인
     public boolean hasTodayCommute(Long memNo) {
         Member member = memberRepository.findById(memNo)
@@ -52,39 +82,6 @@ public class CommuteService {
         return todayCommute.isPresent();
     }
 
-    // 출근 기록
-    public Commute startWork(Long memNo) {
-        // memNo로 Member 객체 조회
-        Member member = memberRepository.findById(memNo)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
-
-        // 오늘 해당 회원의 출근 기록이 있는지 확인
-        Optional<Commute> existingCommute = commuteRepository.findTodayCommuteByMember(member);
-
-        if (existingCommute.isPresent()) {
-            return existingCommute.get();  // 이미 출근 기록이 있으면 해당 기록을 반환
-        } else {
-            // 현재 시간 (한국 표준시)
-            LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-
-            // 주말인지 확인
-            boolean isWeekend = now.getDayOfWeek() == DayOfWeek.SATURDAY || now.getDayOfWeek() == DayOfWeek.SUNDAY;
-
-            // 지각 여부 설정: 평일 오전 9시 이후 출근 시 지각으로 처리
-            String isLate = isWeekend ? "N" : (now.getHour() >= 9 ? "Y" : "N");
-
-            // 새로운 출근 기록 생성
-            Commute commute = Commute.builder()
-                    .member(member)
-                    .commuteOnStartTime(now)
-                    .commuteFlagBlue("Y")
-                    .commuteFlagPurple("N")
-                    .isLate(isLate)
-                    .build();
-
-            return commuteRepository.save(commute);
-        }
-    }
 
     // 퇴근 기록 및 근무 시간 계산
     public Map<String, Object> endWork(Long memNo) {

@@ -4,7 +4,7 @@ let memNo;  // 로그인된 사용자 ID
 
 // 페이지 로드 시 사용자 memNo 가져오기 및 오늘 출근 기록 확인
 document.addEventListener("DOMContentLoaded", function() {
-    fetch("/api/commute/getMemNo")  // 로그인된 사용자 정보 가져오기
+    fetch("/api/commute/getMemNo")
         .then(response => {
             if (!response.ok) {
                 throw new Error("사용자 정보를 불러오는 데 실패했습니다.");

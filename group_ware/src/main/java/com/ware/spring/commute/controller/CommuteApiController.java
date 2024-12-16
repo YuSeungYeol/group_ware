@@ -32,6 +32,29 @@ public class CommuteApiController {
         this.commuteService = commuteService;
     }
     /**
+     출근 버튼
+     @param memNo 회원 번호
+     @return 출근 완료 메시지와 지각 여부
+     */
+    @PostMapping("/start")
+    public ResponseEntity<Map<String, Object>> startWork(@RequestParam("memNo") Long memNo) {
+    	try {
+    		Commute commute = commuteService.startWork(memNo);
+    		commuteService.updateTotalWorkingTime(memNo);
+    		
+    		Map<String, Object> response = Map.of(
+    				"message", "출근이 완료되었습니다.",
+    				"isLate", commute.getIsLate()
+    				);
+    		return ResponseEntity.ok(response);
+    	} catch (Exception e) {
+    		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+    				"message", "출근 처리 중 오류가 발생했습니다.",
+    				"isLate", "N"
+    				));
+    	}
+    }
+    /**
      * 오늘 출근 기록 여부를 확인
      * 
      * @param memNo 회원 번호
@@ -64,31 +87,6 @@ public class CommuteApiController {
         }
     }
 
-    /**
-     * 출근 기록을 처리.
-     * 
-     * @param memNo 회원 번호
-     * @return 출근 완료 메시지와 지각 여부
-     */
-    @PostMapping("/start")
-    public ResponseEntity<Map<String, Object>> startWork(@RequestParam("memNo") Long memNo) {
-        try {
-            Commute commute = commuteService.startWork(memNo);
-            commuteService.updateTotalWorkingTime(memNo);
-
-            Map<String, Object> response = Map.of(
-                "message", "출근이 완료되었습니다.",
-                "isLate", commute.getIsLate()
-            );
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                "message", "출근 처리 중 오류가 발생했습니다.",
-                "isLate", "N"
-            ));
-        }
-    }
 
     /**
      * 퇴근 기록을 처리하고 근무 시간을 계산.
