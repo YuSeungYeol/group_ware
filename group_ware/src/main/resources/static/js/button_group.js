@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function resetButtonsToInitialState() {
-    // 출근 버튼 활성화, 퇴근 및 외출 버튼 비활성화
     document.getElementById("btnStartWork").disabled = false;
     document.getElementById("btnEndWork").disabled = true;
     document.getElementById("btnOut").disabled = true;
@@ -70,18 +69,12 @@ function toggleDropdown(){
     document.getElementById("dropdownMenu").classList.toggle("show");
 }
 
-// 메뉴에서 상태 선택 (착석, 외출, 외근, 식사)
 function selectMenu(option) {
-    // 외출 메뉴에서 선택된 옵션을 버튼에 반영
     document.getElementById("btnOut").innerText = option;
-
     let statusUrl = "/api/commute/updateStatus?memNo=" + memNo + "&status=" + option;
-
     if (option === '착 석') {
         statusUrl = "/api/commute/updateStatus?memNo=" + memNo + "&status=seated";
     }
-
-    // 상태 업데이트 API 요청
     fetch(statusUrl, {
         method: "POST",
     })
@@ -93,7 +86,6 @@ function selectMenu(option) {
     })
     .then(data => {
         Swal.fire(option + ' 상태로 변경되었습니다.', data, 'success');
-        // UI에서 상태 변경
         if (option === '착 석') {
             document.getElementById("btnOut").classList.remove("purple");
             document.getElementById("btnOut").classList.add("blue");

@@ -53,7 +53,6 @@ public class CommuteService {
     		LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 
     		boolean isWeekend = now.getDayOfWeek() == DayOfWeek.SATURDAY || now.getDayOfWeek() == DayOfWeek.SUNDAY;
-
     		String isLate = isWeekend ? "N" : (now.getHour() >= 9 ? "Y" : "N");
 
     		Commute commute = Commute.builder()
@@ -87,10 +86,8 @@ public class CommuteService {
     public Map<String, Object> endWork(Long memNo) {
         try {
             System.out.println("endWork 시작: memNo = " + memNo);
-
             Member member = memberRepository.findById(memNo)
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다. memNo: " + memNo));
-
             Optional<Commute> commuteOpt = commuteRepository.findTodayCommuteByMember(member);
             if (commuteOpt.isPresent()) {
                 Commute commute = commuteOpt.get();
@@ -98,17 +95,14 @@ public class CommuteService {
                 commute.setCommuteOnEndTime(endTime);
                 commute.setCommuteFlagBlue("N");
                 commute.setCommuteFlagPurple("N");
-
                 LocalDateTime startTime = commute.getCommuteOnStartTime();
                 if (startTime == null) {
                     throw new IllegalStateException("출근 시간이 null입니다. memNo: " + memNo);
-                }
-                
+                }   
                 Duration duration = Duration.between(startTime, endTime);
                 long hoursWorked = duration.toHours();
                 long minutesWorked = duration.toMinutes() % 60;
                 commute.setCommuteOutTime(java.sql.Time.valueOf(String.format("%02d:%02d:00", hoursWorked, minutesWorked)));
-
                 commuteRepository.save(commute);
                 updateWeeklyWorkingTime(memNo);
                 updateTotalWorkingTime(memNo);
@@ -117,14 +111,11 @@ public class CommuteService {
                 result.put("minutesWorked", minutesWorked);
                 result.put("startTime", startTime);
                 result.put("endTime", endTime);
-
-                System.out.println("endWork 완료: memNo = " + memNo);
                 return result;
             } else {
                 throw new IllegalStateException("출근 기록이 존재하지 않습니다. memNo: " + memNo);
             }
         } catch (Exception e) {
-            System.err.println("endWork 오류 발생: memNo = " + memNo);
             e.printStackTrace(); 
             throw e; 
         }

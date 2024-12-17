@@ -24,12 +24,10 @@
             </div>
         </div>
 
-        <!-- 로그아웃 폼 추가 -->
         <form id="logoutForm" th:action="@{/logout}" method="post">
             <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
         </form>
 
-        <!-- JavaScript 추가 -->
         <script th:src="@{/js/button_group.js}"></script>
     </th:block>
 </html>
