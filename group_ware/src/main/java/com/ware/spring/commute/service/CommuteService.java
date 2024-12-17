@@ -42,16 +42,11 @@ public class CommuteService {
     public Commute startWork(Long memNo) {
     	Member member = memberRepository.findById(memNo)
     			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
-    	
-
     	Optional<Commute> existingCommute = commuteRepository.findTodayCommuteByMember(member);
-    	
     	if (existingCommute.isPresent()) {
     		return existingCommute.get(); 
     	} else {
-
     		LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-
     		boolean isWeekend = now.getDayOfWeek() == DayOfWeek.SATURDAY || now.getDayOfWeek() == DayOfWeek.SUNDAY;
     		String isLate = isWeekend ? "N" : (now.getHour() >= 9 ? "Y" : "N");
 
@@ -62,7 +57,6 @@ public class CommuteService {
     				.commuteFlagPurple("N")
     				.isLate(isLate)
     				.build();
-    		
     		return commuteRepository.save(commute);
     	}
     }
@@ -70,13 +64,10 @@ public class CommuteService {
     // 오늘 출근 기록 여부 확인
     public boolean hasTodayCommute(Long memNo) {
         Member member = memberRepository.findById(memNo)
-            .orElse(null);  // null 처리
+            .orElse(null); 
         if (member == null) {
-            // 로그로 오류 기록
-            System.out.println("존재하지 않는 회원입니다: " + memNo);
             return false;
         }
-
         Optional<Commute> todayCommute = commuteRepository.findTodayCommuteByMember(member);
         return todayCommute.isPresent();
     }
@@ -85,7 +76,6 @@ public class CommuteService {
     // 퇴근 기록 및 근무 시간 계산
     public Map<String, Object> endWork(Long memNo) {
         try {
-            System.out.println("endWork 시작: memNo = " + memNo);
             Member member = memberRepository.findById(memNo)
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다. memNo: " + memNo));
             Optional<Commute> commuteOpt = commuteRepository.findTodayCommuteByMember(member);
