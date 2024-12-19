@@ -168,7 +168,6 @@ public class CommuteService {
 
     // 퇴근 시 플래그 상태 업데이트
     public void updateEndStatus(Long memNo) {
-        // memNo로 Member 객체 조회
         Member member = memberRepository.findById(memNo)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
