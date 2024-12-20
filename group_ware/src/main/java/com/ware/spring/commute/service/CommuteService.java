@@ -259,8 +259,6 @@ public class CommuteService {
                 .getMemNo();
     }
 
-    
-
 
     public int getTotalWorkingTime(Long memNo, int year) {
         YearMonth startOfYear = YearMonth.of(year, 1);
