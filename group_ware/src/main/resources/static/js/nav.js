@@ -328,5 +328,32 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+document.getElementById("statusButton").addEventListener("click", function () {
+    const year = new Date().getFullYear(); // 현재 연도를 기본 값으로 사용
 
+    fetch(`/commute/status_single?year=${year}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.text();
+        })
+        .then((html) => {
+            // 새로운 HTML 내용을 현재 페이지에 표시
+            const statusContainer = document.getElementById("statusContainer");
+            if (statusContainer) {
+                statusContainer.innerHTML = html;
+            } else {
+                console.error("Status container not found.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error fetching commute status:", error);
+        });
+});
 

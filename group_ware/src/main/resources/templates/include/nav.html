@@ -81,7 +81,6 @@
                     <button class="accordion-btn">직원관리</button>
                     <div class="accordion-content">
                         <a th:href="@{/commute/list}">근태조회</a>
-                        <!-- 회원등록 링크는 ROLE_차장 이상만 볼 수 있도록 제한 -->
                         <a th:href="@{/member/register}">회원등록</a>
                         <a th:href="@{/member/list}">회원수정</a>
                     </div>
@@ -120,7 +119,7 @@
 
             <div id="organizationModal" class="modal1">
                 <span class="close">&times;</span>
-                <div id="organizationTree"></div> <!-- jstree 적용할 div -->
+                <div id="organizationTree"></div> 
             </div>
             <div id="profileModal" class="modal">
                 <div class="modal-content"></div>
@@ -144,6 +143,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
         <script th:src="@{/js/nav.js}"></script>
+        
         <script>
         document.addEventListener("DOMContentLoaded", function() {
             fetch(`/nav?timestamp=${new Date().getTime()}`)
