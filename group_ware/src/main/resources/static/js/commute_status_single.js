@@ -76,7 +76,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 차트를 그리는 함수
     function renderCharts(monthlyWorkingTime, monthlyLateCount, totalWorkingTime, totalLateCount) {
-        // 기존 차트 삭제 (재랜더링 방지)
         if (window.monthlyWorkingTimeChart && typeof window.monthlyWorkingTimeChart.destroy === 'function') {
             window.monthlyWorkingTimeChart.destroy();
         }
@@ -116,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         beginAtZero: true,
                         type: 'linear',
                         position: 'left',
-                        max: 500, // Y축의 최대값을 500시간으로 설정
+                        max: 500, 
                         title: {
                             display: true,
                             text: '근무 시간 (시간)'
@@ -126,13 +125,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         beginAtZero: true,
                         type: 'linear',
                         position: 'right',
-                        max: 20, // 지각 횟수 최대값 설정
+                        max: 20, 
                         title: {
                             display: true,
                             text: '지각 횟수 (회)'
                         },
                         grid: {
-                            drawOnChartArea: false // 이중 y축의 그리드 숨김
+                            drawOnChartArea: false 
                         }
                     }
                 },

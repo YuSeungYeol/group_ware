@@ -149,7 +149,6 @@ public class CommuteService {
     public void updateStatus(Long memNo, String status) {
         Member member = memberRepository.findById(memNo)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
-
         Optional<Commute> commuteOpt = commuteRepository.findTodayCommuteByMember(member);
         if (commuteOpt.isPresent()) {
             Commute commute = commuteOpt.get();
@@ -165,12 +164,10 @@ public class CommuteService {
             throw new IllegalStateException("출근 기록이 존재하지 않습니다.");
         }
     }
-
     // 퇴근 시 플래그 상태 업데이트
     public void updateEndStatus(Long memNo) {
         Member member = memberRepository.findById(memNo)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
-
         Optional<Commute> commuteOpt = commuteRepository.findTodayCommuteByMember(member);
         if (commuteOpt.isPresent()) {
             Commute commute = commuteOpt.get();
