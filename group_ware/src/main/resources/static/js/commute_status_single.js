@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
         window.history.pushState({ path: newURL }, '', newURL);
     }
 
-    // 차트를 그리는 함수
+    // 막대 그래프
     function renderCharts(monthlyWorkingTime, monthlyLateCount, totalWorkingTime, totalLateCount) {
         if (window.monthlyWorkingTimeChart && typeof window.monthlyWorkingTimeChart.destroy === 'function') {
             window.monthlyWorkingTimeChart.destroy();
@@ -82,8 +82,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (window.totalSummaryChart && typeof window.totalSummaryChart.destroy === 'function') {
             window.totalSummaryChart.destroy();
         }
-
-        // 월별 근무 시간 및 지각 횟수 차트 생성 (막대 그래프)
         const ctx = document.getElementById('monthlyWorkingTimeChart').getContext('2d');
         window.monthlyWorkingTimeChart = new Chart(ctx, {
             type: 'bar',
