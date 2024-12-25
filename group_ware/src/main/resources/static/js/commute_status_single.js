@@ -67,13 +67,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error('Error fetching yearly data:', error);
             });
     }
-
     // URL을 연도에 맞게 업데이트하는 함수
     function updateURL(year) {
         const newURL = `${window.location.pathname}?year=${year}`;
         window.history.pushState({ path: newURL }, '', newURL);
     }
-
+	
     // 막대 그래프
     function renderCharts(monthlyWorkingTime, monthlyLateCount, totalWorkingTime, totalLateCount) {
         if (window.monthlyWorkingTimeChart && typeof window.monthlyWorkingTimeChart.destroy === 'function') {
