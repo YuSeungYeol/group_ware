@@ -50,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const monthlyLateCount = data.monthlyLateCount || {};
                 const totalWorkingTime = data.totalWorkingTime || 0;
                 const totalLateCount = data.totalLateCount || 0;
-
                 // 12개월 데이터를 항상 가져오기 위한 기본값 설정
                 const completeMonthlyWorkingTime = Array.from({ length: 12 }, (_, i) => {
                     const monthData = monthlyWorkingTime[i + 1] || { hours: 0, minutes: 0 };
