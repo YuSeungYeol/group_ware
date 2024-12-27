@@ -45,21 +45,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 return response.json();
             })
             .then(data => {
-                // 서버 응답에서 null 또는 undefined인 경우 기본값 설정
                 const monthlyWorkingTime = data.monthlyWorkingTime || {};
                 const monthlyLateCount = data.monthlyLateCount || {};
                 const totalWorkingTime = data.totalWorkingTime || 0;
                 const totalLateCount = data.totalLateCount || 0;
-                // 12개월 데이터를 항상 가져오기 위한 기본값 설정
                 const completeMonthlyWorkingTime = Array.from({ length: 12 }, (_, i) => {
                     const monthData = monthlyWorkingTime[i + 1] || { hours: 0, minutes: 0 };
-                    return monthData.hours + (monthData.minutes / 60); // 시간 단위로 변환
+                    return monthData.hours + (monthData.minutes / 60); 
                 });
-
                 const completeMonthlyLateCount = Array.from({ length: 12 }, (_, i) => {
                     return monthlyLateCount[i + 1] || 0;
                 });
-
                 renderCharts(completeMonthlyWorkingTime, completeMonthlyLateCount, totalWorkingTime, totalLateCount);
             })
             .catch(error => {
@@ -71,7 +67,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const newURL = `${window.location.pathname}?year=${year}`;
         window.history.pushState({ path: newURL }, '', newURL);
     }
-	
     // 막대 그래프
     function renderCharts(monthlyWorkingTime, monthlyLateCount, totalWorkingTime, totalLateCount) {
         if (window.monthlyWorkingTimeChart && typeof window.monthlyWorkingTimeChart.destroy === 'function') {
