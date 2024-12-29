@@ -148,7 +148,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         });
-
         // 누적 근무 시간 및 총 지각 횟수 원형 차트 생성
         const ctxSummary = document.getElementById('totalSummaryChart').getContext('2d');
         window.totalSummaryChart = new Chart(ctxSummary, {
