@@ -330,7 +330,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 document.getElementById("statusButton").addEventListener("click", function () {
     const year = new Date().getFullYear(); // 현재 연도를 기본 값으로 사용
-
     fetch(`/commute/status_single?year=${year}`, {
         method: "GET",
         headers: {
