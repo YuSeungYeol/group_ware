@@ -188,7 +188,6 @@ public class CommuteService {
         }
     }
     
-    
     public void updateTotalWorkingTime(Long memNo) {
         List<WeeklyWorkingTime> weeklyWorkingTimes = weeklyWorkingTimeRepository.findByMemNo(memNo);
         
