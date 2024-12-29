@@ -187,8 +187,9 @@ public class CommuteService {
             return "0시간 0분";
         }
     }
+    
+    
     public void updateTotalWorkingTime(Long memNo) {
-        // 특정 멤버의 주간 근무 시간을 전부 조회
         List<WeeklyWorkingTime> weeklyWorkingTimes = weeklyWorkingTimeRepository.findByMemNo(memNo);
         
         int totalHours = 0;
