@@ -82,7 +82,6 @@ public class CommuteViewController {
             model.addAttribute("totalWorkingTime", 0);
             model.addAttribute("totalLateCount", 0);
         }
-
         return "/commute/commute_status_single";
     }
 
