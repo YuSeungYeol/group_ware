@@ -29,7 +29,6 @@ public interface WeeklyWorkingTimeRepository extends JpaRepository<WeeklyWorking
     // 특정 월에 속한 주간 근무 데이터를 가져오는 (월별 계산 시 사용)
     @Query("SELECT w FROM WeeklyWorkingTime w WHERE w.memNo = :memNo AND MONTH(w.startOfWeek) = :month AND YEAR(w.startOfWeek) = :year")
     List<WeeklyWorkingTime> findByMemNoAndMonth(@Param("memNo") Long memNo, @Param("month") int month, @Param("year") int year);
-
     // 특정 직원의 특정 주간 범위 내의 근무 시간 기록을 가져오기
     @Query("SELECT w FROM WeeklyWorkingTime w WHERE w.memNo = :memNo AND w.startOfWeek >= :startOfWeek AND w.endOfWeek <= :endOfWeek")
     Optional<WeeklyWorkingTime> findWeeklyByMemNoAndWeekRange(@Param("memNo") Long memNo,

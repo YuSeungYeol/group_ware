@@ -86,7 +86,6 @@ public class VehicleApiController {
     public List<VehicleDistributorSalesDto> getTopDistributorsBySales(@RequestParam("year") int year, @RequestParam("month") int month) {
         return vehicleService.getTop5DistributorsBySales(year, month);
     }
-
     /**
      * 상위 5개 차량 판매 데이터를 조회합니다.
      * 설명: 주어진 연도와 월에 대한 상위 5개 차량의 판매량 및 매출액을 반환합니다.

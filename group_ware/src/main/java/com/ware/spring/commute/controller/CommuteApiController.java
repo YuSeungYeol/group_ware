@@ -72,7 +72,6 @@ public class CommuteApiController {
 
     /**
      * 현재 로그인된 사용자의 회원 번호를 반환.
-     * 
      * @return 회원 번호 (memNo)
      */
     @GetMapping("/getMemNo")
