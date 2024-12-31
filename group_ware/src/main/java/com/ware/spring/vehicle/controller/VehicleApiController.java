@@ -74,7 +74,6 @@ public class VehicleApiController {
     public Map<String, Integer> getMonthlySalesData(@RequestParam("year") int year, @RequestParam("month") int month, @RequestParam("memNo") Long memNo) {
         return vehicleService.getMonthlyIndividualSalesData(year, month, memNo);
     }
-
     /**
      * 상위 5개 부서별 판매 데이터를 조회합니다.
      * 설명: 주어진 연도와 월에 대한 상위 5개 부서의 판매량 및 매출액을 반환합니다.

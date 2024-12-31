@@ -329,7 +329,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 document.getElementById("statusButton").addEventListener("click", function () {
-    const year = new Date().getFullYear(); // 현재 연도를 기본 값으로 사용
+    const year = new Date().getFullYear(); 
     fetch(`/commute/status_single?year=${year}`, {
         method: "GET",
         headers: {
@@ -343,7 +343,6 @@ document.getElementById("statusButton").addEventListener("click", function () {
             return response.text();
         })
         .then((html) => {
-            // 새로운 HTML 내용을 현재 페이지에 표시
             const statusContainer = document.getElementById("statusContainer");
             if (statusContainer) {
                 statusContainer.innerHTML = html;
