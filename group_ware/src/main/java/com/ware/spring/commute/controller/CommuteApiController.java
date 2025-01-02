@@ -56,7 +56,6 @@ public class CommuteApiController {
     }
     /**
      * 오늘 출근 기록 여부를 확인
-     * 
      * @param memNo 회원 번호
      * @return 출근 기록이 있는 경우 true, 그렇지 않은 경우 false
      */
@@ -71,7 +70,7 @@ public class CommuteApiController {
     }
 
     /**
-     * 현재 로그인된 사용자의 회원 번호를 반환.
+     * 현재 로그인된 사용자의 회원 번호를 반환.		
      * @return 회원 번호 (memNo)
      */
     @GetMapping("/getMemNo")
