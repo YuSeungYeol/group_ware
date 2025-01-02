@@ -34,7 +34,6 @@ public interface WeeklyWorkingTimeRepository extends JpaRepository<WeeklyWorking
     Optional<WeeklyWorkingTime> findWeeklyByMemNoAndWeekRange(@Param("memNo") Long memNo,
                                                               @Param("startOfWeek") LocalDate startOfWeek,
                                                               @Param("endOfWeek") LocalDate endOfWeek);
-
     // 특정 월 또는 연간 범위의 모든 주간 데이터를 조회
     @Query("SELECT w FROM WeeklyWorkingTime w WHERE w.memNo = :memNo AND w.startOfWeek >= :startOfMonth AND w.endOfWeek <= :endOfMonth")
     List<WeeklyWorkingTime> findMonthlyByMemNoAndMonthRange(@Param("memNo") Long memNo,
