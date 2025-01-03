@@ -55,7 +55,6 @@ public class MemberApiController {
         this.memberService = memberService;
         this.passwordEncoder = passwordEncoder;
     }
-
     /**
      * 회원 등록을 처리합니다.
      * 설명: 회원 정보와 프로필 이미지를 받아 회원을 등록하고 이미지를 저장합니다.
